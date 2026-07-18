@@ -1,7 +1,3 @@
-import { GoogleGenAI } from '@google/genai';
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export async function POST(req) {
   try {
     const data = await req.json();
@@ -10,11 +6,14 @@ export async function POST(req) {
     if (!process.env.GEMINI_API_KEY) {
       return new Response(
         JSON.stringify({ 
-          insight: '⚠️ **Configuration Required**: Gemini API key is missing. Please add `GEMINI_API_KEY=your_key` to your `.env.local` file.\n\n*This is a mock insight. Based on your input, try to get more rest and stay hydrated.*' 
+          insight: '<p><b>👋 Welcome to your Daily Insight!</b></p><p>Based on your check-in today, here are some general tips:</p><ul><li>Stay hydrated — aim for 8 glasses of water</li><li>Take short breaks every 90 minutes if working</li><li>A 10-minute walk can boost both mood and energy</li></ul><p><i>Note: Connect the Gemini AI key for personalized insights.</i></p>' 
         }), 
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
     const prompt = `You are an empathetic Health AI assistant for the Fitmadix app. The user just completed their daily health check-in.
 Here is their data for today:
@@ -42,8 +41,10 @@ Format the response using basic HTML tags (<b>, <ul>, <li>, <br>, <p>). Do not u
 
   } catch (error) {
     console.error('Gemini API Error:', error);
-    return new Response(JSON.stringify({ error: 'Failed to generate insight', details: error.message }), {
-      status: 500,
+    return new Response(JSON.stringify({ 
+      insight: '<p>We couldn\'t generate a personalized insight right now. Please try again later.</p>' 
+    }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   }

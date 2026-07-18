@@ -15,6 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://fitmadix-app.vercel.app'),
   title: 'Fitmadix - Enterprise Medical Health Platform',
   description: 'A comprehensive, clinical-grade medical application featuring AI guidance, chronotherapy, and personalized health tracking.',
   openGraph: {

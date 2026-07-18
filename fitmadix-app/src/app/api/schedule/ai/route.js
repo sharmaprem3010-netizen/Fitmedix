@@ -2,22 +2,22 @@ import dbConnect from '@/lib/db';
 import Schedule from '@/models/Schedule';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
-import { GoogleGenAI } from '@google/genai';
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req) {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      return new Response(JSON.stringify({ error: 'AI features require a Gemini API key. Please configure GEMINI_API_KEY in your environment variables.' }), { status: 503 });
+    }
+
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
     await dbConnect();
     const data = await req.json();
     const { date } = data;
 
     if (!date) {
       return new Response(JSON.stringify({ error: 'Date is required' }), { status: 400 });
-    }
-
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error("Missing GEMINI_API_KEY");
     }
 
     const session = await getServerSession(authOptions);
@@ -48,11 +48,16 @@ Example format:
     let generatedSchedule;
     try {
       const textResponse = aiResponse.text;
-      const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
+      // Try parsing the full response first
       generatedSchedule = JSON.parse(textResponse);
+      // If it parsed as an object with an array inside, extract the array
+      if (!Array.isArray(generatedSchedule)) {
+        const values = Object.values(generatedSchedule);
+        generatedSchedule = values.find(v => Array.isArray(v)) || [];
+      }
     } catch (err) {
-      console.error("AI parse error:", err);
-      return new Response(JSON.stringify({ error: 'Failed to parse AI response' }), { status: 500 });
+      console.error("AI parse error:", err, "Raw text:", aiResponse.text);
+      return new Response(JSON.stringify({ error: 'Failed to parse AI response. Please try again.' }), { status: 500 });
     }
 
     // Save generated schedule to DB

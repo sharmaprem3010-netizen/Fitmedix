@@ -1,9 +1,3 @@
-import { GoogleGenAI } from '@google/genai';
-
-// Initialize the Google GenAI SDK.
-// It will automatically use the GEMINI_API_KEY environment variable.
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export async function POST(req) {
   try {
     const { message } = await req.json();
@@ -19,7 +13,7 @@ export async function POST(req) {
     if (!process.env.GEMINI_API_KEY) {
       return new Response(
         JSON.stringify({ 
-          reply: '⚠️ **Configuration Required**: Gemini API key is missing. Please add `GEMINI_API_KEY=your_key` to your `.env.local` file.\n\n*This is a mock response because the API key is not set up yet.*' 
+          reply: '👋 **Welcome to the Fitmadix AI Health Guide!**\n\nI\'m currently running in demo mode. Here are some general health tips:\n\n- **Stay Hydrated**: Drink at least 8 glasses of water daily\n- **Move More**: Aim for 30 minutes of activity each day\n- **Sleep Well**: Target 7-9 hours of quality sleep\n- **Eat Balanced**: Include fruits, vegetables, and whole grains\n\n*For personalized AI responses, the administrator needs to configure the Gemini API key.*\n\n⚠️ *I am an AI assistant, not a doctor. Always consult a healthcare professional for medical advice.*' 
         }), 
         {
           status: 200,
@@ -27,6 +21,9 @@ export async function POST(req) {
         }
       );
     }
+
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
     // Call the Gemini model
     const response = await ai.models.generateContent({
@@ -51,8 +48,10 @@ export async function POST(req) {
 
   } catch (error) {
     console.error('Gemini API Error:', error);
-    return new Response(JSON.stringify({ error: 'Failed to process request', details: error.message }), {
-      status: 500,
+    return new Response(JSON.stringify({ 
+      reply: 'Sorry, I encountered an issue processing your request. Please try again in a moment.' 
+    }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   }

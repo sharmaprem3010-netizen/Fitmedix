@@ -58,6 +58,7 @@ export default function SchedulePage() {
   };
 
   useEffect(() => {
+    if (!formattedSelectedDate) return;
     const timer = setTimeout(() => {
       fetchSchedules(formattedSelectedDate);
     }, 0);

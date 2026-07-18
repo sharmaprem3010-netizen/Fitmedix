@@ -116,7 +116,7 @@ export default function AIGuidePage() {
             placeholder="Type your health question..." 
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             disabled={isLoading}
           />
           <button className="chat-send" onClick={handleSend} disabled={isLoading || !input.trim()}>
