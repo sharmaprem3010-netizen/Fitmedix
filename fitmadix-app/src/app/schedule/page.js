@@ -7,7 +7,10 @@ import AppSidebar from '@/components/AppSidebar';
 
 export default function SchedulePage() {
   const { data: session } = useSession();
-  const [selectedDateObj, setSelectedDateObj] = useState(new Date());
+  const [selectedDateObj, setSelectedDateObj] = useState(null);
+  const [days, setDays] = useState([]);
+  const [todayString, setTodayString] = useState('');
+  
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -20,20 +23,25 @@ export default function SchedulePage() {
   const [newType, setNewType] = useState('');
   const [newIcon, setNewIcon] = useState('📅');
 
-  const formattedSelectedDate = selectedDateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+  useEffect(() => {
+    const today = new Date();
+    setSelectedDateObj(today);
+    setTodayString(today.toISOString().split('T')[0]);
 
-  // Generate next 7 days
-  const today = new Date();
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    return {
-      date: d.getDate(),
-      weekday: d.toLocaleDateString('en', { weekday: 'short' }),
-      fullDate: d,
-      formatted: d.toISOString().split('T')[0]
-    };
-  });
+    const generatedDays = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      return {
+        date: d.getDate(),
+        weekday: d.toLocaleDateString('en', { weekday: 'short' }),
+        fullDate: d,
+        formatted: d.toISOString().split('T')[0]
+      };
+    });
+    setDays(generatedDays);
+  }, []);
+
+  const formattedSelectedDate = selectedDateObj ? selectedDateObj.toISOString().split('T')[0] : '';
 
   const fetchSchedules = async (dateStr) => {
     setLoading(true);
@@ -61,6 +69,24 @@ export default function SchedulePage() {
     e.preventDefault();
     if (!newTitle || !newTime || !newType) return;
     
+    // 1. Create the new appointment object matching schema
+    const newAppointment = {
+      _id: Date.now().toString(),
+      date: formattedSelectedDate,
+      time: newTime,
+      title: newTitle,
+      type: newType,
+      icon: newIcon || '📅'
+    };
+
+    // 2. Optimistically update the UI immediately
+    setAppointments((prev) => [...prev, newAppointment]);
+    
+    // 3. Close the modal and reset form state
+    setShowAddModal(false);
+    setNewTitle('');
+    setNewType('');
+    
     try {
       const res = await fetch('/api/schedule', {
         method: 'POST',
@@ -70,17 +96,20 @@ export default function SchedulePage() {
           time: newTime,
           title: newTitle,
           type: newType,
-          icon: newIcon
+          icon: newIcon || '📅'
         })
       });
       if (res.ok) {
-        setShowAddModal(false);
-        setNewTitle('');
-        setNewType('');
+        // Fetch again to ensure sync with real DB _ids if needed
         fetchSchedules(formattedSelectedDate);
+      } else {
+        throw new Error('Failed to save to database');
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error saving schedule:", err);
+      // Revert the optimistic update if API call fails
+      setAppointments((prev) => prev.filter((a) => a._id !== newAppointment._id));
+      alert("Failed to save appointment. Please try again.");
     }
   };
 
@@ -155,7 +184,7 @@ export default function SchedulePage() {
       <div className="sub-body" style={{ padding: '0 20px' }}>
         <div className="section-header" style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="section-title" style={{ fontWeight: 800, color: '#1A1A2E', fontSize: '1.1rem' }}>
-            {formattedSelectedDate === today.toISOString().split('T')[0] ? "Today's Schedule" : `Schedule for ${selectedDateObj.getDate()}`}
+            {formattedSelectedDate === todayString ? "Today's Schedule" : `Schedule for ${selectedDateObj?.getDate()}`}
           </div>
           <button 
             onClick={() => setShowAddModal(true)}

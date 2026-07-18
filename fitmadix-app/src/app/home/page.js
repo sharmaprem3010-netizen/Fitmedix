@@ -68,9 +68,11 @@ export default function HomePage() {
 
   const displayedActivities = showAllActivities ? activities : activities.slice(0, 3);
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
-
+  const [greeting, setGreeting] = useState('Welcome');
+  useEffect(() => {
+    const hour = new Date().getHours();
+    setGreeting(hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening');
+  }, []);
   const features = [
     { name: t('Medicine'), icon: '💊', color: 'teal', link: '/medicine' },
     { name: t('Diseases'), icon: '🦠', color: 'red', link: '/diseases' },

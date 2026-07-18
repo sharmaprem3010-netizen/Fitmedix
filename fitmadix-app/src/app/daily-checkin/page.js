@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -13,6 +13,13 @@ export default function DailyCheckinPage() {
 
   const userName = session?.user?.name || t('Guest User');
   const userInitial = userName.charAt(0).toUpperCase();
+
+  const [greeting, setGreeting] = useState('Welcome');
+  
+  useEffect(() => {
+    const hour = new Date().getHours();
+    setGreeting(hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening');
+  }, []);
 
   const [step, setStep] = useState(1);
   const [showSheet, setShowSheet] = useState(true);
@@ -51,9 +58,13 @@ export default function DailyCheckinPage() {
     }
   };
 
-  const handleNext = () => {
-    if (step < 3) setStep(step + 1);
-    else saveAndFinish();
+  const handleNext = (e) => {
+    if (e) e.preventDefault();
+    setStep((prevStep) => {
+      if (prevStep < 3) return prevStep + 1;
+      saveAndFinish();
+      return prevStep;
+    });
   };
 
   const saveAndFinish = async () => {
@@ -109,7 +120,7 @@ export default function DailyCheckinPage() {
               </div>
               <div>
                 <p style={{ margin: 0, fontWeight: 700, fontSize: '1.1rem' }}>{userName}</p>
-                <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>{t(new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening')}</span>
+                <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>{t(greeting)}</span>
               </div>
             </Link>
             <div style={{ display: 'flex', gap: '12px' }}>
@@ -172,7 +183,7 @@ export default function DailyCheckinPage() {
                   ))}
                 </div>
                 
-                <button onClick={handleNext} style={{ width: '100%', padding: '16px', background: '#10B981', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)' }}>
+                <button type="button" onClick={handleNext} style={{ width: '100%', padding: '16px', background: '#10B981', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)' }}>
                   {t('Next')} →
                 </button>
               </div>
@@ -200,7 +211,7 @@ export default function DailyCheckinPage() {
                   ))}
                 </div>
                 
-                <button onClick={handleNext} style={{ width: '100%', padding: '16px', background: '#10B981', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)' }}>
+                <button type="button" onClick={handleNext} style={{ width: '100%', padding: '16px', background: '#10B981', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)' }}>
                   {t('Next')} →
                 </button>
                 <div onClick={handleNext} style={{ textAlign: 'center', marginTop: '16px', color: '#6B7280', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>{t('No symptoms today')}</div>
@@ -248,7 +259,7 @@ export default function DailyCheckinPage() {
                   </div>
                 )}
                 
-                <button onClick={handleNext} style={{ width: '100%', padding: '16px', background: '#10B981', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)' }}>
+                <button type="button" onClick={handleNext} style={{ width: '100%', padding: '16px', background: '#10B981', color: 'white', border: 'none', borderRadius: '16px', fontWeight: 800, fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)' }}>
                   {t('Finish')} →
                 </button>
               </div>
