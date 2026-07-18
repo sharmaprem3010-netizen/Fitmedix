@@ -31,7 +31,7 @@ Based on this, please provide a short, supportive response (about 3-4 sentences 
 Format the response using basic HTML tags (<b>, <ul>, <li>, <br>, <p>). Do not use Markdown. Keep it encouraging but professional.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
     });
 

@@ -38,7 +38,7 @@ Do not wrap the JSON in markdown code blocks. Just output raw JSON.
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         systemInstruction: systemPrompt,
