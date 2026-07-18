@@ -65,7 +65,7 @@ Note: "status" MUST be one of: "normal", "high", or "low".
       ],
     });
 
-    const outputText = response.text().trim();
+    const outputText = response.text.trim();
     const cleanedOutput = outputText.replace(/^```json\n?/, '').replace(/\n?```$/, '');
     const parsedData = JSON.parse(cleanedOutput);
 

@@ -35,7 +35,7 @@ Format the response using basic HTML tags (<b>, <ul>, <li>, <br>, <p>). Do not u
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
     });
 
-    return new Response(JSON.stringify({ insight: response.text() }), {
+    return new Response(JSON.stringify({ insight: response.text }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

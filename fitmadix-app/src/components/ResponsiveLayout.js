@@ -97,42 +97,8 @@ export default function ResponsiveLayout({ children }) {
   // New Features States
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSOSModal, setShowSOSModal] = useState(false);
-  // Keep initial render deterministic to avoid hydration mismatch.
-  // Start with false on both server and client, then read persisted preference after mount.
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [showStreakPopover, setShowStreakPopover] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
-
-  // After mount, read localStorage once and update theme. This avoids SSR/CSR mismatch.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const stored = localStorage.getItem('fitmadix_theme');
-      if (stored === 'dark') {
-        setTimeout(() => setIsDarkTheme(true), 0);
-      } else if (stored === 'light') {
-        setTimeout(() => setIsDarkTheme(false), 0);
-      } else {
-        // Fallback to system preference (Edge/Windows setting)
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (prefersDark) {
-          setTimeout(() => setIsDarkTheme(true), 0);
-        }
-      }
-      
-      // Listen for system theme changes live!
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = (e) => {
-        if (!localStorage.getItem('fitmadix_theme')) {
-          setIsDarkTheme(e.matches);
-        }
-      };
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    } catch (e) {
-      // ignore localStorage errors
-    }
-  }, []);
 
   // Use shared Bluetooth context
   const bt = useBluetooth();
@@ -142,19 +108,6 @@ export default function ResponsiveLayout({ children }) {
     height: '55px',
     objectFit: 'contain',
     borderRadius: '12px'
-  };
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    document.body.classList.toggle('dark-theme', isDarkTheme);
-  }, [isDarkTheme]);
-
-  const toggleTheme = () => {
-    setIsDarkTheme(prev => {
-      const nextTheme = !prev;
-      localStorage.setItem('fitmadix_theme', nextTheme ? 'dark' : 'light');
-      return nextTheme;
-    });
   };
 
   const handleSyncClick = () => {
@@ -355,18 +308,6 @@ export default function ResponsiveLayout({ children }) {
               background: '#EFF6FF', padding: '6px', borderRadius: '50%', border: '1px solid #BFDBFE'
             }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: isSyncing ? 0.5 : 1 }}><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
-            </div>
-
-            {/* Theme Toggle */}
-            <div onClick={toggleTheme} className="clinik-hide-mobile" style={{ 
-              cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center',
-              background: 'var(--bg-glass)', padding: '6px', borderRadius: '50%'
-            }}>
-              {isDarkTheme ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-              )}
             </div>
 
             <div className="clinik-hide-mobile" style={{ width: '1px', height: '24px', background: '#E5E9F2', margin: '0 4px' }}></div>

@@ -47,7 +47,8 @@ Example format:
 
     let generatedSchedule;
     try {
-      const textResponse = aiResponse.text();
+      const textResponse = aiResponse.text;
+      const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
       generatedSchedule = JSON.parse(textResponse);
     } catch (err) {
       console.error("AI parse error:", err);

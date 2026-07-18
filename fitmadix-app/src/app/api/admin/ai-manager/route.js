@@ -46,7 +46,7 @@ Do not wrap the JSON in markdown code blocks. Just output raw JSON.
       }
     });
 
-    let rawText = response.text();
+    let rawText = response.text;
     // Clean up potential markdown formatting
     if (rawText.startsWith('```json')) {
       rawText = rawText.replace(/```json\n?/, '').replace(/```\n?$/, '');

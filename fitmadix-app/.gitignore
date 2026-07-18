@@ -42,3 +42,5 @@ next-env.d.ts
 
 # Secure Storage for sensitive credentials
 /secure_vault/
+
+.vercel

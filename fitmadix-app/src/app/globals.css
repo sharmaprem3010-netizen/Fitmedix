@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@layer base {
+
 /* ============================================
    FITMADIX — Global Design System
    "Your Health, Our Priority"
    ============================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 /* ---------- CSS Variables ---------- */
 :root {
@@ -1641,7 +1644,9 @@ body.dark-theme .sage-divider::after {
 }
 
 body.dark-theme .sage-doctor-img {
-  filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+  filter: drop-shadow(0 0 15px rgba(32, 138, 239, 0.3));
+  border: 3px solid rgba(32, 138, 239, 0.3);
+  box-shadow: 0 0 20px rgba(32, 138, 239, 0.15);
 }
 
 body.dark-theme .clinik-header-actions > button,
@@ -3060,6 +3065,11 @@ body.dark-theme .timer-btn.play {
   height: auto;
   z-index: 10;
   pointer-events: none;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  aspect-ratio: 1;
+  background: transparent;
 }
 
 .sage-auth-container {
@@ -3222,4 +3232,6 @@ body.dark-theme .timer-btn.play {
 .sage-btn-social svg {
   width: 20px;
   height: 20px;
+}
+
 }

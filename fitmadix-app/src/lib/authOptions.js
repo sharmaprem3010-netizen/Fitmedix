@@ -1,5 +1,10 @@
 import GoogleProvider from "next-auth/providers/google";
 
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import dbConnect from "@/lib/db";
+import User from "@/models/User";
+
 function requireEnv(name) {
   const value = process.env[name];
   if (!value) {
@@ -10,6 +15,32 @@ function requireEnv(name) {
 
 export const authOptions = {
   providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Invalid credentials");
+        }
+        await dbConnect();
+        const user = await User.findOne({ email: credentials.email }).lean();
+        if (!user || !user.password) {
+          throw new Error("User not found or missing password");
+        }
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+        if (!isValid) {
+          throw new Error("Incorrect password");
+        }
+        return {
+          id: user._id.toString(),
+          name: `${user.firstName} ${user.lastName}`.trim(),
+          email: user.email,
+        };
+      }
+    }),
     GoogleProvider({
       clientId: requireEnv('GOOGLE_CLIENT_ID'),
       clientSecret: requireEnv('GOOGLE_CLIENT_SECRET'),
