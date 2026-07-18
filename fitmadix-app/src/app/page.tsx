@@ -90,7 +90,7 @@ export default function LandingPage() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
           </Link>
           <Link href="/login" className="flex items-center justify-center gap-2 bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-full text-base font-medium hover:bg-gray-50 transition-all shadow-sm w-full sm:w-auto">
-            Request Clinical Demo
+            Log in
           </Link>
         </div>
 
