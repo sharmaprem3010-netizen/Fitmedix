@@ -364,7 +364,7 @@ function Safety() {
           </p>
           <p>
             <span className="text-foreground">Always seek the advice of a qualified healthcare
-            provider</span> with any questions you may have regarding a medical condition. Never
+              provider</span> with any questions you may have regarding a medical condition. Never
             disregard professional medical advice or delay seeking it because of something you read
             here.
           </p>
