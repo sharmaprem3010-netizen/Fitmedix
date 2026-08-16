@@ -1,9 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getFoods } from "@/services/api";
-import { AudioGuide } from "@/components/AudioGuide";
-import { IconNav } from "@/components/IconNav";
-import { VideoTutorials } from "@/components/VideoTutorials";
 
 export const Route = createFileRoute("/food")({
   component: FoodPage,
@@ -18,9 +15,6 @@ function FoodPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 p-8">
       <h1 className="text-4xl font-bold text-center mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>Food Encyclopedia</h1>
-      <AudioGuide items={data ?? []} type="food" />
-      <IconNav />
-      <VideoTutorials videoSrc="/videos/food_tutorial.mp4" />
       {isLoading && <p className="text-center">Loading...</p>}
       {error && <p className="text-center text-red-500">Failed to load data.</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">

@@ -1,7 +1,7 @@
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 // Generic type for a record
-export type Record = Record<string, any>;
+export type DataRecord = Record<string, any>;
 
 // ---------- Food ----------
 export async function getFoods() {
@@ -16,13 +16,13 @@ export async function getFoodById(id: number) {
   return data;
 }
 
-export async function createFood(payload: Record) {
+export async function createFood(payload: DataRecord) {
   const { data, error } = await supabase.from('foods').insert([payload]);
   if (error) throw error;
   return data;
 }
 
-export async function updateFood(id: number, payload: Record) {
+export async function updateFood(id: number, payload: DataRecord) {
   const { data, error } = await supabase.from('foods').update(payload).eq('id', id);
   if (error) throw error;
   return data;
@@ -47,13 +47,13 @@ export async function getMedicineById(id: number) {
   return data;
 }
 
-export async function createMedicine(payload: Record) {
+export async function createMedicine(payload: DataRecord) {
   const { data, error } = await supabase.from('medicines').insert([payload]);
   if (error) throw error;
   return data;
 }
 
-export async function updateMedicine(id: number, payload: Record) {
+export async function updateMedicine(id: number, payload: DataRecord) {
   const { data, error } = await supabase.from('medicines').update(payload).eq('id', id);
   if (error) throw error;
   return data;
@@ -78,13 +78,13 @@ export async function getDiseaseById(id: number) {
   return data;
 }
 
-export async function createDisease(payload: Record) {
+export async function createDisease(payload: DataRecord) {
   const { data, error } = await supabase.from('diseases').insert([payload]);
   if (error) throw error;
   return data;
 }
 
-export async function updateDisease(id: number, payload: Record) {
+export async function updateDisease(id: number, payload: DataRecord) {
   const { data, error } = await supabase.from('diseases').update(payload).eq('id', id);
   if (error) throw error;
   return data;
