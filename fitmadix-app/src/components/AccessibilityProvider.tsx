@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 
-type Language = "en-IN" | "hi-IN" | "bn-IN";
+type Language = "en-IN" | "hi-IN" | "bn-IN" | "te-IN" | "mr-IN" | "ta-IN" | "ur-IN" | "gu-IN" | "kn-IN" | "ml-IN" | "pa-IN" | "or-IN";
 type FontSize = "normal" | "large" | "x-large";
 
 interface AccessibilityContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  languageCode: "en" | "hi" | "bn";
+  languageCode: string;
   languageLabel: string;
   fontSize: FontSize;
   setFontSize: (size: FontSize) => void;
@@ -18,10 +18,19 @@ interface AccessibilityContextType {
 
 const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
 
-const LANG_MAP: Record<Language, { code: "en" | "hi" | "bn"; label: string; flag: string }> = {
+const LANG_MAP: Record<Language, { code: string; label: string; flag: string }> = {
   "en-IN": { code: "en", label: "English", flag: "🇬🇧" },
   "hi-IN": { code: "hi", label: "हिंदी", flag: "🇮🇳" },
-  "bn-IN": { code: "bn", label: "বাংলা", flag: "🇧🇩" },
+  "bn-IN": { code: "bn", label: "বাংলা", flag: "🇮🇳" },
+  "te-IN": { code: "te", label: "తెలుగు", flag: "🇮🇳" },
+  "mr-IN": { code: "mr", label: "मराठी", flag: "🇮🇳" },
+  "ta-IN": { code: "ta", label: "தமிழ்", flag: "🇮🇳" },
+  "ur-IN": { code: "ur", label: "اردو", flag: "🇮🇳" },
+  "gu-IN": { code: "gu", label: "ગુજરાતી", flag: "🇮🇳" },
+  "kn-IN": { code: "kn", label: "ಕನ್ನಡ", flag: "🇮🇳" },
+  "ml-IN": { code: "ml", label: "മലയാളം", flag: "🇮🇳" },
+  "pa-IN": { code: "pa", label: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
+  "or-IN": { code: "or", label: "ଓଡ଼ିଆ", flag: "🇮🇳" },
 };
 
 const FONT_SCALES: Record<FontSize, number> = {
@@ -140,7 +149,7 @@ export function useAccessibility() {
     return {
       language: "en-IN" as Language,
       setLanguage: () => {},
-      languageCode: "en" as const,
+      languageCode: "en",
       languageLabel: "English",
       fontSize: "normal" as FontSize,
       setFontSize: () => {},
@@ -163,7 +172,16 @@ export function LanguagePicker({ compact = false }: { compact?: boolean }) {
   const options: { lang: Language; flag: string; label: string }[] = [
     { lang: "en-IN", flag: "🇬🇧", label: "English" },
     { lang: "hi-IN", flag: "🇮🇳", label: "हिंदी" },
-    { lang: "bn-IN", flag: "🇧🇩", label: "বাংলা" },
+    { lang: "bn-IN", flag: "🇮🇳", label: "বাংলা" },
+    { lang: "te-IN", flag: "🇮🇳", label: "తెలుగు" },
+    { lang: "mr-IN", flag: "🇮🇳", label: "मराठी" },
+    { lang: "ta-IN", flag: "🇮🇳", label: "தமிழ்" },
+    { lang: "ur-IN", flag: "🇮🇳", label: "اردو" },
+    { lang: "gu-IN", flag: "🇮🇳", label: "ગુજરાતી" },
+    { lang: "kn-IN", flag: "🇮🇳", label: "ಕನ್ನಡ" },
+    { lang: "ml-IN", flag: "🇮🇳", label: "മലയാളം" },
+    { lang: "pa-IN", flag: "🇮🇳", label: "ਪੰਜਾਬੀ" },
+    { lang: "or-IN", flag: "🇮🇳", label: "ଓଡ଼ିଆ" },
   ];
 
   const current = options.find((o) => o.lang === language) ?? options[0];

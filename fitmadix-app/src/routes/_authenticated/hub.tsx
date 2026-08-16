@@ -12,7 +12,9 @@ import {
   Biohazard,
   LineChart,
   User,
-  LogOut
+  LogOut,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 import { useAccessibility, LanguagePicker, FontSizeToggle } from "@/components/AccessibilityProvider";
@@ -25,8 +27,18 @@ export const Route = createFileRoute("/_authenticated/hub")({
 
 function HubPage() {
   const { speak } = useTextToSpeech();
-  const { autoSpeak, language } = useAccessibility();
+  const { autoSpeak, stopSpeaking, isSpeaking, language } = useAccessibility();
   const navigate = useNavigate();
+
+  const readAllOptions = () => {
+    if (isSpeaking) {
+      stopSpeaking();
+      return;
+    }
+    const intro = "Fitmadix Hub. Available options are: ";
+    const optionsText = features.map(f => f.voice).join(". ");
+    autoSpeak(intro + optionsText);
+  };
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -78,6 +90,23 @@ function HubPage() {
             <LanguagePicker compact />
           </div>
         </div>
+
+        {/* Voice Navigation for Illiterate Users */}
+        <button
+          onClick={readAllOptions}
+          className={`mb-8 flex w-full items-center justify-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${
+            isSpeaking 
+              ? "animate-pulse border-blue-500 bg-blue-500/10 text-blue-500" 
+              : "border-primary bg-primary/10 text-primary hover:bg-primary/20"
+          }`}
+          aria-label={isSpeaking ? "Stop speaking options" : "Read all options aloud"}
+        >
+          {isSpeaking ? <VolumeX className="h-8 w-8" /> : <Volume2 className="h-8 w-8" />}
+          <div>
+            <h2 className="text-lg font-bold">{isSpeaking ? "Stop Speaking" : "Read Options Aloud"}</h2>
+            <p className="text-xs opacity-80">Tap here to hear all available tools</p>
+          </div>
+        </button>
 
         {/* Feature Grid */}
         <div className="grid grid-cols-2 gap-4">
