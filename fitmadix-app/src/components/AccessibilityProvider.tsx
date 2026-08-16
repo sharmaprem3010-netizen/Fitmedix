@@ -94,15 +94,17 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
       utterance.pitch = 1;
       utterance.volume = 1;
 
-      // Try to find a matching voice
+      // Try to find a matching local voice
       const voices = window.speechSynthesis.getVoices();
       const prefix = language.split("-")[0];
       const voice =
         voices.find((v) => v.lang === language) ??
         voices.find((v) => v.lang.startsWith(prefix)) ??
-        voices.find((v) => v.lang.startsWith("en")) ??
         null;
-      if (voice) utterance.voice = voice;
+        
+      if (voice) {
+        utterance.voice = voice;
+      }
 
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
