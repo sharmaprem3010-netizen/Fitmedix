@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 import { useAccessibility, LanguagePicker, FontSizeToggle } from "@/components/AccessibilityProvider";
+import { hubTranslations } from "@/translations/hub";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -28,30 +29,24 @@ export const Route = createFileRoute("/_authenticated/hub")({
 function HubPage() {
   const { speak } = useTextToSpeech();
   const { autoSpeak, stopSpeaking, isSpeaking, language } = useAccessibility();
-  const navigate = useNavigate();
+  const t = hubTranslations[language] || hubTranslations["en-IN"];
 
   const readAllOptions = () => {
     if (isSpeaking) {
       stopSpeaking();
       return;
     }
-    const intro = "Fitmadix Hub. Available options are: ";
+    const intro = t.intro;
     const optionsText = features.map(f => f.voice).join(". ");
     autoSpeak(intro + optionsText);
   };
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      if (language === "hi-IN") {
-        autoSpeak("आज आप क्या करना चाहेंगे?");
-      } else if (language === "bn-IN") {
-        autoSpeak("আজ আপনি কী করতে চান?");
-      } else {
-        autoSpeak("What would you like to do today?");
-      }
+    const timer = setTimeout(() => {
+      autoSpeak(t.intro);
     }, 500);
-    return () => clearTimeout(t);
-  }, [autoSpeak, language]);
+    return () => clearTimeout(timer);
+  }, [autoSpeak, t.intro]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -59,16 +54,16 @@ function HubPage() {
   };
 
   const features = [
-    { title: "AI Doctor", icon: MessageSquare, emoji: "💬", color: "bg-blue-500", link: "/chat", desc: "Talk about your symptoms", voice: "AI Doctor. Talk about your symptoms." },
-    { title: "Prescriptions", icon: Camera, emoji: "📋", color: "bg-purple-500", link: "/prescription", desc: "Scan and read medicines", voice: "Prescriptions. Scan and read your medicines." },
-    { title: "Diet Scanner", icon: UtensilsCrossed, emoji: "🍽️", color: "bg-emerald-500", link: "/food-scan", desc: "Check if food is healthy", voice: "Diet Scanner. Check if your food is healthy." },
-    { title: "Nearby Help", icon: MapPin, emoji: "📍", color: "bg-red-500", link: "/nearby", desc: "Find hospitals & clinics", voice: "Nearby Help. Find hospitals and clinics near you." },
-    { title: "Food Logs", icon: LineChart, emoji: "📊", color: "bg-orange-500", link: "/food-log", desc: "Track daily calories", voice: "Food Logs. Track your daily calories." },
-    { title: "Workouts", icon: Dumbbell, emoji: "🏋️", color: "bg-cyan-500", link: "/exercise", desc: "Home exercise plans", voice: "Workouts. Home exercise plans." },
-    { title: "Food Info", icon: BookOpen, emoji: "🍎", color: "bg-green-500", link: "/encyclopedia/food", desc: "Nutrition encyclopedia", voice: "Food Info. Learn about nutrition of any food." },
-    { title: "Medicines", icon: Pill, emoji: "💊", color: "bg-indigo-500", link: "/encyclopedia/medicine", desc: "Drug uses and effects", voice: "Medicines. Learn about drug uses and effects." },
-    { title: "Diseases", icon: Biohazard, emoji: "🦠", color: "bg-rose-500", link: "/encyclopedia/disease", desc: "Condition encyclopedia", voice: "Diseases. Learn about medical conditions." },
-    { title: "Profile", icon: User, emoji: "👤", color: "bg-slate-500", link: "/profile", desc: "Your health details", voice: "Profile. Your health details." },
+    { title: t.features.aiDoctor.title, icon: MessageSquare, emoji: "💬", color: "bg-blue-500", link: "/chat", desc: t.features.aiDoctor.desc, voice: t.features.aiDoctor.voice },
+    { title: t.features.prescriptions.title, icon: Camera, emoji: "📋", color: "bg-purple-500", link: "/prescription", desc: t.features.prescriptions.desc, voice: t.features.prescriptions.voice },
+    { title: t.features.dietScanner.title, icon: UtensilsCrossed, emoji: "🍽️", color: "bg-emerald-500", link: "/food-scan", desc: t.features.dietScanner.desc, voice: t.features.dietScanner.voice },
+    { title: t.features.nearbyHelp.title, icon: MapPin, emoji: "📍", color: "bg-red-500", link: "/nearby", desc: t.features.nearbyHelp.desc, voice: t.features.nearbyHelp.voice },
+    { title: t.features.foodLogs.title, icon: LineChart, emoji: "📊", color: "bg-orange-500", link: "/food-log", desc: t.features.foodLogs.desc, voice: t.features.foodLogs.voice },
+    { title: t.features.workouts.title, icon: Dumbbell, emoji: "🏋️", color: "bg-cyan-500", link: "/exercise", desc: t.features.workouts.desc, voice: t.features.workouts.voice },
+    { title: t.features.foodInfo.title, icon: BookOpen, emoji: "🍎", color: "bg-green-500", link: "/encyclopedia/food", desc: t.features.foodInfo.desc, voice: t.features.foodInfo.voice },
+    { title: t.features.medicines.title, icon: Pill, emoji: "💊", color: "bg-indigo-500", link: "/encyclopedia/medicine", desc: t.features.medicines.desc, voice: t.features.medicines.voice },
+    { title: t.features.diseases.title, icon: Biohazard, emoji: "🦠", color: "bg-rose-500", link: "/encyclopedia/disease", desc: t.features.diseases.desc, voice: t.features.diseases.voice },
+    { title: t.features.profile.title, icon: User, emoji: "👤", color: "bg-slate-500", link: "/profile", desc: t.features.profile.desc, voice: t.features.profile.voice },
   ];
 
   return (
@@ -99,12 +94,12 @@ function HubPage() {
               ? "animate-pulse border-blue-500 bg-blue-500/10 text-blue-500" 
               : "border-primary bg-primary/10 text-primary hover:bg-primary/20"
           }`}
-          aria-label={isSpeaking ? "Stop speaking options" : "Read all options aloud"}
+          aria-label={isSpeaking ? t.stopSpeaking : t.readAloud}
         >
           {isSpeaking ? <VolumeX className="h-8 w-8" /> : <Volume2 className="h-8 w-8" />}
           <div>
-            <h2 className="text-lg font-bold">{isSpeaking ? "Stop Speaking" : "Read Options Aloud"}</h2>
-            <p className="text-xs opacity-80">Tap here to hear all available tools</p>
+            <h2 className="text-lg font-bold">{isSpeaking ? t.stopSpeaking : t.readAloud}</h2>
+            <p className="text-xs opacity-80">{t.tapToHear}</p>
           </div>
         </button>
 
