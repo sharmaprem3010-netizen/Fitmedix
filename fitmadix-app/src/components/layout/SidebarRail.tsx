@@ -29,6 +29,7 @@ export const SidebarRail: React.FC<SidebarRailProps> = ({
     {
       title: 'Fitness',
       items: [
+        { id: 'hub', label: 'Health Hub', icon: <Home className="w-5 h-5" /> },
         { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
         { id: 'workouts', label: 'Workouts', icon: <Dumbbell className="w-5 h-5" /> },
         { id: 'exercises', label: 'Exercise DB', icon: <BookOpen className="w-5 h-5" /> },

@@ -60,7 +60,7 @@ function HubPage() {
   ];
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="min-h-dvh w-full flex-1 overflow-y-auto bg-background">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
