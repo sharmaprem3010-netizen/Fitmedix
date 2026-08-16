@@ -12,9 +12,27 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAiCoachRouteImport } from './routes/_authenticated/ai-coach'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedExerciseRouteImport } from './routes/_authenticated/exercise'
+import { Route as AuthenticatedExercisesRouteImport } from './routes/_authenticated/exercises'
+import { Route as AuthenticatedFoodLogRouteImport } from './routes/_authenticated/food-log'
+import { Route as AuthenticatedFoodScanRouteImport } from './routes/_authenticated/food-scan'
+import { Route as AuthenticatedHubRouteImport } from './routes/_authenticated/hub'
+import { Route as AuthenticatedNearbyRouteImport } from './routes/_authenticated/nearby'
+import { Route as AuthenticatedNutritionRouteImport } from './routes/_authenticated/nutrition'
+import { Route as AuthenticatedPrescriptionRouteImport } from './routes/_authenticated/prescription'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
+import { Route as AuthenticatedWorkoutsRouteImport } from './routes/_authenticated/workouts'
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
+import { Route as AuthenticatedEncyclopediaDiseaseRouteImport } from './routes/_authenticated/encyclopedia.disease'
+import { Route as AuthenticatedEncyclopediaFoodRouteImport } from './routes/_authenticated/encyclopedia.food'
+import { Route as AuthenticatedEncyclopediaMedicineRouteImport } from './routes/_authenticated/encyclopedia.medicine'
+import { Route as AuthenticatedExerciseWorkoutIdRouteImport } from './routes/_authenticated/exercise.$workoutId'
+import { Route as AuthenticatedFoodLogSettingsRouteImport } from './routes/_authenticated/food-log.settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,9 +48,75 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAiCoachRoute = AuthenticatedAiCoachRouteImport.update({
+  id: '/ai-coach',
+  path: '/ai-coach',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedExerciseRoute = AuthenticatedExerciseRouteImport.update({
+  id: '/exercise',
+  path: '/exercise',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedExercisesRoute = AuthenticatedExercisesRouteImport.update({
+  id: '/exercises',
+  path: '/exercises',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFoodLogRoute = AuthenticatedFoodLogRouteImport.update({
+  id: '/food-log',
+  path: '/food-log',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFoodScanRoute = AuthenticatedFoodScanRouteImport.update({
+  id: '/food-scan',
+  path: '/food-scan',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHubRoute = AuthenticatedHubRouteImport.update({
+  id: '/hub',
+  path: '/hub',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNearbyRoute = AuthenticatedNearbyRouteImport.update({
+  id: '/nearby',
+  path: '/nearby',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNutritionRoute = AuthenticatedNutritionRouteImport.update({
+  id: '/nutrition',
+  path: '/nutrition',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPrescriptionRoute =
+  AuthenticatedPrescriptionRouteImport.update({
+    id: '/prescription',
+    path: '/prescription',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVitalsRoute = AuthenticatedVitalsRouteImport.update({
+  id: '/vitals',
+  path: '/vitals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWorkoutsRoute = AuthenticatedWorkoutsRouteImport.update({
+  id: '/workouts',
+  path: '/workouts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedChatIndexRoute = AuthenticatedChatIndexRouteImport.update({
@@ -46,19 +130,85 @@ const AuthenticatedChatThreadIdRoute =
     path: '/chat/$threadId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEncyclopediaDiseaseRoute =
+  AuthenticatedEncyclopediaDiseaseRouteImport.update({
+    id: '/encyclopedia/disease',
+    path: '/encyclopedia/disease',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEncyclopediaFoodRoute =
+  AuthenticatedEncyclopediaFoodRouteImport.update({
+    id: '/encyclopedia/food',
+    path: '/encyclopedia/food',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEncyclopediaMedicineRoute =
+  AuthenticatedEncyclopediaMedicineRouteImport.update({
+    id: '/encyclopedia/medicine',
+    path: '/encyclopedia/medicine',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedExerciseWorkoutIdRoute =
+  AuthenticatedExerciseWorkoutIdRouteImport.update({
+    id: '/$workoutId',
+    path: '/$workoutId',
+    getParentRoute: () => AuthenticatedExerciseRoute,
+  } as any)
+const AuthenticatedFoodLogSettingsRoute =
+  AuthenticatedFoodLogSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedFoodLogRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/ai-coach': typeof AuthenticatedAiCoachRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/exercise': typeof AuthenticatedExerciseRouteWithChildren
+  '/exercises': typeof AuthenticatedExercisesRoute
+  '/food-log': typeof AuthenticatedFoodLogRouteWithChildren
+  '/food-scan': typeof AuthenticatedFoodScanRoute
+  '/hub': typeof AuthenticatedHubRoute
+  '/nearby': typeof AuthenticatedNearbyRoute
+  '/nutrition': typeof AuthenticatedNutritionRoute
+  '/prescription': typeof AuthenticatedPrescriptionRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/vitals': typeof AuthenticatedVitalsRoute
+  '/workouts': typeof AuthenticatedWorkoutsRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
+  '/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
+  '/encyclopedia/medicine': typeof AuthenticatedEncyclopediaMedicineRoute
+  '/exercise/$workoutId': typeof AuthenticatedExerciseWorkoutIdRoute
+  '/food-log/settings': typeof AuthenticatedFoodLogSettingsRoute
   '/chat/': typeof AuthenticatedChatIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/ai-coach': typeof AuthenticatedAiCoachRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/exercise': typeof AuthenticatedExerciseRouteWithChildren
+  '/exercises': typeof AuthenticatedExercisesRoute
+  '/food-log': typeof AuthenticatedFoodLogRouteWithChildren
+  '/food-scan': typeof AuthenticatedFoodScanRoute
+  '/hub': typeof AuthenticatedHubRoute
+  '/nearby': typeof AuthenticatedNearbyRoute
+  '/nutrition': typeof AuthenticatedNutritionRoute
+  '/prescription': typeof AuthenticatedPrescriptionRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/vitals': typeof AuthenticatedVitalsRoute
+  '/workouts': typeof AuthenticatedWorkoutsRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
+  '/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
+  '/encyclopedia/medicine': typeof AuthenticatedEncyclopediaMedicineRoute
+  '/exercise/$workoutId': typeof AuthenticatedExerciseWorkoutIdRoute
+  '/food-log/settings': typeof AuthenticatedFoodLogSettingsRoute
   '/chat': typeof AuthenticatedChatIndexRoute
 }
 export interface FileRoutesById {
@@ -66,22 +216,104 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/ai-coach': typeof AuthenticatedAiCoachRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/exercise': typeof AuthenticatedExerciseRouteWithChildren
+  '/_authenticated/exercises': typeof AuthenticatedExercisesRoute
+  '/_authenticated/food-log': typeof AuthenticatedFoodLogRouteWithChildren
+  '/_authenticated/food-scan': typeof AuthenticatedFoodScanRoute
+  '/_authenticated/hub': typeof AuthenticatedHubRoute
+  '/_authenticated/nearby': typeof AuthenticatedNearbyRoute
+  '/_authenticated/nutrition': typeof AuthenticatedNutritionRoute
+  '/_authenticated/prescription': typeof AuthenticatedPrescriptionRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
+  '/_authenticated/workouts': typeof AuthenticatedWorkoutsRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/_authenticated/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
+  '/_authenticated/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
+  '/_authenticated/encyclopedia/medicine': typeof AuthenticatedEncyclopediaMedicineRoute
+  '/_authenticated/exercise/$workoutId': typeof AuthenticatedExerciseWorkoutIdRoute
+  '/_authenticated/food-log/settings': typeof AuthenticatedFoodLogSettingsRoute
   '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/profile' | '/chat/$threadId' | '/chat/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/ai-coach'
+    | '/analytics'
+    | '/dashboard'
+    | '/exercise'
+    | '/exercises'
+    | '/food-log'
+    | '/food-scan'
+    | '/hub'
+    | '/nearby'
+    | '/nutrition'
+    | '/prescription'
+    | '/profile'
+    | '/vitals'
+    | '/workouts'
+    | '/chat/$threadId'
+    | '/encyclopedia/disease'
+    | '/encyclopedia/food'
+    | '/encyclopedia/medicine'
+    | '/exercise/$workoutId'
+    | '/food-log/settings'
+    | '/chat/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/profile' | '/chat/$threadId' | '/chat'
+  to:
+    | '/'
+    | '/auth'
+    | '/ai-coach'
+    | '/analytics'
+    | '/dashboard'
+    | '/exercise'
+    | '/exercises'
+    | '/food-log'
+    | '/food-scan'
+    | '/hub'
+    | '/nearby'
+    | '/nutrition'
+    | '/prescription'
+    | '/profile'
+    | '/vitals'
+    | '/workouts'
+    | '/chat/$threadId'
+    | '/encyclopedia/disease'
+    | '/encyclopedia/food'
+    | '/encyclopedia/medicine'
+    | '/exercise/$workoutId'
+    | '/food-log/settings'
+    | '/chat'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/ai-coach'
+    | '/_authenticated/analytics'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/exercise'
+    | '/_authenticated/exercises'
+    | '/_authenticated/food-log'
+    | '/_authenticated/food-scan'
+    | '/_authenticated/hub'
+    | '/_authenticated/nearby'
+    | '/_authenticated/nutrition'
+    | '/_authenticated/prescription'
     | '/_authenticated/profile'
+    | '/_authenticated/vitals'
+    | '/_authenticated/workouts'
     | '/_authenticated/chat/$threadId'
+    | '/_authenticated/encyclopedia/disease'
+    | '/_authenticated/encyclopedia/food'
+    | '/_authenticated/encyclopedia/medicine'
+    | '/_authenticated/exercise/$workoutId'
+    | '/_authenticated/food-log/settings'
     | '/_authenticated/chat/'
   fileRoutesById: FileRoutesById
 }
@@ -114,11 +346,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/ai-coach': {
+      id: '/_authenticated/ai-coach'
+      path: '/ai-coach'
+      fullPath: '/ai-coach'
+      preLoaderRoute: typeof AuthenticatedAiCoachRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/exercise': {
+      id: '/_authenticated/exercise'
+      path: '/exercise'
+      fullPath: '/exercise'
+      preLoaderRoute: typeof AuthenticatedExerciseRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/exercises': {
+      id: '/_authenticated/exercises'
+      path: '/exercises'
+      fullPath: '/exercises'
+      preLoaderRoute: typeof AuthenticatedExercisesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/food-log': {
+      id: '/_authenticated/food-log'
+      path: '/food-log'
+      fullPath: '/food-log'
+      preLoaderRoute: typeof AuthenticatedFoodLogRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/food-scan': {
+      id: '/_authenticated/food-scan'
+      path: '/food-scan'
+      fullPath: '/food-scan'
+      preLoaderRoute: typeof AuthenticatedFoodScanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/hub': {
+      id: '/_authenticated/hub'
+      path: '/hub'
+      fullPath: '/hub'
+      preLoaderRoute: typeof AuthenticatedHubRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/nearby': {
+      id: '/_authenticated/nearby'
+      path: '/nearby'
+      fullPath: '/nearby'
+      preLoaderRoute: typeof AuthenticatedNearbyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/nutrition': {
+      id: '/_authenticated/nutrition'
+      path: '/nutrition'
+      fullPath: '/nutrition'
+      preLoaderRoute: typeof AuthenticatedNutritionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/prescription': {
+      id: '/_authenticated/prescription'
+      path: '/prescription'
+      fullPath: '/prescription'
+      preLoaderRoute: typeof AuthenticatedPrescriptionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vitals': {
+      id: '/_authenticated/vitals'
+      path: '/vitals'
+      fullPath: '/vitals'
+      preLoaderRoute: typeof AuthenticatedVitalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/workouts': {
+      id: '/_authenticated/workouts'
+      path: '/workouts'
+      fullPath: '/workouts'
+      preLoaderRoute: typeof AuthenticatedWorkoutsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chat/': {
@@ -135,18 +458,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/encyclopedia/disease': {
+      id: '/_authenticated/encyclopedia/disease'
+      path: '/encyclopedia/disease'
+      fullPath: '/encyclopedia/disease'
+      preLoaderRoute: typeof AuthenticatedEncyclopediaDiseaseRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/encyclopedia/food': {
+      id: '/_authenticated/encyclopedia/food'
+      path: '/encyclopedia/food'
+      fullPath: '/encyclopedia/food'
+      preLoaderRoute: typeof AuthenticatedEncyclopediaFoodRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/encyclopedia/medicine': {
+      id: '/_authenticated/encyclopedia/medicine'
+      path: '/encyclopedia/medicine'
+      fullPath: '/encyclopedia/medicine'
+      preLoaderRoute: typeof AuthenticatedEncyclopediaMedicineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/exercise/$workoutId': {
+      id: '/_authenticated/exercise/$workoutId'
+      path: '/$workoutId'
+      fullPath: '/exercise/$workoutId'
+      preLoaderRoute: typeof AuthenticatedExerciseWorkoutIdRouteImport
+      parentRoute: typeof AuthenticatedExerciseRoute
+    }
+    '/_authenticated/food-log/settings': {
+      id: '/_authenticated/food-log/settings'
+      path: '/settings'
+      fullPath: '/food-log/settings'
+      preLoaderRoute: typeof AuthenticatedFoodLogSettingsRouteImport
+      parentRoute: typeof AuthenticatedFoodLogRoute
+    }
   }
 }
 
+interface AuthenticatedExerciseRouteChildren {
+  AuthenticatedExerciseWorkoutIdRoute: typeof AuthenticatedExerciseWorkoutIdRoute
+}
+
+const AuthenticatedExerciseRouteChildren: AuthenticatedExerciseRouteChildren = {
+  AuthenticatedExerciseWorkoutIdRoute: AuthenticatedExerciseWorkoutIdRoute,
+}
+
+const AuthenticatedExerciseRouteWithChildren =
+  AuthenticatedExerciseRoute._addFileChildren(
+    AuthenticatedExerciseRouteChildren,
+  )
+
+interface AuthenticatedFoodLogRouteChildren {
+  AuthenticatedFoodLogSettingsRoute: typeof AuthenticatedFoodLogSettingsRoute
+}
+
+const AuthenticatedFoodLogRouteChildren: AuthenticatedFoodLogRouteChildren = {
+  AuthenticatedFoodLogSettingsRoute: AuthenticatedFoodLogSettingsRoute,
+}
+
+const AuthenticatedFoodLogRouteWithChildren =
+  AuthenticatedFoodLogRoute._addFileChildren(AuthenticatedFoodLogRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAiCoachRoute: typeof AuthenticatedAiCoachRoute
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedExerciseRoute: typeof AuthenticatedExerciseRouteWithChildren
+  AuthenticatedExercisesRoute: typeof AuthenticatedExercisesRoute
+  AuthenticatedFoodLogRoute: typeof AuthenticatedFoodLogRouteWithChildren
+  AuthenticatedFoodScanRoute: typeof AuthenticatedFoodScanRoute
+  AuthenticatedHubRoute: typeof AuthenticatedHubRoute
+  AuthenticatedNearbyRoute: typeof AuthenticatedNearbyRoute
+  AuthenticatedNutritionRoute: typeof AuthenticatedNutritionRoute
+  AuthenticatedPrescriptionRoute: typeof AuthenticatedPrescriptionRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
+  AuthenticatedWorkoutsRoute: typeof AuthenticatedWorkoutsRoute
   AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
+  AuthenticatedEncyclopediaDiseaseRoute: typeof AuthenticatedEncyclopediaDiseaseRoute
+  AuthenticatedEncyclopediaFoodRoute: typeof AuthenticatedEncyclopediaFoodRoute
+  AuthenticatedEncyclopediaMedicineRoute: typeof AuthenticatedEncyclopediaMedicineRoute
   AuthenticatedChatIndexRoute: typeof AuthenticatedChatIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAiCoachRoute: AuthenticatedAiCoachRoute,
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedExerciseRoute: AuthenticatedExerciseRouteWithChildren,
+  AuthenticatedExercisesRoute: AuthenticatedExercisesRoute,
+  AuthenticatedFoodLogRoute: AuthenticatedFoodLogRouteWithChildren,
+  AuthenticatedFoodScanRoute: AuthenticatedFoodScanRoute,
+  AuthenticatedHubRoute: AuthenticatedHubRoute,
+  AuthenticatedNearbyRoute: AuthenticatedNearbyRoute,
+  AuthenticatedNutritionRoute: AuthenticatedNutritionRoute,
+  AuthenticatedPrescriptionRoute: AuthenticatedPrescriptionRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,
+  AuthenticatedWorkoutsRoute: AuthenticatedWorkoutsRoute,
   AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
+  AuthenticatedEncyclopediaDiseaseRoute: AuthenticatedEncyclopediaDiseaseRoute,
+  AuthenticatedEncyclopediaFoodRoute: AuthenticatedEncyclopediaFoodRoute,
+  AuthenticatedEncyclopediaMedicineRoute:
+    AuthenticatedEncyclopediaMedicineRoute,
   AuthenticatedChatIndexRoute: AuthenticatedChatIndexRoute,
 }
 

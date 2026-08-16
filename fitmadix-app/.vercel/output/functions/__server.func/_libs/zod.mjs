@@ -3505,7 +3505,7 @@ var ZodFirstPartyTypeKind;
 	ZodFirstPartyTypeKind["ZodReadonly"] = "ZodReadonly";
 })(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
 var stringType = ZodString.create;
-ZodNumber.create;
+var numberType = ZodNumber.create;
 ZodNaN.create;
 ZodBigInt.create;
 ZodBoolean.create;
@@ -3539,4 +3539,4 @@ ZodNullable.create;
 ZodEffects.createWithPreprocess;
 ZodPipeline.create;
 //#endregion
-export { objectType as n, stringType as r, enumType as t };
+export { stringType as i, numberType as n, objectType as r, enumType as t };

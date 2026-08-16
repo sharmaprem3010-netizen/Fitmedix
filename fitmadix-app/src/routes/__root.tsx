@@ -10,9 +10,9 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
+import { AccessibilityProvider } from "@/components/AccessibilityProvider";
 
 function NotFoundComponent() {
   return (
@@ -39,9 +39,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
@@ -79,25 +76,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Fitmadix — Your AI Doctor Assistant" },
+      { title: "Fitmadix — AI Fitness & Health Platform" },
       {
         name: "description",
         content:
-          "Chat with an AI that acts as a doctor — get symptom checks, general guidance, and health suggestions with clear safety warnings.",
+          "Your complete AI-powered fitness dashboard — track workouts, log nutrition, get AI coaching, and monitor your health.",
       },
       { name: "author", content: "Fitmadix" },
-      { property: "og:title", content: "Fitmadix — Your AI Doctor Assistant" },
+      { property: "og:title", content: "Fitmadix — AI Fitness & Health Platform" },
       {
         property: "og:description",
         content:
-          "AI-powered symptom checks and health guidance with clear medical safety warnings.",
+          "AI-powered fitness tracking, workout planning, nutrition logging, and health insights.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/logo.jpg", type: "image/jpeg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -114,9 +111,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var stored = localStorage.getItem("fitmadix-theme");
+                if (stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+                  document.documentElement.classList.add("dark");
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
       </head>
       <body>
         {children}
@@ -141,7 +150,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AccessibilityProvider>
+        <Outlet />
+      </AccessibilityProvider>
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );

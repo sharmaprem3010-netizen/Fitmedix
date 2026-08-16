@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: fitmedix-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fitmedix
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  frontend:
+    build:
+      context: ./fitmadix-app
+      dockerfile: Dockerfile
+    container_name: fitmedix-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - db
+    environment:
+      VITE_SUPABASE_URL: "http://localhost:5432"
+      VITE_SUPABASE_ANON_KEY: "public-anon-key"
+    volumes:
+      - ./fitmadix-app:/app
+    command: npm run dev
+
+volumes:
+  pgdata:

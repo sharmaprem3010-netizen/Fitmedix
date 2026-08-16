@@ -9,6 +9,8 @@ import {
   Loader2,
   LogOut,
   Menu,
+  Mic,
+  MicOff,
   Plus,
   Trash2,
   User,
@@ -17,6 +19,8 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { createThread, deleteThread, sendChatMessage } from "@/lib/ai-doctor.functions";
+import { useVoiceInput } from "@/hooks/use-voice-input";
+import { SpeakButton } from "@/components/SpeakButton";
 
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   component: ChatThread,
@@ -143,7 +147,7 @@ function ChatThread() {
   };
 
   return (
-    <div className="flex h-dvh bg-background">
+    <div className="flex h-full w-full bg-background">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-border bg-surface transition-transform md:relative md:translate-x-0 ${
@@ -152,10 +156,7 @@ function ChatThread() {
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <Link to="/" className="flex items-center gap-2 font-semibold">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-primary text-primary-foreground">
-              <HeartPulse className="h-3.5 w-3.5" />
-            </span>
-            Fit<span className="text-primary">madix</span>
+            <img src="/logo.jpg" alt="FitMadix Logo" className="h-8 object-contain" />
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -293,6 +294,7 @@ function ChatThread() {
           className="border-t border-border bg-background px-4 py-3"
         >
           <div className="mx-auto flex max-w-2xl items-end gap-2">
+            <MicButton onTranscript={(t) => setInput((prev) => (prev ? prev + " " : "") + t)} disabled={busy} />
             <textarea
               ref={inputRef}
               value={input}
@@ -386,7 +388,14 @@ function Bubble({
             <Dot /> <Dot delay={0.15} /> <Dot delay={0.3} />
           </span>
         ) : (
-          <SimpleMarkdown text={content} />
+          <>
+            <SimpleMarkdown text={content} />
+            {!isUser && content && (
+              <div className="mt-2 flex justify-end">
+                <SpeakButton text={content} />
+              </div>
+            )}
+          </>
         )}
       </div>
       {isUser && (
@@ -395,6 +404,34 @@ function Bubble({
         </span>
       )}
     </div>
+  );
+}
+
+function MicButton({ onTranscript, disabled }: { onTranscript: (text: string) => void; disabled: boolean }) {
+  const { isListening, transcript, interimTranscript, startListening, stopListening, isSupported } = useVoiceInput();
+
+  useEffect(() => {
+    if (transcript) onTranscript(transcript);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcript]);
+
+  if (!isSupported) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={isListening ? stopListening : startListening}
+      disabled={disabled}
+      className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-all ${
+        isListening
+          ? "animate-pulse border-red-400 bg-red-500/10 text-red-500"
+          : "border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+      } disabled:opacity-50`}
+      aria-label={isListening ? "Stop listening" : "Voice input"}
+      title={isListening ? "Tap to stop" : "Speak your symptoms"}
+    >
+      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+    </button>
   );
 }
 

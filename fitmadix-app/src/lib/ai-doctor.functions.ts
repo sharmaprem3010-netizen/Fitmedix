@@ -74,32 +74,40 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       { role: "user", content: data.message },
     ];
 
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI is not configured");
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("AI is not configured (GEMINI_API_KEY missing)");
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const systemInstruction = SYSTEM_PROMPT + profileBlock;
+
+    const geminiContents = [
+      ...(history ?? []).map((m) => messageSchema.parse(m)),
+      { role: "user", content: data.message },
+    ].filter(m => m.role !== 'system').map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages,
+        systemInstruction: {
+          parts: [{ text: systemInstruction }]
+        },
+        contents: geminiContents,
       }),
     });
 
     if (!res.ok) {
       const text = await res.text();
       if (res.status === 429) throw new Error("Rate limit — please try again in a moment.");
-      if (res.status === 402) throw new Error("AI credits exhausted. Please contact support.");
       throw new Error(`AI error: ${text.slice(0, 200)}`);
     }
 
-    const json = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-    const reply = json.choices?.[0]?.message?.content ?? "I'm sorry, I couldn't generate a reply.";
+    const json = (await res.json()) as any;
+    const reply = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "I'm sorry, I couldn't generate a reply.";
 
     await supabase.from("messages").insert({
       thread_id: data.threadId,

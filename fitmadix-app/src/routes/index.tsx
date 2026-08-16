@@ -4,16 +4,22 @@ import {
   Activity,
   AlertTriangle,
   ArrowRight,
+  BookOpen,
   Brain,
+  Camera,
   Check,
   ChevronRight,
+  Dumbbell,
   Lock,
+  MapPin,
   Menu,
   MessagesSquare,
+  Mic,
   Moon,
   ShieldCheck,
   Stethoscope,
   Sun,
+  UtensilsCrossed,
   X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,17 +27,17 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Fitmadix — Your AI Doctor Assistant" },
+      { title: "Fitmadix — AI Fitness & Health Platform" },
       {
         name: "description",
         content:
-          "Talk to an AI that acts as a doctor. Describe symptoms, get suggestions and clear safety warnings — not a substitute for real medical care.",
+          "Your complete AI-powered fitness dashboard — track workouts, log nutrition, get AI coaching, and monitor your health.",
       },
-      { property: "og:title", content: "Fitmadix — Your AI Doctor Assistant" },
+      { property: "og:title", content: "Fitmadix — AI Fitness & Health Platform" },
       {
         property: "og:description",
         content:
-          "AI-powered symptom checks and general health guidance with clear medical warnings.",
+          "AI-powered fitness tracking, workout planning, nutrition logging, and health insights.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -42,14 +48,13 @@ export const Route = createFileRoute("/")({
 
 function useTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
+
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("fitmadix-theme") : null;
-    const initial =
-      (stored as "light" | "dark") ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    setTheme(initial);
-    document.documentElement.classList.toggle("dark", initial === "dark");
+    // Determine current theme from DOM (set by __root.tsx inline script)
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
   }, []);
+
   const toggle = () => {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
@@ -72,12 +77,7 @@ function useSession() {
 function Logo() {
   return (
     <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-      <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
-        <span className="font-display text-base leading-none">F</span>
-      </span>
-      <span className="text-lg">
-        Fit<span className="text-primary">madix</span>
-      </span>
+      <img src="/logo.jpg" alt="Fitmadix Logo" className="h-10 object-contain" />
     </Link>
   );
 }
@@ -286,6 +286,36 @@ function Features() {
       icon: ShieldCheck,
       title: "Private by default",
       desc: "Your chats are only visible to you. Encrypted in transit and at rest.",
+    },
+    {
+      icon: Camera,
+      title: "Prescription reader",
+      desc: "Snap a photo of your prescription — AI explains each medicine, timing, and next steps.",
+    },
+    {
+      icon: UtensilsCrossed,
+      title: "Diet scanner",
+      desc: "Photograph your meal and get instant nutritional advice with a simple health rating.",
+    },
+    {
+      icon: MapPin,
+      title: "Nearby facilities",
+      desc: "Find hospitals, clinics, and pharmacies near you with one tap. Navigate or call instantly.",
+    },
+    {
+      icon: Mic,
+      title: "Voice-first input",
+      desc: "Speak your symptoms in Hindi, Bengali, or English — no typing needed.",
+    },
+    {
+      icon: BookOpen,
+      title: "Health encyclopedias",
+      desc: "Search food, medicine, and disease info — AI-powered knowledge at your fingertips.",
+    },
+    {
+      icon: Dumbbell,
+      title: "Home workouts",
+      desc: "Guided exercises with timers, reps, and rest periods — no gym required.",
     },
   ];
   return (
