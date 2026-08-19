@@ -19,7 +19,7 @@ import {
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 import { useAccessibility, LanguagePicker, FontSizeToggle } from "@/components/AccessibilityProvider";
 import { hubTranslations } from "@/translations/hub";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/hub")({
@@ -27,9 +27,10 @@ export const Route = createFileRoute("/_authenticated/hub")({
 });
 
 function HubPage() {
-  const { speak } = useTextToSpeech();
   const { autoSpeak, stopSpeaking, isSpeaking, language } = useAccessibility();
+  const navigate = useNavigate();
   const t = hubTranslations[language] || hubTranslations["en-IN"];
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const readAllOptions = () => {
     if (isSpeaking) {
@@ -49,11 +50,18 @@ function HubPage() {
   }, [autoSpeak, t.intro]);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    navigate({ to: "/", replace: true });
+    try {
+      setIsSigningOut(true);
+      await supabase.auth.signOut();
+      navigate({ to: "/", replace: true });
+    } catch (error) {
+      console.error("Error signing out:", error);
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
-  const features = [
+  const features = useMemo(() => [
     { title: t.features.aiDoctor.title, icon: MessageSquare, emoji: "💬", color: "bg-blue-500", link: "/chat", desc: t.features.aiDoctor.desc, voice: t.features.aiDoctor.voice },
     { title: t.features.prescriptions.title, icon: Camera, emoji: "📋", color: "bg-purple-500", link: "/prescription", desc: t.features.prescriptions.desc, voice: t.features.prescriptions.voice },
     { title: t.features.dietScanner.title, icon: UtensilsCrossed, emoji: "🍽️", color: "bg-emerald-500", link: "/food-scan", desc: t.features.dietScanner.desc, voice: t.features.dietScanner.voice },
@@ -64,7 +72,7 @@ function HubPage() {
     { title: t.features.medicines.title, icon: Pill, emoji: "💊", color: "bg-indigo-500", link: "/encyclopedia/medicine", desc: t.features.medicines.desc, voice: t.features.medicines.voice },
     { title: t.features.diseases.title, icon: Biohazard, emoji: "🦠", color: "bg-rose-500", link: "/encyclopedia/disease", desc: t.features.diseases.desc, voice: t.features.diseases.voice },
     { title: t.features.profile.title, icon: User, emoji: "👤", color: "bg-slate-500", link: "/profile", desc: t.features.profile.desc, voice: t.features.profile.voice },
-  ];
+  ], [t]);
 
   return (
     <div className="min-h-dvh w-full flex-1 overflow-y-auto bg-background">
@@ -129,10 +137,16 @@ function HubPage() {
         <div className="mt-8 flex justify-center">
           <button
             onClick={signOut}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            disabled={isSigningOut}
+            className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Sign out of your account"
           >
-            <LogOut className="h-4 w-4" /> Sign Out
+            {isSigningOut ? (
+              <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+            ) : (
+              <LogOut className="h-4 w-4" /> 
+            )}
+            {isSigningOut ? "Signing out..." : "Sign Out"}
           </button>
         </div>
       </div>
