@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as FoodRouteImport } from './routes/food'
 import { Route as AuthenticatedAiCoachRouteImport } from './routes/_authenticated/ai-coach'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -46,6 +47,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoodRoute = FoodRouteImport.update({
+  id: '/food',
+  path: '/food',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAiCoachRoute = AuthenticatedAiCoachRouteImport.update({
@@ -164,6 +170,7 @@ const AuthenticatedFoodLogSettingsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/food': typeof FoodRoute
   '/ai-coach': typeof AuthenticatedAiCoachRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -189,6 +196,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/food': typeof FoodRoute
   '/ai-coach': typeof AuthenticatedAiCoachRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/food': typeof FoodRoute
   '/_authenticated/ai-coach': typeof AuthenticatedAiCoachRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/food'
     | '/ai-coach'
     | '/analytics'
     | '/dashboard'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/food'
     | '/ai-coach'
     | '/analytics'
     | '/dashboard'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/food'
     | '/_authenticated/ai-coach'
     | '/_authenticated/analytics'
     | '/_authenticated/dashboard'
@@ -321,6 +333,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  FoodRoute: typeof FoodRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -344,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/food': {
+      id: '/food'
+      path: '/food'
+      fullPath: '/food'
+      preLoaderRoute: typeof FoodRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/ai-coach': {
@@ -572,6 +592,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  FoodRoute: FoodRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

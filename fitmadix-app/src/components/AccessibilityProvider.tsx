@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 
-type Language = "en-IN" | "hi-IN" | "bn-IN" | "te-IN" | "mr-IN" | "ta-IN" | "ur-IN" | "gu-IN" | "kn-IN" | "ml-IN" | "pa-IN" | "or-IN";
+export type Language = "en-IN" | "hi-IN" | "bn-IN" | "te-IN" | "mr-IN" | "ta-IN" | "ur-IN" | "gu-IN" | "kn-IN" | "ml-IN" | "pa-IN" | "or-IN";
 type FontSize = "normal" | "large" | "x-large";
 
 interface AccessibilityContextType {

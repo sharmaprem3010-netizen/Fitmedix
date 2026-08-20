@@ -27,6 +27,7 @@ export const Route = createFileRoute("/_authenticated/hub")({
 });
 
 function HubPage() {
+  const navigate = useNavigate();
   const { speak } = useTextToSpeech();
   const { autoSpeak, stopSpeaking, isSpeaking, language } = useAccessibility();
   const t = hubTranslations[language] || hubTranslations["en-IN"];
@@ -68,11 +69,11 @@ function HubPage() {
 
   return (
     <div className="min-h-dvh w-full flex-1 overflow-y-auto bg-background">
-      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-primary text-white shadow-glow">
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-primary text-white shadow-glow shrink-0">
               <HeartPulse className="h-6 w-6" />
             </div>
             <div>
@@ -80,7 +81,7 @@ function HubPage() {
               <p className="text-sm text-muted-foreground">Your complete health assistant</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <FontSizeToggle />
             <LanguagePicker compact />
           </div>
@@ -96,7 +97,7 @@ function HubPage() {
           }`}
           aria-label={isSpeaking ? t.stopSpeaking : t.readAloud}
         >
-          {isSpeaking ? <VolumeX className="h-8 w-8" /> : <Volume2 className="h-8 w-8" />}
+          {isSpeaking ? <VolumeX className="h-8 w-8 shrink-0" /> : <Volume2 className="h-8 w-8 shrink-0" />}
           <div>
             <h2 className="text-lg font-bold">{isSpeaking ? t.stopSpeaking : t.readAloud}</h2>
             <p className="text-xs opacity-80">{t.tapToHear}</p>
@@ -104,7 +105,7 @@ function HubPage() {
         </button>
 
         {/* Feature Grid */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {features.map((f) => (
             <Link
               key={f.title}
@@ -114,12 +115,12 @@ function HubPage() {
               onFocus={() => autoSpeak(f.voice)}
               onMouseEnter={() => autoSpeak(f.voice)}
             >
-              <div className={`grid h-16 w-16 place-items-center rounded-2xl ${f.color} bg-opacity-10 transition-transform group-hover:scale-110`}>
+              <div className={`grid h-16 w-16 shrink-0 place-items-center rounded-2xl ${f.color} bg-opacity-10 transition-transform group-hover:scale-110`}>
                 <span className="text-4xl" role="img" aria-hidden="true">{f.emoji}</span>
               </div>
               <div>
-                <h2 className="font-semibold">{f.title}</h2>
-                <p className="mt-1 text-[11px] text-muted-foreground">{f.desc}</p>
+                <h2 className="font-semibold text-sm sm:text-base leading-tight">{f.title}</h2>
+                <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2">{f.desc}</p>
               </div>
             </Link>
           ))}
