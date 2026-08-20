@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+
 
 // Simple validation utilities that query public APIs for food, medicine, and disease data.
 // These are minimal stubs – you can expand them with proper authentication and error handling.
