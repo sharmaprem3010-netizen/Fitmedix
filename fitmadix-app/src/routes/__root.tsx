@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
 import { AccessibilityProvider } from "@/components/AccessibilityProvider";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function NotFoundComponent() {
   return (
@@ -154,6 +155,7 @@ function RootComponent() {
         <Outlet />
       </AccessibilityProvider>
       <Toaster richColors position="top-center" />
+      <SpeedInsights />
     </QueryClientProvider>
   );
 }
