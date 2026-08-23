@@ -38,6 +38,11 @@ function AuthPage() {
     });
   }, [navigate, redirect]);
 
+  const authRedirectUrl =
+    import.meta.env.VITE_DEV_SUPABASE_REDIRECT_URL ||
+    import.meta.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
+    `${window.location.origin}/auth/callback`;
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast.error("Enter a valid email");
@@ -49,20 +54,26 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/chat`,
+            emailRedirectTo: authRedirectUrl,
             data: { display_name: displayName || email.split("@")[0] },
           },
         });
         if (error) throw error;
-        toast.success("Account created — welcome!");
+          toast.success("Account created. Check your email to confirm your account.");
+        return;
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          if (error.message.toLowerCase().includes("email not confirmed")) {
+            throw new Error("Please confirm your email before signing in.");
+          }
+          throw new Error("Invalid email or password.");
+        }
         toast.success("Signed in");
       }
       navigate({ to: redirect ?? "/chat", replace: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Something went wrong";
+      const msg = err instanceof Error ? err.message : "Unable to sign in right now. Please try again.";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -75,7 +86,7 @@ function AuthPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/chat`,
+          redirectTo: authRedirectUrl,
         },
       });
       if (error) throw error;

@@ -27,6 +27,7 @@ import { Route as AuthenticatedPrescriptionRouteImport } from './routes/_authent
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
 import { Route as AuthenticatedWorkoutsRouteImport } from './routes/_authenticated/workouts'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as AuthenticatedEncyclopediaDiseaseRouteImport } from './routes/_authenticated/encyclopedia.disease'
@@ -125,6 +126,11 @@ const AuthenticatedWorkoutsRoute = AuthenticatedWorkoutsRouteImport.update({
   path: '/workouts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthenticatedChatIndexRoute = AuthenticatedChatIndexRouteImport.update({
   id: '/chat/',
   path: '/chat/',
@@ -169,7 +175,7 @@ const AuthenticatedFoodLogSettingsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/food': typeof FoodRoute
   '/ai-coach': typeof AuthenticatedAiCoachRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/workouts': typeof AuthenticatedWorkoutsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
   '/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
@@ -195,7 +202,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/food': typeof FoodRoute
   '/ai-coach': typeof AuthenticatedAiCoachRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/workouts': typeof AuthenticatedWorkoutsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
   '/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
@@ -223,7 +231,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/food': typeof FoodRoute
   '/_authenticated/ai-coach': typeof AuthenticatedAiCoachRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/_authenticated/workouts': typeof AuthenticatedWorkoutsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/_authenticated/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
   '/_authenticated/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/vitals'
     | '/workouts'
+    | '/auth/callback'
     | '/chat/$threadId'
     | '/encyclopedia/disease'
     | '/encyclopedia/food'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/vitals'
     | '/workouts'
+    | '/auth/callback'
     | '/chat/$threadId'
     | '/encyclopedia/disease'
     | '/encyclopedia/food'
@@ -320,6 +331,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/vitals'
     | '/_authenticated/workouts'
+    | '/auth/callback'
     | '/_authenticated/chat/$threadId'
     | '/_authenticated/encyclopedia/disease'
     | '/_authenticated/encyclopedia/food'
@@ -332,7 +344,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   FoodRoute: typeof FoodRoute
 }
 
@@ -464,6 +476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkoutsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_authenticated/chat/': {
       id: '/_authenticated/chat/'
       path: '/chat'
@@ -588,10 +607,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   FoodRoute: FoodRoute,
 }
 export const routeTree = rootRouteImport
