@@ -33,8 +33,7 @@ export function useVoiceInput(): UseVoiceInputReturn {
 
   const createRecognition = useCallback(() => {
     if (!isSupported) return null;
-    const SpeechRecognition =
-      window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;

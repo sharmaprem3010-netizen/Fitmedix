@@ -1,16 +1,32 @@
-import { Routine, WorkoutSessionLog, MealItem, MacroTargets, WeightLogEntry, StrengthRecord, VitalsData, UserMetrics } from '../types/fitness';
-import { INITIAL_ROUTINES, INITIAL_VITALS, INITIAL_MACRO_TARGETS, SAMPLE_MEALS, SAMPLE_WEIGHT_HISTORY, SAMPLE_STRENGTH_RECORDS } from '../data/mockData';
+import {
+  Routine,
+  WorkoutSessionLog,
+  MealItem,
+  MacroTargets,
+  WeightLogEntry,
+  StrengthRecord,
+  VitalsData,
+  UserMetrics,
+} from "../types/fitness";
+import {
+  INITIAL_ROUTINES,
+  INITIAL_VITALS,
+  INITIAL_MACRO_TARGETS,
+  SAMPLE_MEALS,
+  SAMPLE_WEIGHT_HISTORY,
+  SAMPLE_STRENGTH_RECORDS,
+} from "../data/mockData";
 
 const STORAGE_KEYS = {
-  ROUTINES: 'fitmadix_routines_v1',
-  WORKOUT_LOGS: 'fitmadix_workout_logs_v1',
-  MEALS: 'fitmadix_meals_v1',
-  MACRO_TARGETS: 'fitmadix_macro_targets_v1',
-  WEIGHT_LOGS: 'fitmadix_weight_logs_v1',
-  STRENGTH_RECORDS: 'fitmadix_strength_records_v1',
-  VITALS: 'fitmadix_vitals_v1',
-  USER_METRICS: 'fitmadix_user_metrics_v1',
-  DARK_MODE: 'fitmadix_dark_mode_v1'
+  ROUTINES: "fitmadix_routines_v1",
+  WORKOUT_LOGS: "fitmadix_workout_logs_v1",
+  MEALS: "fitmadix_meals_v1",
+  MACRO_TARGETS: "fitmadix_macro_targets_v1",
+  WEIGHT_LOGS: "fitmadix_weight_logs_v1",
+  STRENGTH_RECORDS: "fitmadix_strength_records_v1",
+  VITALS: "fitmadix_vitals_v1",
+  USER_METRICS: "fitmadix_user_metrics_v1",
+  DARK_MODE: "fitmadix_dark_mode_v1",
 };
 
 type Listener = () => void;
@@ -22,7 +38,7 @@ export function subscribeStorage(listener: Listener): () => void {
 }
 
 function notifyStorage() {
-  listeners.forEach(fn => fn());
+  listeners.forEach((fn) => fn());
 }
 
 export function getRoutines(): Routine[] {
@@ -40,7 +56,7 @@ export function getRoutines(): Routine[] {
 
 export function saveRoutine(routine: Routine): Routine[] {
   const routines = getRoutines();
-  const existingIndex = routines.findIndex(r => r.id === routine.id);
+  const existingIndex = routines.findIndex((r) => r.id === routine.id);
   let updated: Routine[];
   if (existingIndex >= 0) {
     updated = [...routines];
@@ -54,7 +70,7 @@ export function saveRoutine(routine: Routine): Routine[] {
 }
 
 export function deleteRoutine(routineId: string): Routine[] {
-  const routines = getRoutines().filter(r => r.id !== routineId);
+  const routines = getRoutines().filter((r) => r.id !== routineId);
   localStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(routines));
   notifyStorage();
   return routines;
@@ -73,13 +89,17 @@ export function saveWorkoutLog(log: WorkoutSessionLog): WorkoutSessionLog[] {
   const logs = getWorkoutLogs();
   const updated = [log, ...logs];
   localStorage.setItem(STORAGE_KEYS.WORKOUT_LOGS, JSON.stringify(updated));
-  
+
   // Also update vitals
   const vitals = getVitals();
   vitals.totalWeeklyVolumeKg += log.totalVolumeKg;
-  vitals.weeklyOutputKwh = Math.round((vitals.weeklyOutputKwh + (log.caloriesBurnedEstimate / 200)) * 10) / 10;
+  vitals.weeklyOutputKwh =
+    Math.round((vitals.weeklyOutputKwh + log.caloriesBurnedEstimate / 200) * 10) / 10;
   vitals.activeStreakDays += 1;
-  vitals.strainScore = Math.min(21, Math.round((vitals.strainScore + (log.durationSeconds / 300)) * 10) / 10);
+  vitals.strainScore = Math.min(
+    21,
+    Math.round((vitals.strainScore + log.durationSeconds / 300) * 10) / 10,
+  );
   saveVitals(vitals);
 
   // Auto-record 1RM Strength PRs from completed exercise sets
@@ -87,35 +107,39 @@ export function saveWorkoutLog(log: WorkoutSessionLog): WorkoutSessionLog[] {
   let recordsChanged = false;
   const updatedRecords = [...currentRecords];
 
-  log.exerciseLogs.forEach(ex => {
-    ex.sets.filter(s => s.completed && s.weightKg > 0 && s.reps > 0).forEach(set => {
-      const estimated1RM = Math.round((set.weightKg * (1 + set.reps / 30)) * 10) / 10;
-      const existingIdx = updatedRecords.findIndex(r => r.exerciseName.toLowerCase() === ex.exerciseName.toLowerCase());
+  log.exerciseLogs.forEach((ex) => {
+    ex.sets
+      .filter((s) => s.completed && s.weightKg > 0 && s.reps > 0)
+      .forEach((set) => {
+        const estimated1RM = Math.round(set.weightKg * (1 + set.reps / 30) * 10) / 10;
+        const existingIdx = updatedRecords.findIndex(
+          (r) => r.exerciseName.toLowerCase() === ex.exerciseName.toLowerCase(),
+        );
 
-      if (existingIdx >= 0) {
-        if (estimated1RM > updatedRecords[existingIdx].estimatedOneRepMaxKg) {
-          updatedRecords[existingIdx] = {
+        if (existingIdx >= 0) {
+          if (estimated1RM > updatedRecords[existingIdx].estimatedOneRepMaxKg) {
+            updatedRecords[existingIdx] = {
+              id: `sr-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+              exerciseName: ex.exerciseName,
+              weightKg: set.weightKg,
+              reps: set.reps,
+              estimatedOneRepMaxKg: estimated1RM,
+              date: new Date().toISOString().split("T")[0],
+            };
+            recordsChanged = true;
+          }
+        } else {
+          updatedRecords.push({
             id: `sr-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
             exerciseName: ex.exerciseName,
             weightKg: set.weightKg,
             reps: set.reps,
             estimatedOneRepMaxKg: estimated1RM,
-            date: new Date().toISOString().split('T')[0],
-          };
+            date: new Date().toISOString().split("T")[0],
+          });
           recordsChanged = true;
         }
-      } else {
-        updatedRecords.push({
-          id: `sr-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
-          exerciseName: ex.exerciseName,
-          weightKg: set.weightKg,
-          reps: set.reps,
-          estimatedOneRepMaxKg: estimated1RM,
-          date: new Date().toISOString().split('T')[0],
-        });
-        recordsChanged = true;
-      }
-    });
+      });
   });
 
   if (recordsChanged) {
@@ -144,7 +168,7 @@ export function saveMeal(meal: MealItem): MealItem[] {
 }
 
 export function deleteMeal(mealId: string): MealItem[] {
-  const meals = getMeals().filter(m => m.id !== mealId);
+  const meals = getMeals().filter((m) => m.id !== mealId);
   localStorage.setItem(STORAGE_KEYS.MEALS, JSON.stringify(meals));
   notifyStorage();
   return meals;
@@ -192,7 +216,7 @@ export function getStrengthRecords(): StrengthRecord[] {
 }
 
 export function clearAllData(): void {
-  Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+  Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
   notifyStorage();
 }
 
@@ -214,24 +238,26 @@ export function saveVitals(vitals: VitalsData): VitalsData {
 export function getUserMetrics(): UserMetrics {
   try {
     const data = localStorage.getItem(STORAGE_KEYS.USER_METRICS);
-    return data ? JSON.parse(data) : {
-      age: 28,
-      gender: 'male',
-      weightKg: 81.3,
-      heightCm: 180,
-      activityLevel: 'moderate',
-      goal: 'cut',
-      bodyFatPercentage: 14.5
-    };
+    return data
+      ? JSON.parse(data)
+      : {
+          age: 28,
+          gender: "male",
+          weightKg: 81.3,
+          heightCm: 180,
+          activityLevel: "moderate",
+          goal: "cut",
+          bodyFatPercentage: 14.5,
+        };
   } catch {
     return {
       age: 28,
-      gender: 'male',
+      gender: "male",
       weightKg: 81.3,
       heightCm: 180,
-      activityLevel: 'moderate',
-      goal: 'cut',
-      bodyFatPercentage: 14.5
+      activityLevel: "moderate",
+      goal: "cut",
+      bodyFatPercentage: 14.5,
     };
   }
 }
@@ -245,7 +271,7 @@ export function saveUserMetrics(metrics: UserMetrics): UserMetrics {
 export function getDarkMode(): boolean {
   try {
     const val = localStorage.getItem(STORAGE_KEYS.DARK_MODE);
-    return val === null ? true : val === 'true'; // Default to true (Bold Typography theme)
+    return val === null ? true : val === "true"; // Default to true (Bold Typography theme)
   } catch {
     return true;
   }

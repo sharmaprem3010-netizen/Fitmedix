@@ -1,11 +1,11 @@
-import { UserMetrics, MacroTargets } from '../types/fitness';
+import { UserMetrics, MacroTargets } from "../types/fitness";
 
 /**
  * Calculates BMR using the Mifflin-St Jeor Formula
  */
 export function calculateBMR(metrics: UserMetrics): number {
   const { weightKg, heightCm, age, gender } = metrics;
-  if (gender === 'male') {
+  if (gender === "male") {
     return Math.round(10 * weightKg + 6.25 * heightCm - 5 * age + 5);
   } else {
     return Math.round(10 * weightKg + 6.25 * heightCm - 5 * age - 161);
@@ -15,10 +15,14 @@ export function calculateBMR(metrics: UserMetrics): number {
 /**
  * Calculates TDEE based on BMR and activity multiplier
  */
-export function calculateTDEE(metrics: UserMetrics): { bmr: number; tdee: number; targetCalories: number } {
+export function calculateTDEE(metrics: UserMetrics): {
+  bmr: number;
+  tdee: number;
+  targetCalories: number;
+} {
   const bmr = calculateBMR(metrics);
-  
-  const multipliers: Record<UserMetrics['activityLevel'], number> = {
+
+  const multipliers: Record<UserMetrics["activityLevel"], number> = {
     sedentary: 1.2,
     light: 1.375,
     moderate: 1.55,
@@ -27,11 +31,11 @@ export function calculateTDEE(metrics: UserMetrics): { bmr: number; tdee: number
   };
 
   const tdee = Math.round(bmr * (multipliers[metrics.activityLevel] || 1.55));
-  
+
   let targetCalories = tdee;
-  if (metrics.goal === 'cut') {
+  if (metrics.goal === "cut") {
     targetCalories = Math.round(tdee * 0.8); // 20% deficit
-  } else if (metrics.goal === 'bulk') {
+  } else if (metrics.goal === "bulk") {
     targetCalories = Math.round(tdee * 1.15); // 15% surplus
   }
 
@@ -41,9 +45,13 @@ export function calculateTDEE(metrics: UserMetrics): { bmr: number; tdee: number
 /**
  * Calculates target macronutrients based on calorie target & weight
  */
-export function calculateMacroSplit(targetCalories: number, weightKg: number, goal: UserMetrics['goal']): MacroTargets {
+export function calculateMacroSplit(
+  targetCalories: number,
+  weightKg: number,
+  goal: UserMetrics["goal"],
+): MacroTargets {
   let proteinG = Math.round(weightKg * 2.2); // ~2.2g per kg (1g per lb)
-  if (goal === 'cut') {
+  if (goal === "cut") {
     proteinG = Math.round(weightKg * 2.4); // slightly higher protein on cut
   }
 
@@ -59,7 +67,7 @@ export function calculateMacroSplit(targetCalories: number, weightKg: number, go
     protein: proteinG,
     carbs: carbsG,
     fat: fatG,
-    waterMl: Math.round(weightKg * 40) // 40ml per kg
+    waterMl: Math.round(weightKg * 40), // 40ml per kg
   };
 }
 
@@ -75,7 +83,11 @@ export function calculateOneRepMax(weightKg: number, reps: number): number {
 /**
  * Estimates workout calorie expenditure based on duration and intensity
  */
-export function estimateCalorieBurn(durationMinutes: number, bodyWeightKg: number = 80, intensityMultiplier: number = 6.5): number {
+export function estimateCalorieBurn(
+  durationMinutes: number,
+  bodyWeightKg: number = 80,
+  intensityMultiplier: number = 6.5,
+): number {
   // Calorie Burn = MET x 3.5 x weight (kg) / 200 x duration (mins)
-  return Math.round((intensityMultiplier * 3.5 * bodyWeightKg / 200) * durationMinutes);
+  return Math.round(((intensityMultiplier * 3.5 * bodyWeightKg) / 200) * durationMinutes);
 }

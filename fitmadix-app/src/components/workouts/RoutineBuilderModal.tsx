@@ -1,9 +1,9 @@
-import React, { useState, useContext } from 'react';
-import { Search, Plus, Trash2, Dumbbell, Save } from 'lucide-react';
-import { Routine, RoutineExercise, ExerciseCategory } from '../../types/fitness';
-import { Modal } from '../ui/Modal';
-import { Button } from '../ui/AppButton';
-import { AuthenticatedContext } from '../../routes/_authenticated/route';
+import React, { useState, useContext } from "react";
+import { Search, Plus, Trash2, Dumbbell, Save } from "lucide-react";
+import { Routine, RoutineExercise, ExerciseCategory } from "../../types/fitness";
+import { Modal } from "../ui/Modal";
+import { Button } from "../ui/AppButton";
+import { AuthenticatedContext } from "../../routes/_authenticated/route";
 
 interface RoutineBuilderModalProps {
   isOpen: boolean;
@@ -20,15 +20,17 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
 }) => {
   const context = useContext(AuthenticatedContext);
   const EXERCISES_DATABASE = context?.exercises || [];
-  const [title, setTitle] = useState('');
-  const [subtitle, setSubtitle] = useState('');
-  const [category, setCategory] = useState('Hypertrophy');
+  const [title, setTitle] = useState("");
+  const [subtitle, setSubtitle] = useState("");
+  const [category, setCategory] = useState("Hypertrophy");
   const [durationMinutes, setDurationMinutes] = useState(60);
-  const [difficulty, setDifficulty] = useState<'Beginner' | 'Intermediate' | 'Advanced'>('Intermediate');
+  const [difficulty, setDifficulty] = useState<"Beginner" | "Intermediate" | "Advanced">(
+    "Intermediate",
+  );
   const [selectedExercises, setSelectedExercises] = useState<RoutineExercise[]>([]);
 
   const handleAddExercise = (exerciseId: string) => {
-    const found = EXERCISES_DATABASE.find(e => e.id === exerciseId);
+    const found = EXERCISES_DATABASE.find((e) => e.id === exerciseId);
     if (!found) return;
 
     const newEx: RoutineExercise = {
@@ -41,23 +43,23 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
       restSeconds: found.restSeconds,
     };
 
-    setSelectedExercises(prev => [...prev, newEx]);
+    setSelectedExercises((prev) => [...prev, newEx]);
   };
 
   const handleRemoveExercise = (index: number) => {
-    setSelectedExercises(prev => prev.filter((_, idx) => idx !== index));
+    setSelectedExercises((prev) => prev.filter((_, idx) => idx !== index));
   };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
-    const targetMuscles = Array.from(new Set(selectedExercises.map(e => e.category))) as string[];
+    const targetMuscles = Array.from(new Set(selectedExercises.map((e) => e.category))) as string[];
 
     const newRoutine: Routine = {
       id: `custom-routine-${Date.now()}`,
       title,
-      subtitle: subtitle || `${targetMuscles.join(' & ')} Focus`,
+      subtitle: subtitle || `${targetMuscles.join(" & ")} Focus`,
       category,
       durationMinutes,
       targetMuscles,
@@ -91,7 +93,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
               required
               placeholder="e.g. Chest & Triceps Blast"
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
             />
           </div>
@@ -103,7 +105,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
               type="text"
               placeholder="e.g. Upper Body Hypertrophy"
               value={subtitle}
-              onChange={e => setSubtitle(e.target.value)}
+              onChange={(e) => setSubtitle(e.target.value)}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
             />
           </div>
@@ -118,7 +120,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
             <input
               type="text"
               value={category}
-              onChange={e => setCategory(e.target.value)}
+              onChange={(e) => setCategory(e.target.value)}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
             />
           </div>
@@ -130,7 +132,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
             <input
               type="number"
               value={durationMinutes}
-              onChange={e => setDurationMinutes(parseInt(e.target.value) || 45)}
+              onChange={(e) => setDurationMinutes(parseInt(e.target.value) || 45)}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
             />
           </div>
@@ -141,7 +143,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
             </label>
             <select
               value={difficulty}
-              onChange={e => setDifficulty(e.target.value as any)}
+              onChange={(e) => setDifficulty(e.target.value as any)}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
             >
               <option value="Beginner">Beginner</option>
@@ -157,16 +159,16 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
             Add Exercise from Database
           </label>
           <select
-            onChange={e => {
+            onChange={(e) => {
               if (e.target.value) {
                 handleAddExercise(e.target.value);
-                e.target.value = '';
+                e.target.value = "";
               }
             }}
             className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-zinc-600 cursor-pointer"
           >
             <option value="">-- Choose an exercise to add --</option>
-            {EXERCISES_DATABASE.map(ex => (
+            {EXERCISES_DATABASE.map((ex) => (
               <option key={ex.id} value={ex.id}>
                 {ex.name} ({ex.category})
               </option>
@@ -186,10 +188,15 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
             </div>
           ) : (
             selectedExercises.map((ex, idx) => (
-              <div key={idx} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-between gap-3">
+              <div
+                key={idx}
+                className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-between gap-3"
+              >
                 <div>
                   <p className="text-sm font-bold text-white">{ex.exerciseName}</p>
-                  <p className="text-xs text-zinc-400">{ex.sets} sets × {ex.reps} • Rest {ex.restSeconds}s</p>
+                  <p className="text-xs text-zinc-400">
+                    {ex.sets} sets × {ex.reps} • Rest {ex.restSeconds}s
+                  </p>
                 </div>
                 <button
                   type="button"

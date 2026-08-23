@@ -31,14 +31,23 @@ Rules:
 
 export const generateAIWorkoutServer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { goal: string; experienceLevel: string; daysPerWeek: number; equipment: string; targetFocus: string }) =>
-    z.object({
-      goal: z.string(),
-      experienceLevel: z.string(),
-      daysPerWeek: z.number(),
-      equipment: z.string(),
-      targetFocus: z.string(),
-    }).parse(input),
+  .inputValidator(
+    (input: {
+      goal: string;
+      experienceLevel: string;
+      daysPerWeek: number;
+      equipment: string;
+      targetFocus: string;
+    }) =>
+      z
+        .object({
+          goal: z.string(),
+          experienceLevel: z.string(),
+          daysPerWeek: z.number(),
+          equipment: z.string(),
+          targetFocus: z.string(),
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -53,17 +62,20 @@ export const generateAIWorkoutServer = createServerFn({ method: "POST" })
 
 Return ONLY the JSON object, no other text.`;
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: WORKOUT_SYSTEM_PROMPT }] },
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-        },
-      }),
-    });
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: WORKOUT_SYSTEM_PROMPT }] },
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+          },
+        }),
+      },
+    );
 
     if (!res.ok) {
       const text = await res.text();
@@ -73,7 +85,7 @@ Return ONLY the JSON object, no other text.`;
 
     const json = (await res.json()) as any;
     const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
-    
+
     try {
       return JSON.parse(rawText);
     } catch {
@@ -109,13 +121,16 @@ Rules:
 
 export const generateAIMealPlanServer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { calorieTarget: number; dietType: string; goal: string; allergies: string }) =>
-    z.object({
-      calorieTarget: z.number(),
-      dietType: z.string(),
-      goal: z.string(),
-      allergies: z.string(),
-    }).parse(input),
+  .inputValidator(
+    (input: { calorieTarget: number; dietType: string; goal: string; allergies: string }) =>
+      z
+        .object({
+          calorieTarget: z.number(),
+          dietType: z.string(),
+          goal: z.string(),
+          allergies: z.string(),
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -125,21 +140,24 @@ export const generateAIMealPlanServer = createServerFn({ method: "POST" })
 - Target Calories: ${data.calorieTarget} kcal
 - Dietary Focus: ${data.dietType}
 - Goal: ${data.goal}
-- Allergies/Restrictions: ${data.allergies || 'None'}
+- Allergies/Restrictions: ${data.allergies || "None"}
 
 Return ONLY the JSON object, no other text.`;
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: MEAL_SYSTEM_PROMPT }] },
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-        },
-      }),
-    });
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: MEAL_SYSTEM_PROMPT }] },
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+          },
+        }),
+      },
+    );
 
     if (!res.ok) {
       const text = await res.text();
@@ -148,7 +166,7 @@ Return ONLY the JSON object, no other text.`;
 
     const json = (await res.json()) as any;
     const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
-    
+
     try {
       return JSON.parse(rawText);
     } catch {
@@ -177,10 +195,12 @@ Rules:
 export const askAICoachServer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { query: string; context: string }) =>
-    z.object({
-      query: z.string().min(1).max(2000),
-      context: z.string(),
-    }).parse(input),
+    z
+      .object({
+        query: z.string().min(1).max(2000),
+        context: z.string(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -188,14 +208,17 @@ export const askAICoachServer = createServerFn({ method: "POST" })
 
     const userPrompt = `User context: ${data.context}\n\nQuestion: ${data.query}`;
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: COACH_SYSTEM_PROMPT }] },
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-      }),
-    });
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: COACH_SYSTEM_PROMPT }] },
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        }),
+      },
+    );
 
     if (!res.ok) {
       const text = await res.text();
@@ -204,7 +227,9 @@ export const askAICoachServer = createServerFn({ method: "POST" })
     }
 
     const json = (await res.json()) as any;
-    const reply = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "I'm sorry, I couldn't generate a response. Please try again.";
-    
+    const reply =
+      json.candidates?.[0]?.content?.parts?.[0]?.text ??
+      "I'm sorry, I couldn't generate a response. Please try again.";
+
     return { reply };
   });

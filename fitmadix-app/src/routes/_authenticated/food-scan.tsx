@@ -1,13 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import {
-  ArrowLeft,
-  Camera,
-  Leaf,
-  Loader2,
-  RefreshCw,
-} from "lucide-react";
+import { ArrowLeft, Camera, Leaf, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useCamera } from "@/hooks/use-camera";
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
@@ -80,7 +74,15 @@ function NutrientBar({ label, level }: { label: string; level: string }) {
 }
 
 function FoodScanPage() {
-  const { videoRef, isStreaming, photoDataUrl, capture, reset, startCamera, error: camError } = useCamera();
+  const {
+    videoRef,
+    isStreaming,
+    photoDataUrl,
+    capture,
+    reset,
+    startCamera,
+    error: camError,
+  } = useCamera();
   const { speak } = useTextToSpeech();
   const analyze = useServerFn(analyzeFood);
 
@@ -143,13 +145,7 @@ function FoodScanPage() {
           <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
             {isStreaming ? (
               <div className="relative overflow-hidden rounded-2xl bg-black">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full"
-                />
+                <video ref={videoRef} autoPlay playsInline muted className="w-full" />
                 {/* Viewfinder */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="h-[60%] w-[80%] rounded-3xl border-2 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.3)]" />
@@ -200,11 +196,7 @@ function FoodScanPage() {
         {/* Preview Step */}
         {step === "preview" && photoDataUrl && (
           <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
-            <img
-              src={photoDataUrl}
-              alt="Captured food"
-              className="w-full rounded-2xl"
-            />
+            <img src={photoDataUrl} alt="Captured food" className="w-full rounded-2xl" />
             <div className="mt-4 flex gap-3">
               <button
                 onClick={handleReset}
@@ -242,9 +234,7 @@ function FoodScanPage() {
                   >
                     {ratingConfig[result.healthRating].label}
                   </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {result.calories_estimate}
-                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">{result.calories_estimate}</p>
                 </div>
 
                 {/* Detected Items */}

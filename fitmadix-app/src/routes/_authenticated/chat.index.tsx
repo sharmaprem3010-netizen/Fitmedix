@@ -13,7 +13,9 @@ export const Route = createFileRoute("/_authenticated/chat/")({
 function ChatIndex() {
   const navigate = useNavigate();
   const create = useServerFn(createThread);
-  const [threads, setThreads] = useState<{ id: string; title: string; updated_at: string }[] | null>(null);
+  const [threads, setThreads] = useState<
+    { id: string; title: string; updated_at: string }[] | null
+  >(null);
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
@@ -56,7 +58,9 @@ function ChatIndex() {
         >
           <Plus className="h-3.5 w-3.5" /> New consultation
         </button>
-        <Link to="/" className="text-xs hover:underline">Back home</Link>
+        <Link to="/" className="text-xs hover:underline">
+          Back home
+        </Link>
       </div>
     </div>
   );

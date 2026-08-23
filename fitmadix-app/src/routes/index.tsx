@@ -245,7 +245,9 @@ function Hero() {
               </span>
               <div className="leading-tight">
                 <p className="font-display text-base tracking-wide text-foreground">{b.label}</p>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{b.sub}</p>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {b.sub}
+                </p>
               </div>
             </div>
           ))}
@@ -351,9 +353,21 @@ function Features() {
 
 function HowItWorks() {
   const steps = [
-    { n: "01", title: "Create your account", desc: "Sign up with email and add a basic profile so the AI can tailor its answers." },
-    { n: "02", title: "Describe your symptoms", desc: "Chat naturally. The AI asks follow-up questions the way a good doctor would." },
-    { n: "03", title: "Get clear guidance", desc: "Possible causes, self-care steps, and when to seek professional help — with warnings when it matters." },
+    {
+      n: "01",
+      title: "Create your account",
+      desc: "Sign up with email and add a basic profile so the AI can tailor its answers.",
+    },
+    {
+      n: "02",
+      title: "Describe your symptoms",
+      desc: "Chat naturally. The AI asks follow-up questions the way a good doctor would.",
+    },
+    {
+      n: "03",
+      title: "Get clear guidance",
+      desc: "Possible causes, self-care steps, and when to seek professional help — with warnings when it matters.",
+    },
   ];
   return (
     <section id="how" className="border-y border-border bg-surface">
@@ -389,14 +403,18 @@ function Safety() {
         <div className="mt-6 space-y-4 text-sm text-muted-foreground">
           <p>
             Fitmadix is an AI assistant powered by large language models. It is designed for
-            <span className="text-foreground"> general educational and informational purposes only</span>{" "}
+            <span className="text-foreground">
+              {" "}
+              general educational and informational purposes only
+            </span>{" "}
             and is not a substitute for professional medical advice, diagnosis, or treatment.
           </p>
           <p>
-            <span className="text-foreground">Always seek the advice of a qualified healthcare
-              provider</span> with any questions you may have regarding a medical condition. Never
-            disregard professional medical advice or delay seeking it because of something you read
-            here.
+            <span className="text-foreground">
+              Always seek the advice of a qualified healthcare provider
+            </span>{" "}
+            with any questions you may have regarding a medical condition. Never disregard
+            professional medical advice or delay seeking it because of something you read here.
           </p>
           <ul className="grid gap-2">
             {[
@@ -427,9 +445,15 @@ function Footer() {
           </span>
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-          <a href="#safety" className="hover:text-foreground">Safety</a>
-          <a href="#features" className="hover:text-foreground">Features</a>
-          <Link to="/auth" className="hover:text-foreground">Sign in</Link>
+          <a href="#safety" className="hover:text-foreground">
+            Safety
+          </a>
+          <a href="#features" className="hover:text-foreground">
+            Features
+          </a>
+          <Link to="/auth" className="hover:text-foreground">
+            Sign in
+          </Link>
         </nav>
       </div>
     </footer>

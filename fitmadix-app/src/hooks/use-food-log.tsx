@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
 export interface FoodLogEntry {
   id: string;
@@ -36,18 +36,18 @@ export function useFoodLog(date: string) {
     }
 
     const { data, error } = await (supabase as any)
-      .from('food_log')
-      .select('*')
-      .eq('user_id', user.user.id)
-      .eq('date', date)
-      .order('created_at', { ascending: true });
+      .from("food_log")
+      .select("*")
+      .eq("user_id", user.user.id)
+      .eq("date", date)
+      .order("created_at", { ascending: true });
 
     if (!error && data) {
       // In a real app, water might be stored separately or as a specific row type
       // For this implementation, we'll store water in local state for the day
       const storedWater = localStorage.getItem(`water_${date}`);
       if (storedWater) setWaterGlasses(parseInt(storedWater, 10));
-      
+
       setEntries(data as unknown as FoodLogEntry[]);
     }
     setLoading(false);
@@ -57,30 +57,30 @@ export function useFoodLog(date: string) {
     fetchLog();
   }, [fetchLog]);
 
-  const addEntry = async (entry: Omit<FoodLogEntry, 'id'>) => {
+  const addEntry = async (entry: Omit<FoodLogEntry, "id">) => {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) return;
 
     const { data, error } = await (supabase as any)
-      .from('food_log')
+      .from("food_log")
       .insert({
         user_id: user.user.id,
-        ...entry
+        ...entry,
       })
       .select()
       .single();
 
     if (!error && data) {
-      setEntries(prev => [...prev, data as unknown as FoodLogEntry]);
+      setEntries((prev) => [...prev, data as unknown as FoodLogEntry]);
     } else {
-        throw new Error(error?.message || "Failed to add entry");
+      throw new Error(error?.message || "Failed to add entry");
     }
   };
 
   const removeEntry = async (id: string) => {
-    const { error } = await (supabase as any).from('food_log').delete().eq('id', id);
+    const { error } = await (supabase as any).from("food_log").delete().eq("id", id);
     if (!error) {
-      setEntries(prev => prev.filter(e => e.id !== id));
+      setEntries((prev) => prev.filter((e) => e.id !== id));
     }
   };
 
@@ -89,13 +89,16 @@ export function useFoodLog(date: string) {
     localStorage.setItem(`water_${date}`, glasses.toString());
   };
 
-  const summary: DailySummary = entries.reduce((acc, entry) => ({
-    calories: acc.calories + (entry.calories || 0),
-    protein: acc.protein + (entry.protein_g || 0),
-    carbs: acc.carbs + (entry.carbs_g || 0),
-    fat: acc.fat + (entry.fat_g || 0),
-    water_glasses: waterGlasses
-  }), { calories: 0, protein: 0, carbs: 0, fat: 0, water_glasses: waterGlasses });
+  const summary: DailySummary = entries.reduce(
+    (acc, entry) => ({
+      calories: acc.calories + (entry.calories || 0),
+      protein: acc.protein + (entry.protein_g || 0),
+      carbs: acc.carbs + (entry.carbs_g || 0),
+      fat: acc.fat + (entry.fat_g || 0),
+      water_glasses: waterGlasses,
+    }),
+    { calories: 0, protein: 0, carbs: 0, fat: 0, water_glasses: waterGlasses },
+  );
 
   return {
     entries,
@@ -105,6 +108,6 @@ export function useFoodLog(date: string) {
     removeEntry,
     waterGlasses,
     updateWater,
-    refresh: fetchLog
+    refresh: fetchLog,
   };
 }

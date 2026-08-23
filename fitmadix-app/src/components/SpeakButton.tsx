@@ -34,11 +34,7 @@ export function SpeakButton({ text, lang = "en-IN", className = "" }: SpeakButto
       aria-label={isSpeaking ? "Stop speaking" : "Read aloud"}
       title={isSpeaking ? "Stop" : "Read aloud"}
     >
-      {isSpeaking ? (
-        <VolumeX className="h-3.5 w-3.5" />
-      ) : (
-        <Volume2 className="h-3.5 w-3.5" />
-      )}
+      {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
     </button>
   );
 }

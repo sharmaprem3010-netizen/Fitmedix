@@ -24,24 +24,27 @@ function MedicineEncyclopediaPage() {
     if (query !== transcript) setQuery(transcript);
   }
 
-  const handleSearch = useCallback(async (e?: React.FormEvent, directQuery?: string) => {
-    e?.preventDefault();
-    const searchTerm = directQuery ?? query;
-    if (!searchTerm.trim()) return;
-    
-    if (directQuery) setQuery(directQuery);
-    setLoading(true);
-    setResult(null);
-    try {
-      const res = await search({ data: { query: searchTerm, type: "medicine" } });
-      setResult(res);
-      if (res.description) speak(res.description);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Search failed");
-    } finally {
-      setLoading(false);
-    }
-  }, [query, search, speak]);
+  const handleSearch = useCallback(
+    async (e?: React.FormEvent, directQuery?: string) => {
+      e?.preventDefault();
+      const searchTerm = directQuery ?? query;
+      if (!searchTerm.trim()) return;
+
+      if (directQuery) setQuery(directQuery);
+      setLoading(true);
+      setResult(null);
+      try {
+        const res = await search({ data: { query: searchTerm, type: "medicine" } });
+        setResult(res);
+        if (res.description) speak(res.description);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Search failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [query, search, speak],
+  );
 
   const handleReset = () => {
     setResult(null);
@@ -63,7 +66,11 @@ function MedicineEncyclopediaPage() {
     <div className="flex-1 overflow-y-auto bg-background">
       <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
         <div className="mb-6 flex items-center gap-3">
-          <Link to="/hub" className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground hover:bg-secondary hover:text-foreground" aria-label="Go back to hub">
+          <Link
+            to="/hub"
+            className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+            aria-label="Go back to hub"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
@@ -135,7 +142,11 @@ function MedicineEncyclopediaPage() {
             <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
               <div className="flex items-start justify-between">
                 <h2 className="text-2xl font-semibold">{result.name}</h2>
-                <button onClick={() => speak(result.description)} className="text-primary hover:opacity-80" aria-label="Read aloud">
+                <button
+                  onClick={() => speak(result.description)}
+                  className="text-primary hover:opacity-80"
+                  aria-label="Read aloud"
+                >
                   <Volume2 className="h-5 w-5" />
                 </button>
               </div>
@@ -147,15 +158,24 @@ function MedicineEncyclopediaPage() {
                 <h3 className="text-sm font-medium text-muted-foreground">Common Uses</h3>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {result.uses.map((u: string, i: number) => (
-                    <span key={i} className="rounded-full bg-secondary px-3 py-1 text-xs text-foreground">{u}</span>
+                    <span
+                      key={i}
+                      className="rounded-full bg-secondary px-3 py-1 text-xs text-foreground"
+                    >
+                      {u}
+                    </span>
                   ))}
                 </div>
               </div>
             )}
 
             <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5">
-              <h3 className="text-sm font-medium text-blue-700 dark:text-blue-400">💊 How to take it</h3>
-              <p className="mt-1 text-sm text-blue-800/80 dark:text-blue-300/80">{result.dosage_tips}</p>
+              <h3 className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                💊 How to take it
+              </h3>
+              <p className="mt-1 text-sm text-blue-800/80 dark:text-blue-300/80">
+                {result.dosage_tips}
+              </p>
             </div>
 
             {result.side_effects?.length > 0 && (
@@ -163,12 +183,20 @@ function MedicineEncyclopediaPage() {
                 <h3 className="text-sm font-medium text-muted-foreground mb-3">Side Effects</h3>
                 <div className="space-y-2">
                   {result.side_effects.map((se: any, i: number) => (
-                    <div key={i} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
+                    <div
+                      key={i}
+                      className="flex items-center justify-between rounded-lg bg-secondary/50 p-3"
+                    >
                       <span className="text-sm">{se.effect}</span>
-                      <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-md ${
-                        se.severity === 'severe' ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' :
-                        se.severity === 'moderate' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
-                      }`}>
+                      <span
+                        className={`text-[10px] uppercase font-bold px-2 py-1 rounded-md ${
+                          se.severity === "severe"
+                            ? "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400"
+                            : se.severity === "moderate"
+                              ? "bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
+                              : "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+                        }`}
+                      >
                         {se.severity}
                       </span>
                     </div>
@@ -179,9 +207,13 @@ function MedicineEncyclopediaPage() {
 
             {result.warnings?.length > 0 && (
               <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5">
-                <h3 className="text-sm font-medium text-red-700 dark:text-red-400">⚠️ Important Warnings</h3>
+                <h3 className="text-sm font-medium text-red-700 dark:text-red-400">
+                  ⚠️ Important Warnings
+                </h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-red-600/80 dark:text-red-400/80">
-                  {result.warnings.map((w: string, i: number) => <li key={i}>{w}</li>)}
+                  {result.warnings.map((w: string, i: number) => (
+                    <li key={i}>{w}</li>
+                  ))}
                 </ul>
               </div>
             )}

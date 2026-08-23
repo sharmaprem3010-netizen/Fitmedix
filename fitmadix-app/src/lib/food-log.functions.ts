@@ -31,13 +31,13 @@ export const searchFoodLogItem = createServerFn({ method: "POST" })
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: FOOD_SEARCH_PROMPT }] },
           contents: [{ role: "user", parts: [{ text: `Provide nutrition for: ${data.query}` }] }],
-          generationConfig: { responseMimeType: "application/json" }
+          generationConfig: { responseMimeType: "application/json" },
         }),
       },
     );
 
     if (!res.ok) {
-        throw new Error("Failed to search food item.");
+      throw new Error("Failed to search food item.");
     }
 
     const json = await res.json();

@@ -17,8 +17,7 @@ export function useTextToSpeech(): UseTextToSpeechReturn {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  const isSupported =
-    typeof window !== "undefined" && "speechSynthesis" in window;
+  const isSupported = typeof window !== "undefined" && "speechSynthesis" in window;
 
   const getBestVoice = useCallback(
     (lang: Language): SpeechSynthesisVoice | null => {
@@ -86,8 +85,7 @@ export function useTextToSpeech(): UseTextToSpeechReturn {
       // This triggers re-evaluation of getBestVoice on next speak() call
     };
     window.speechSynthesis.addEventListener("voiceschanged", handleVoicesChanged);
-    return () =>
-      window.speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
+    return () => window.speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
   }, [isSupported]);
 
   return { speak, stop, isSpeaking, isSupported };

@@ -4,8 +4,12 @@
  * Previously this file returned hardcoded empty data.  Now every call goes
  * through the real Gemini-powered server functions defined in /lib/*.
  */
-import type { AIWorkoutPlan, AIMealPlan } from '../types/fitness';
-import { generateAIWorkoutServer, generateAIMealPlanServer, askAICoachServer } from '../lib/ai-coach.functions';
+import type { AIWorkoutPlan, AIMealPlan } from "../types/fitness";
+import {
+  generateAIWorkoutServer,
+  generateAIMealPlanServer,
+  askAICoachServer,
+} from "../lib/ai-coach.functions";
 
 export async function generateAIWorkout(params: {
   goal: string;
@@ -16,16 +20,16 @@ export async function generateAIWorkout(params: {
 }): Promise<AIWorkoutPlan> {
   const result = await generateAIWorkoutServer({ data: params });
   return {
-    title: result.title ?? 'AI Generated Routine',
-    summary: result.summary ?? '',
-    splitOverview: result.splitOverview ?? '',
+    title: result.title ?? "AI Generated Routine",
+    summary: result.summary ?? "",
+    splitOverview: result.splitOverview ?? "",
     exercises: (result.exercises ?? []).map((ex: any) => ({
-      name: ex.name ?? 'Unknown',
-      category: ex.category ?? 'Full Body',
+      name: ex.name ?? "Unknown",
+      category: ex.category ?? "Full Body",
       sets: Number(ex.sets) || 3,
-      reps: String(ex.reps ?? '10'),
+      reps: String(ex.reps ?? "10"),
       restSeconds: Number(ex.restSeconds) || 60,
-      reasoning: ex.reasoning ?? '',
+      reasoning: ex.reasoning ?? "",
     })),
   };
 }
@@ -38,7 +42,7 @@ export async function generateAIMealPlan(params: {
 }): Promise<AIMealPlan> {
   const result = await generateAIMealPlanServer({ data: params });
   return {
-    title: result.title ?? 'AI Generated Meal Plan',
+    title: result.title ?? "AI Generated Meal Plan",
     dailyCalories: Number(result.dailyCalories) || params.calorieTarget,
     macros: {
       protein: Number(result.macros?.protein) || 150,
@@ -46,9 +50,9 @@ export async function generateAIMealPlan(params: {
       fat: Number(result.macros?.fat) || 65,
     },
     meals: (result.meals ?? []).map((m: any) => ({
-      mealName: m.mealName ?? 'Meal',
-      timeSlot: m.timeSlot ?? '',
-      description: m.description ?? '',
+      mealName: m.mealName ?? "Meal",
+      timeSlot: m.timeSlot ?? "",
+      description: m.description ?? "",
       ingredients: m.ingredients ?? [],
       macros: {
         calories: Number(m.macros?.calories) || 0,

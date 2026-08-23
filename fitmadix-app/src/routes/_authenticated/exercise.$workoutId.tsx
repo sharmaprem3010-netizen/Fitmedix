@@ -42,7 +42,9 @@ function ActiveWorkoutPage() {
           </button>
           <div className="absolute bottom-6 left-6 text-white">
             <h1 className="text-3xl font-bold">{plan.title}</h1>
-            <p className="mt-2 text-white/80">{plan.estimatedMinutes} mins • {totalExercises} exercises</p>
+            <p className="mt-2 text-white/80">
+              {plan.estimatedMinutes} mins • {totalExercises} exercises
+            </p>
           </div>
         </div>
         <div className="flex-1 rounded-t-3xl bg-background -mt-4 px-6 pt-6 pb-24">
@@ -56,7 +58,9 @@ function ActiveWorkoutPage() {
                 <div>
                   <h3 className="font-semibold">{ex.name}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {ex.duration_seconds ? `00:${ex.duration_seconds.toString().padStart(2, '0')}` : `x${ex.reps}`}
+                    {ex.duration_seconds
+                      ? `00:${ex.duration_seconds.toString().padStart(2, "0")}`
+                      : `x${ex.reps}`}
                   </p>
                 </div>
               </div>
@@ -80,7 +84,9 @@ function ActiveWorkoutPage() {
       <div className="flex min-h-dvh flex-col items-center justify-center bg-background p-6 text-center">
         <CheckCircle2 className="mx-auto h-24 w-24 text-emerald-500" />
         <h1 className="mt-6 text-3xl font-bold">Workout Complete!</h1>
-        <p className="mt-2 text-muted-foreground">You burned approx {plan.estimatedCalories} calories.</p>
+        <p className="mt-2 text-muted-foreground">
+          You burned approx {plan.estimatedCalories} calories.
+        </p>
         <Link
           to="/exercise"
           className="mt-10 w-full rounded-full bg-gradient-primary py-4 font-bold text-primary-foreground shadow-glow"
@@ -127,10 +133,10 @@ function ActiveWorkoutPage() {
             <span className="mb-6 text-8xl">{currentExercise?.icon}</span>
             <h2 className="text-2xl font-bold">{currentExercise?.name}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{currentExercise?.description}</p>
-            
+
             <div className="my-8 text-7xl font-bold tracking-tighter text-primary">
               {currentExercise?.duration_seconds ? (
-                <span>00:{timeRemaining.toString().padStart(2, '0')}</span>
+                <span>00:{timeRemaining.toString().padStart(2, "0")}</span>
               ) : (
                 <span>x{currentExercise?.reps}</span>
               )}
@@ -148,12 +154,12 @@ function ActiveWorkoutPage() {
           >
             {state === "paused" ? <Play className="h-8 w-8 ml-1" /> : <Pause className="h-8 w-8" />}
           </button>
-          
+
           <button
             onClick={next}
             className="grid h-20 w-20 place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-glow"
           >
-            {(state === "resting" || currentExercise?.duration_seconds) ? (
+            {state === "resting" || currentExercise?.duration_seconds ? (
               <SkipForward className="h-8 w-8" />
             ) : (
               <ChevronRight className="h-10 w-10" /> // "Done" with reps
@@ -161,7 +167,7 @@ function ActiveWorkoutPage() {
           </button>
         </div>
         <p className="mt-4 text-center text-xs text-muted-foreground uppercase font-bold tracking-wider">
-          {(state === "resting" || currentExercise?.duration_seconds) ? "Skip" : "Done with reps"}
+          {state === "resting" || currentExercise?.duration_seconds ? "Skip" : "Done with reps"}
         </p>
       </div>
     </div>

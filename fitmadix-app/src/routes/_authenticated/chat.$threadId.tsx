@@ -26,7 +26,12 @@ export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   component: ChatThread,
 });
 
-type Msg = { id: string; role: "user" | "assistant" | "system"; content: string; created_at: string };
+type Msg = {
+  id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  created_at: string;
+};
 type Thread = { id: string; title: string; updated_at: string };
 
 function ChatThread() {
@@ -277,24 +282,18 @@ function ChatThread() {
                 {messages.map((m) => (
                   <Bubble key={m.id} role={m.role} content={m.content} />
                 ))}
-                {busy && (
-                  <Bubble
-                    role="assistant"
-                    content=""
-                    typing
-                  />
-                )}
+                {busy && <Bubble role="assistant" content="" typing />}
               </div>
             )}
           </div>
         </div>
 
-        <form
-          onSubmit={submit}
-          className="border-t border-border bg-background px-4 py-3"
-        >
+        <form onSubmit={submit} className="border-t border-border bg-background px-4 py-3">
           <div className="mx-auto flex max-w-2xl items-end gap-2">
-            <MicButton onTranscript={(t) => setInput((prev) => (prev ? prev + " " : "") + t)} disabled={busy} />
+            <MicButton
+              onTranscript={(t) => setInput((prev) => (prev ? prev + " " : "") + t)}
+              disabled={busy}
+            />
             <textarea
               ref={inputRef}
               value={input}
@@ -316,7 +315,11 @@ function ChatThread() {
               className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5 disabled:opacity-50"
               aria-label="Send"
             >
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+              {busy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowUp className="h-4 w-4" />
+              )}
             </button>
           </div>
           <p className="mx-auto mt-2 max-w-2xl text-center text-[10px] text-muted-foreground">
@@ -407,8 +410,15 @@ function Bubble({
   );
 }
 
-function MicButton({ onTranscript, disabled }: { onTranscript: (text: string) => void; disabled: boolean }) {
-  const { isListening, transcript, interimTranscript, startListening, stopListening, isSupported } = useVoiceInput();
+function MicButton({
+  onTranscript,
+  disabled,
+}: {
+  onTranscript: (text: string) => void;
+  disabled: boolean;
+}) {
+  const { isListening, transcript, interimTranscript, startListening, stopListening, isSupported } =
+    useVoiceInput();
 
   useEffect(() => {
     if (transcript) onTranscript(transcript);
@@ -480,7 +490,12 @@ function formatInline(t: string): React.ReactNode {
     if (m.index > last) parts.push(t.slice(last, m.index));
     const tok = m[0];
     if (tok.startsWith("**")) parts.push(<strong key={m.index}>{tok.slice(2, -2)}</strong>);
-    else parts.push(<code key={m.index} className="rounded bg-muted px-1 py-0.5 text-xs">{tok.slice(1, -1)}</code>);
+    else
+      parts.push(
+        <code key={m.index} className="rounded bg-muted px-1 py-0.5 text-xs">
+          {tok.slice(1, -1)}
+        </code>,
+      );
     last = m.index + tok.length;
   }
   if (last < t.length) parts.push(t.slice(last));

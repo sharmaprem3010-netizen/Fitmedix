@@ -1,41 +1,28 @@
-export type NavigationTab = 
-  | 'dashboard' 
-  | 'workouts' 
-  | 'exercises' 
-  | 'nutrition' 
-  | 'ai-coach' 
-  | 'analytics' 
-  | 'vitals'
-  | 'hub'
-  | 'chat'
-  | 'food-log'
-  | 'food-scan'
-  | 'prescription'
-  | 'nearby'
-  | 'profile'
-  | 'exercise'
-  | 'encyclopedia-food'
-  | 'encyclopedia-medicine'
-  | 'encyclopedia-disease';
+export type NavigationTab =
+  | "dashboard"
+  | "workouts"
+  | "exercises"
+  | "nutrition"
+  | "ai-coach"
+  | "analytics"
+  | "vitals"
+  | "hub"
+  | "chat"
+  | "food-log"
+  | "food-scan"
+  | "prescription"
+  | "nearby"
+  | "profile"
+  | "exercise"
+  | "encyclopedia-food"
+  | "encyclopedia-medicine"
+  | "encyclopedia-disease";
 
-export type ExerciseCategory = 
-  | 'Chest' 
-  | 'Back' 
-  | 'Legs' 
-  | 'Shoulders' 
-  | 'Arms' 
-  | 'Core' 
-  | 'Cardio' 
-  | 'Full Body';
+export type ExerciseCategory =
+  "Chest" | "Back" | "Legs" | "Shoulders" | "Arms" | "Core" | "Cardio" | "Full Body";
 
-export type EquipmentType = 
-  | 'Barbell' 
-  | 'Dumbbell' 
-  | 'Machine' 
-  | 'Cable' 
-  | 'Bodyweight' 
-  | 'Kettlebell' 
-  | 'Bands';
+export type EquipmentType =
+  "Barbell" | "Dumbbell" | "Machine" | "Cable" | "Bodyweight" | "Kettlebell" | "Bands";
 
 export interface Exercise {
   id: string;
@@ -44,7 +31,7 @@ export interface Exercise {
   primaryMuscle: string;
   secondaryMuscles?: string[];
   equipment: EquipmentType;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
   instructions: string[];
   tips: string[];
   gifUrl?: string;
@@ -71,7 +58,7 @@ export interface Routine {
   category: string;
   durationMinutes: number;
   targetMuscles: string[];
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
   exercises: RoutineExercise[];
   isCustom?: boolean;
   createdAt?: string;
@@ -113,7 +100,7 @@ export interface MealItem {
   proteinG: number;
   carbsG: number;
   fatG: number;
-  mealType: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack';
+  mealType: "Breakfast" | "Lunch" | "Dinner" | "Snack";
   loggedAt: string;
 }
 
@@ -127,11 +114,11 @@ export interface MacroTargets {
 
 export interface UserMetrics {
   age: number;
-  gender: 'male' | 'female';
+  gender: "male" | "female";
   weightKg: number;
   heightCm: number;
-  activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'extra';
-  goal: 'cut' | 'maintain' | 'bulk';
+  activityLevel: "sedentary" | "light" | "moderate" | "active" | "extra";
+  goal: "cut" | "maintain" | "bulk";
   bodyFatPercentage?: number;
 }
 

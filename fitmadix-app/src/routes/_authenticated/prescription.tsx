@@ -82,7 +82,15 @@ function TimingLabel({ timing }: { timing: string }) {
 }
 
 function PrescriptionPage() {
-  const { videoRef, isStreaming, photoDataUrl, capture, reset, startCamera, error: camError } = useCamera();
+  const {
+    videoRef,
+    isStreaming,
+    photoDataUrl,
+    capture,
+    reset,
+    startCamera,
+    error: camError,
+  } = useCamera();
   const { speak } = useTextToSpeech();
   const analyze = useServerFn(analyzePrescription);
 
@@ -214,11 +222,7 @@ function PrescriptionPage() {
         {/* Preview Step */}
         {step === "preview" && photoDataUrl && (
           <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
-            <img
-              src={photoDataUrl}
-              alt="Captured prescription"
-              className="w-full rounded-2xl"
-            />
+            <img src={photoDataUrl} alt="Captured prescription" className="w-full rounded-2xl" />
             <div className="mt-4 flex gap-3">
               <button
                 onClick={handleReset}

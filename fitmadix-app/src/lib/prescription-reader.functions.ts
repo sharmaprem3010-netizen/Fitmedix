@@ -91,8 +91,7 @@ export const analyzePrescription = createServerFn({ method: "POST" })
     }
 
     const json = (await res.json()) as any;
-    const rawText =
-      json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
     // Parse the JSON response, handling potential markdown code fences
     let cleaned = rawText.trim();
@@ -111,9 +110,11 @@ export const analyzePrescription = createServerFn({ method: "POST" })
     } catch {
       return {
         medicines: [],
-        summary: rawText || "Could not analyze the prescription. Please try taking a clearer photo.",
+        summary:
+          rawText || "Could not analyze the prescription. Please try taking a clearer photo.",
         warnings: "None",
-        nextSteps: "Please try again with a clearer photo, or show the prescription to a pharmacist.",
+        nextSteps:
+          "Please try again with a clearer photo, or show the prescription to a pharmacist.",
       };
     }
   });

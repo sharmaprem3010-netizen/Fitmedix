@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
-import { Utensils, Plus, Trash2, Flame, Droplets, Calculator, RefreshCw, Check } from 'lucide-react';
-import { MealItem, MacroTargets, UserMetrics } from '../../types/fitness';
-import { calculateTDEE, calculateMacroSplit } from '../../utils/calculators';
-import { ProgressRing } from '../ui/ProgressRing';
-import { Button } from '../ui/AppButton';
-import { Modal } from '../ui/Modal';
+import React, { useState } from "react";
+import {
+  Utensils,
+  Plus,
+  Trash2,
+  Flame,
+  Droplets,
+  Calculator,
+  RefreshCw,
+  Check,
+} from "lucide-react";
+import { MealItem, MacroTargets, UserMetrics } from "../../types/fitness";
+import { calculateTDEE, calculateMacroSplit } from "../../utils/calculators";
+import { ProgressRing } from "../ui/ProgressRing";
+import { Button } from "../ui/AppButton";
+import { Modal } from "../ui/Modal";
 
 interface NutritionTrackerProps {
   meals: MealItem[];
@@ -29,13 +38,13 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
   // Quick Meal Form state
-  const [mealName, setMealName] = useState('');
-  const [servingSize, setServingSize] = useState('1 Portion');
+  const [mealName, setMealName] = useState("");
+  const [servingSize, setServingSize] = useState("1 Portion");
   const [calories, setCalories] = useState(400);
   const [proteinG, setProteinG] = useState(30);
   const [carbsG, setCarbsG] = useState(40);
   const [fatG, setFatG] = useState(12);
-  const [mealType, setMealType] = useState<MealItem['mealType']>('Lunch');
+  const [mealType, setMealType] = useState<MealItem["mealType"]>("Lunch");
 
   // Water intake
   const [loggedWaterMl, setLoggedWaterMl] = useState(0);
@@ -62,12 +71,12 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
       carbsG,
       fatG,
       mealType,
-      loggedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      loggedAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
     onAddMeal(newMeal);
     setIsMealModalOpen(false);
-    setMealName('');
+    setMealName("");
   };
 
   const handleCalculateTDEE = () => {
@@ -83,7 +92,9 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-800 pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">Nutrition & Macro Intelligence</h1>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+            Nutrition & Macro Intelligence
+          </h1>
           <p className="text-sm text-zinc-400 mt-1">
             Track daily macronutrients and optimize metabolic output
           </p>
@@ -106,8 +117,10 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Calorie Ring Summary (Col 5) */}
         <div className="lg:col-span-5 bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-2xl relative">
-          <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">Daily Calorie Balance</p>
-          
+          <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">
+            Daily Calorie Balance
+          </p>
+
           <ProgressRing
             value={totalCalories}
             max={macroTargets.calories}
@@ -121,7 +134,7 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
           <p className="text-xs text-zinc-400 mt-4 font-medium">
             {macroTargets.calories - totalCalories > 0
               ? `${macroTargets.calories - totalCalories} kcal remaining for today`
-              : 'Daily calorie target reached'}
+              : "Daily calorie target reached"}
           </p>
         </div>
 
@@ -132,7 +145,8 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-emerald-400">Protein</p>
               <p className="text-3xl font-extrabold text-white mt-1">
-                {totalProtein} <span className="text-sm font-normal text-zinc-500">/ {macroTargets.protein}g</span>
+                {totalProtein}{" "}
+                <span className="text-sm font-normal text-zinc-500">/ {macroTargets.protein}g</span>
               </p>
             </div>
             <div className="h-2 bg-zinc-900 rounded-full overflow-hidden mt-4">
@@ -146,9 +160,12 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
           {/* Carbs */}
           <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-400">Carbohydrates</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-blue-400">
+                Carbohydrates
+              </p>
               <p className="text-3xl font-extrabold text-white mt-1">
-                {totalCarbs} <span className="text-sm font-normal text-zinc-500">/ {macroTargets.carbs}g</span>
+                {totalCarbs}{" "}
+                <span className="text-sm font-normal text-zinc-500">/ {macroTargets.carbs}g</span>
               </p>
             </div>
             <div className="h-2 bg-zinc-900 rounded-full overflow-hidden mt-4">
@@ -164,7 +181,8 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-amber-400">Fats</p>
               <p className="text-3xl font-extrabold text-white mt-1">
-                {totalFat} <span className="text-sm font-normal text-zinc-500">/ {macroTargets.fat}g</span>
+                {totalFat}{" "}
+                <span className="text-sm font-normal text-zinc-500">/ {macroTargets.fat}g</span>
               </p>
             </div>
             <div className="h-2 bg-zinc-900 rounded-full overflow-hidden mt-4">
@@ -193,13 +211,13 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setLoggedWaterMl(prev => prev + 250)}
+            onClick={() => setLoggedWaterMl((prev) => prev + 250)}
             className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs font-bold text-white cursor-pointer"
           >
             + 250ml Glass
           </button>
           <button
-            onClick={() => setLoggedWaterMl(prev => prev + 500)}
+            onClick={() => setLoggedWaterMl((prev) => prev + 500)}
             className="px-3 py-1.5 bg-blue-500 text-black font-bold text-xs rounded-lg hover:bg-blue-400 cursor-pointer"
           >
             + 500ml Bottle
@@ -220,8 +238,11 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
           </div>
         ) : (
           <div className="divide-y divide-zinc-900">
-            {meals.map(m => (
-              <div key={m.id} className="px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-zinc-900/30 transition-colors">
+            {meals.map((m) => (
+              <div
+                key={m.id}
+                className="px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-zinc-900/30 transition-colors"
+              >
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold px-2 py-0.5 bg-zinc-800 text-zinc-300 rounded">
@@ -229,7 +250,9 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
                     </span>
                     <h4 className="text-sm font-bold text-white">{m.name}</h4>
                   </div>
-                  <p className="text-xs text-zinc-500 mt-0.5">{m.servingSize} • Logged at {m.loggedAt}</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    {m.servingSize} • Logged at {m.loggedAt}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-6">
@@ -264,23 +287,27 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
       >
         <form onSubmit={handleSaveMeal} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Meal Name</label>
+            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              Meal Name
+            </label>
             <input
               type="text"
               required
               placeholder="e.g. Salmon & Sweet Potato Bowl"
               value={mealName}
-              onChange={e => setMealName(e.target.value)}
+              onChange={(e) => setMealName(e.target.value)}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-zinc-600"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Meal Slot</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+                Meal Slot
+              </label>
               <select
                 value={mealType}
-                onChange={e => setMealType(e.target.value as any)}
+                onChange={(e) => setMealType(e.target.value as any)}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               >
                 <option value="Breakfast">Breakfast</option>
@@ -291,11 +318,13 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Calories (kcal)</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+                Calories (kcal)
+              </label>
               <input
                 type="number"
                 value={calories}
-                onChange={e => setCalories(parseInt(e.target.value) || 0)}
+                onChange={(e) => setCalories(parseInt(e.target.value) || 0)}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               />
             </div>
@@ -303,29 +332,35 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Protein (g)</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+                Protein (g)
+              </label>
               <input
                 type="number"
                 value={proteinG}
-                onChange={e => setProteinG(parseInt(e.target.value) || 0)}
+                onChange={(e) => setProteinG(parseInt(e.target.value) || 0)}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Carbs (g)</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+                Carbs (g)
+              </label>
               <input
                 type="number"
                 value={carbsG}
-                onChange={e => setCarbsG(parseInt(e.target.value) || 0)}
+                onChange={(e) => setCarbsG(parseInt(e.target.value) || 0)}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Fat (g)</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+                Fat (g)
+              </label>
               <input
                 type="number"
                 value={fatG}
-                onChange={e => setFatG(parseInt(e.target.value) || 0)}
+                onChange={(e) => setFatG(parseInt(e.target.value) || 0)}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               />
             </div>
@@ -353,20 +388,28 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Weight (kg)</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+                Weight (kg)
+              </label>
               <input
                 type="number"
                 value={calcMetrics.weightKg}
-                onChange={e => setCalcMetrics({ ...calcMetrics, weightKg: parseFloat(e.target.value) || 70 })}
+                onChange={(e) =>
+                  setCalcMetrics({ ...calcMetrics, weightKg: parseFloat(e.target.value) || 70 })
+                }
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Height (cm)</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+                Height (cm)
+              </label>
               <input
                 type="number"
                 value={calcMetrics.heightCm}
-                onChange={e => setCalcMetrics({ ...calcMetrics, heightCm: parseFloat(e.target.value) || 175 })}
+                onChange={(e) =>
+                  setCalcMetrics({ ...calcMetrics, heightCm: parseFloat(e.target.value) || 175 })
+                }
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               />
             </div>
@@ -378,7 +421,9 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
               <input
                 type="number"
                 value={calcMetrics.age}
-                onChange={e => setCalcMetrics({ ...calcMetrics, age: parseInt(e.target.value) || 25 })}
+                onChange={(e) =>
+                  setCalcMetrics({ ...calcMetrics, age: parseInt(e.target.value) || 25 })
+                }
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               />
             </div>
@@ -387,7 +432,7 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
               <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Gender</label>
               <select
                 value={calcMetrics.gender}
-                onChange={e => setCalcMetrics({ ...calcMetrics, gender: e.target.value as any })}
+                onChange={(e) => setCalcMetrics({ ...calcMetrics, gender: e.target.value as any })}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
               >
                 <option value="male">Male</option>
@@ -397,10 +442,14 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Activity Multiplier</label>
+            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              Activity Multiplier
+            </label>
             <select
               value={calcMetrics.activityLevel}
-              onChange={e => setCalcMetrics({ ...calcMetrics, activityLevel: e.target.value as any })}
+              onChange={(e) =>
+                setCalcMetrics({ ...calcMetrics, activityLevel: e.target.value as any })
+              }
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
             >
               <option value="sedentary">Sedentary (Desk job, no workouts)</option>
@@ -412,10 +461,12 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Fitness Goal</label>
+            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              Fitness Goal
+            </label>
             <select
               value={calcMetrics.goal}
-              onChange={e => setCalcMetrics({ ...calcMetrics, goal: e.target.value as any })}
+              onChange={(e) => setCalcMetrics({ ...calcMetrics, goal: e.target.value as any })}
               className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
             >
               <option value="cut">Fat Loss (-20% Calorie Deficit)</option>

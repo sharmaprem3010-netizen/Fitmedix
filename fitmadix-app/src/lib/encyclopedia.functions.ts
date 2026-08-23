@@ -50,19 +50,20 @@ Respond with a JSON object exactly matching this structure:
   "when_to_see_doctor": "Clear advice on when this requires medical attention",
   "is_emergency": true | false
 }
-Keep language simple (5th-grade level). Never diagnose.`
+Keep language simple (5th-grade level). Never diagnose.`,
 };
 
 export const searchEncyclopedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { query: string; type: "food" | "medicine" | "disease"; language?: string }) =>
-    z
-      .object({
-        query: z.string().min(1).max(500),
-        type: z.enum(["food", "medicine", "disease"]),
-        language: z.enum(["en", "hi", "bn"]).optional().default("en"),
-      })
-      .parse(input),
+  .inputValidator(
+    (input: { query: string; type: "food" | "medicine" | "disease"; language?: string }) =>
+      z
+        .object({
+          query: z.string().min(1).max(500),
+          type: z.enum(["food", "medicine", "disease"]),
+          language: z.enum(["en", "hi", "bn"]).optional().default("en"),
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -94,7 +95,7 @@ export const searchEncyclopedia = createServerFn({ method: "POST" })
           ],
           generationConfig: {
             responseMimeType: "application/json",
-          }
+          },
         }),
       },
     );

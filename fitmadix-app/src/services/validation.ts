@@ -1,5 +1,3 @@
-
-
 // Simple validation utilities that query public APIs for food, medicine, and disease data.
 // These are minimal stubs – you can expand them with proper authentication and error handling.
 
@@ -11,7 +9,7 @@ export async function validateFoodItem(item: any): Promise<boolean> {
     const data = await res.json();
     return data.totalHits > 0;
   } catch (e) {
-    console.error('Food validation error:', e);
+    console.error("Food validation error:", e);
     return false;
   }
 }
@@ -24,7 +22,7 @@ export async function validateMedicineItem(item: any): Promise<boolean> {
     const data = await res.json();
     return data.results && data.results.length > 0;
   } catch (e) {
-    console.error('Medicine validation error:', e);
+    console.error("Medicine validation error:", e);
     return false;
   }
 }
@@ -37,7 +35,7 @@ export async function validateDiseaseItem(item: any): Promise<boolean> {
     const data = await res.json();
     return data[0] && data[0].length > 0;
   } catch (e) {
-    console.error('Disease validation error:', e);
+    console.error("Disease validation error:", e);
     return false;
   }
 }

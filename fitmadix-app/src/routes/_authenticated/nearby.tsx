@@ -44,7 +44,9 @@ function NearbyPage() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
-  const [filter, setFilter] = useState<"all" | "hospital" | "clinic" | "pharmacy" | "doctors">("all");
+  const [filter, setFilter] = useState<"all" | "hospital" | "clinic" | "pharmacy" | "doctors">(
+    "all",
+  );
 
   // Auto-request location on mount
   useEffect(() => {
@@ -84,8 +86,7 @@ function NearbyPage() {
     }
   };
 
-  const filtered =
-    filter === "all" ? facilities : facilities.filter((f) => f.type === filter);
+  const filtered = filter === "all" ? facilities : facilities.filter((f) => f.type === filter);
 
   const openDirections = (f: Facility) => {
     window.open(

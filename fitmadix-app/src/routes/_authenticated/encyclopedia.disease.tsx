@@ -1,7 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useCallback } from "react";
-import { ArrowLeft, Loader2, Search, Mic, Volume2, AlertTriangle, Activity, RotateCcw, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  Search,
+  Mic,
+  Volume2,
+  AlertTriangle,
+  Activity,
+  RotateCcw,
+  ShieldCheck,
+} from "lucide-react";
 import { searchEncyclopedia } from "@/lib/encyclopedia.functions";
 import { toast } from "sonner";
 import { useVoiceInput } from "@/hooks/use-voice-input";
@@ -24,24 +34,27 @@ function DiseaseEncyclopediaPage() {
     if (query !== transcript) setQuery(transcript);
   }
 
-  const handleSearch = useCallback(async (e?: React.FormEvent, directQuery?: string) => {
-    e?.preventDefault();
-    const searchTerm = directQuery ?? query;
-    if (!searchTerm.trim()) return;
-    
-    if (directQuery) setQuery(directQuery);
-    setLoading(true);
-    setResult(null);
-    try {
-      const res = await search({ data: { query: searchTerm, type: "disease" } });
-      setResult(res);
-      if (res.description) speak(res.description);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Search failed");
-    } finally {
-      setLoading(false);
-    }
-  }, [query, search, speak]);
+  const handleSearch = useCallback(
+    async (e?: React.FormEvent, directQuery?: string) => {
+      e?.preventDefault();
+      const searchTerm = directQuery ?? query;
+      if (!searchTerm.trim()) return;
+
+      if (directQuery) setQuery(directQuery);
+      setLoading(true);
+      setResult(null);
+      try {
+        const res = await search({ data: { query: searchTerm, type: "disease" } });
+        setResult(res);
+        if (res.description) speak(res.description);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Search failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [query, search, speak],
+  );
 
   const handleReset = () => {
     setResult(null);
@@ -63,7 +76,11 @@ function DiseaseEncyclopediaPage() {
     <div className="flex-1 overflow-y-auto bg-background">
       <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
         <div className="mb-6 flex items-center gap-3">
-          <Link to="/hub" className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground hover:bg-secondary hover:text-foreground" aria-label="Go back to hub">
+          <Link
+            to="/hub"
+            className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+            aria-label="Go back to hub"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
@@ -130,14 +147,21 @@ function DiseaseEncyclopediaPage() {
             {result.is_emergency && (
               <div className="flex items-center gap-3 rounded-2xl bg-red-500 p-4 text-white shadow-lg shadow-red-500/20">
                 <AlertTriangle className="h-6 w-6 shrink-0" />
-                <p className="text-sm font-medium">🚨 This condition can be a medical emergency. Seek immediate care if experiencing severe symptoms.</p>
+                <p className="text-sm font-medium">
+                  🚨 This condition can be a medical emergency. Seek immediate care if experiencing
+                  severe symptoms.
+                </p>
               </div>
             )}
 
             <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
               <div className="flex items-start justify-between">
                 <h2 className="text-2xl font-semibold">{result.name}</h2>
-                <button onClick={() => speak(result.description)} className="text-primary hover:opacity-80" aria-label="Read aloud">
+                <button
+                  onClick={() => speak(result.description)}
+                  className="text-primary hover:opacity-80"
+                  aria-label="Read aloud"
+                >
                   <Volume2 className="h-5 w-5" />
                 </button>
               </div>
@@ -148,13 +172,17 @@ function DiseaseEncyclopediaPage() {
               <div className="rounded-2xl border border-border bg-card p-5">
                 <h3 className="text-sm font-medium text-muted-foreground">🤒 Symptoms</h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm">
-                  {result.symptoms?.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                  {result.symptoms?.map((s: string, i: number) => (
+                    <li key={i}>{s}</li>
+                  ))}
                 </ul>
               </div>
               <div className="rounded-2xl border border-border bg-card p-5">
                 <h3 className="text-sm font-medium text-muted-foreground">🔍 Common Causes</h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm">
-                  {result.causes?.map((c: string, i: number) => <li key={i}>{c}</li>)}
+                  {result.causes?.map((c: string, i: number) => (
+                    <li key={i}>{c}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -165,23 +193,33 @@ function DiseaseEncyclopediaPage() {
                   <ShieldCheck className="h-4 w-4" /> Prevention
                 </h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                  {result.prevention.map((p: string, i: number) => <li key={i}>{p}</li>)}
+                  {result.prevention.map((p: string, i: number) => (
+                    <li key={i}>{p}</li>
+                  ))}
                 </ul>
               </div>
             )}
 
             {result.treatments?.length > 0 && (
               <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5">
-                <h3 className="text-sm font-medium text-blue-700 dark:text-blue-400">💊 Common Treatments</h3>
+                <h3 className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                  💊 Common Treatments
+                </h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-blue-800/80 dark:text-blue-300/80">
-                  {result.treatments.map((t: string, i: number) => <li key={i}>{t}</li>)}
+                  {result.treatments.map((t: string, i: number) => (
+                    <li key={i}>{t}</li>
+                  ))}
                 </ul>
               </div>
             )}
 
             <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
-              <h3 className="text-sm font-medium text-amber-700 dark:text-amber-400">🏥 When to see a doctor</h3>
-              <p className="mt-1 text-sm text-amber-800/80 dark:text-amber-300/80">{result.when_to_see_doctor}</p>
+              <h3 className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                🏥 When to see a doctor
+              </h3>
+              <p className="mt-1 text-sm text-amber-800/80 dark:text-amber-300/80">
+                {result.when_to_see_doctor}
+              </p>
             </div>
 
             <Link

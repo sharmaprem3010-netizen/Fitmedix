@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Play, Plus, Dumbbell, Clock, Flame, Trash2, Tag } from 'lucide-react';
-import { Routine, WorkoutSessionLog } from '../../types/fitness';
-import { Card } from '../ui/AppCard';
-import { Button } from '../ui/AppButton';
-import { Badge } from '../ui/AppBadge';
-import { RoutineBuilderModal } from './RoutineBuilderModal';
+import React, { useState } from "react";
+import { Play, Plus, Dumbbell, Clock, Flame, Trash2, Tag } from "lucide-react";
+import { Routine, WorkoutSessionLog } from "../../types/fitness";
+import { Card } from "../ui/AppCard";
+import { Button } from "../ui/AppButton";
+import { Badge } from "../ui/AppBadge";
+import { RoutineBuilderModal } from "./RoutineBuilderModal";
 
 interface WorkoutPlannerProps {
   routines: Routine[];
@@ -19,20 +19,21 @@ export const WorkoutPlanner: React.FC<WorkoutPlannerProps> = ({
   onStartWorkout,
   onSaveRoutine,
   onDeleteRoutine,
-  searchQuery = '',
+  searchQuery = "",
 }) => {
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('All');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("All");
 
-  const categories = ['All', ...Array.from(new Set(routines.map(r => r.category)))];
+  const categories = ["All", ...Array.from(new Set(routines.map((r) => r.category)))];
 
-  const filteredRoutines = routines.filter(r => {
+  const filteredRoutines = routines.filter((r) => {
     const matchesSearch = searchQuery
       ? r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
 
-    const matchesCategory = selectedCategoryFilter === 'All' || r.category === selectedCategoryFilter;
+    const matchesCategory =
+      selectedCategoryFilter === "All" || r.category === selectedCategoryFilter;
 
     return matchesSearch && matchesCategory;
   });
@@ -56,14 +57,14 @@ export const WorkoutPlanner: React.FC<WorkoutPlannerProps> = ({
 
       {/* Category Filter Chips */}
       <div className="flex flex-wrap items-center gap-2">
-        {categories.map(cat => (
+        {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setSelectedCategoryFilter(cat)}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedCategoryFilter === cat
-                ? 'bg-white text-black shadow-md'
-                : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700'
+                ? "bg-white text-black shadow-md"
+                : "bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700"
             }`}
           >
             {cat}
@@ -73,7 +74,7 @@ export const WorkoutPlanner: React.FC<WorkoutPlannerProps> = ({
 
       {/* Routine Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredRoutines.map(routine => {
+        {filteredRoutines.map((routine) => {
           return (
             <Card
               key={routine.id}
@@ -105,7 +106,9 @@ export const WorkoutPlanner: React.FC<WorkoutPlannerProps> = ({
                     {routine.exercises.slice(0, 4).map((ex, idx) => (
                       <li key={idx} className="text-xs text-zinc-300 flex justify-between">
                         <span>{ex.exerciseName}</span>
-                        <span className="text-zinc-500 font-mono">{ex.sets} × {ex.reps}</span>
+                        <span className="text-zinc-500 font-mono">
+                          {ex.sets} × {ex.reps}
+                        </span>
                       </li>
                     ))}
                     {routine.exercises.length > 4 && (

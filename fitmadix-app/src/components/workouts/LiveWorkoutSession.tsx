@@ -1,7 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Pause, Check, ArrowRight, RotateCcw, Award, Clock, Flame, Dumbbell, X } from 'lucide-react';
-import { Routine, WorkoutSessionLog, ExerciseLog, SetLog } from '../../types/fitness';
-import { estimateCalorieBurn, calculateOneRepMax } from '../../utils/calculators';
+import React, { useState, useEffect } from "react";
+import {
+  Play,
+  Pause,
+  Check,
+  ArrowRight,
+  RotateCcw,
+  Award,
+  Clock,
+  Flame,
+  Dumbbell,
+  X,
+} from "lucide-react";
+import { Routine, WorkoutSessionLog, ExerciseLog, SetLog } from "../../types/fitness";
+import { estimateCalorieBurn, calculateOneRepMax } from "../../utils/calculators";
 
 interface LiveWorkoutSessionProps {
   routine: Routine;
@@ -17,17 +28,17 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
-  
+
   // Rest Timer State
   const [restSecondsRemaining, setRestSecondsRemaining] = useState<number | null>(null);
 
   // Exercise set logs state
   const [exerciseLogs, setExerciseLogs] = useState<ExerciseLog[]>(() => {
-    return routine.exercises.map(ex => {
+    return routine.exercises.map((ex) => {
       const sets: SetLog[] = Array.from({ length: ex.sets }).map((_, i) => ({
         setNumber: i + 1,
         weightKg: ex.targetWeightKg || 20,
-        reps: parseInt(ex.reps.split('-')[0]) || 10,
+        reps: parseInt(ex.reps.split("-")[0]) || 10,
         completed: false,
       }));
       return {
@@ -43,7 +54,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
     let interval: NodeJS.Timeout;
     if (isTimerRunning) {
       interval = setInterval(() => {
-        setElapsedSeconds(prev => prev + 1);
+        setElapsedSeconds((prev) => prev + 1);
       }, 1000);
     }
     return () => clearInterval(interval);
@@ -54,7 +65,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
     let interval: NodeJS.Timeout;
     if (restSecondsRemaining !== null && restSecondsRemaining > 0) {
       interval = setInterval(() => {
-        setRestSecondsRemaining(prev => (prev !== null && prev > 1 ? prev - 1 : null));
+        setRestSecondsRemaining((prev) => (prev !== null && prev > 1 ? prev - 1 : null));
       }, 1000);
     }
     return () => clearInterval(interval);
@@ -64,7 +75,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
   const currentLog = exerciseLogs[currentExerciseIndex];
 
   const handleToggleSetComplete = (setIndex: number) => {
-    setExerciseLogs(prev => {
+    setExerciseLogs((prev) => {
       const updated = [...prev];
       const targetEx = { ...updated[currentExerciseIndex] };
       const sets = [...targetEx.sets];
@@ -82,7 +93,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
   };
 
   const handleUpdateSetWeight = (setIndex: number, weight: number) => {
-    setExerciseLogs(prev => {
+    setExerciseLogs((prev) => {
       const updated = [...prev];
       const targetEx = { ...updated[currentExerciseIndex] };
       const sets = [...targetEx.sets];
@@ -94,7 +105,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
   };
 
   const handleUpdateSetReps = (setIndex: number, reps: number) => {
-    setExerciseLogs(prev => {
+    setExerciseLogs((prev) => {
       const updated = [...prev];
       const targetEx = { ...updated[currentExerciseIndex] };
       const sets = [...targetEx.sets];
@@ -108,16 +119,19 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
     const remainingSecs = secs % 60;
-    return `${mins.toString().padStart(2, '0')}:${remainingSecs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${remainingSecs.toString().padStart(2, "0")}`;
   };
 
   // Calculate stats
   const totalVolume = exerciseLogs.reduce((acc, ex) => {
-    return acc + ex.sets.reduce((sAcc, set) => set.completed ? sAcc + (set.weightKg * set.reps) : sAcc, 0);
+    return (
+      acc +
+      ex.sets.reduce((sAcc, set) => (set.completed ? sAcc + set.weightKg * set.reps : sAcc), 0)
+    );
   }, 0);
 
   const completedSetsCount = exerciseLogs.reduce((acc, ex) => {
-    return acc + ex.sets.filter(s => s.completed).length;
+    return acc + ex.sets.filter((s) => s.completed).length;
   }, 0);
 
   const handleFinish = () => {
@@ -185,7 +199,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
           {routine.exercises.map((ex, idx) => {
             const isCurrent = idx === currentExerciseIndex;
             const exLog = exerciseLogs[idx];
-            const isCompleted = exLog.sets.every(s => s.completed);
+            const isCompleted = exLog.sets.every((s) => s.completed);
 
             return (
               <button
@@ -193,13 +207,15 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
                 onClick={() => setCurrentExerciseIndex(idx)}
                 className={`w-full p-3 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between ${
                   isCurrent
-                    ? 'bg-zinc-800 border-zinc-600 text-white shadow-lg'
-                    : 'bg-zinc-900/50 border-zinc-800/80 text-zinc-400 hover:text-white hover:bg-zinc-900'
+                    ? "bg-zinc-800 border-zinc-600 text-white shadow-lg"
+                    : "bg-zinc-900/50 border-zinc-800/80 text-zinc-400 hover:text-white hover:bg-zinc-900"
                 }`}
               >
                 <div>
                   <p className="text-xs font-bold tracking-tight">{ex.exerciseName}</p>
-                  <p className="text-[10px] text-zinc-500 mt-0.5">{ex.sets} Sets × {ex.reps}</p>
+                  <p className="text-[10px] text-zinc-500 mt-0.5">
+                    {ex.sets} Sets × {ex.reps}
+                  </p>
                 </div>
                 {isCompleted && (
                   <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
@@ -218,7 +234,8 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
               <div>
                 <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">
-                  Exercise {currentExerciseIndex + 1} of {routine.exercises.length} • {currentExercise.category}
+                  Exercise {currentExerciseIndex + 1} of {routine.exercises.length} •{" "}
+                  {currentExercise.category}
                 </span>
                 <h1 className="text-3xl font-extrabold text-white tracking-tight mt-1">
                   {currentExercise.exerciseName}
@@ -255,17 +272,21 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
                     <div
                       key={sIdx}
                       className={`grid grid-cols-12 gap-2 px-6 py-3.5 items-center transition-colors ${
-                        set.completed ? 'bg-emerald-950/20' : 'hover:bg-zinc-900/50'
+                        set.completed ? "bg-emerald-950/20" : "hover:bg-zinc-900/50"
                       }`}
                     >
-                      <span className="col-span-2 text-sm font-bold text-zinc-400">#{set.setNumber}</span>
+                      <span className="col-span-2 text-sm font-bold text-zinc-400">
+                        #{set.setNumber}
+                      </span>
 
                       {/* Weight Input */}
                       <div className="col-span-4 flex items-center gap-2">
                         <input
                           type="number"
                           value={set.weightKg}
-                          onChange={e => handleUpdateSetWeight(sIdx, parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            handleUpdateSetWeight(sIdx, parseFloat(e.target.value) || 0)
+                          }
                           className="w-20 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm font-bold text-white text-center focus:outline-none focus:border-zinc-600"
                         />
                         <span className="text-xs text-zinc-500 hidden sm:inline">kg</span>
@@ -276,7 +297,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
                         <input
                           type="number"
                           value={set.reps}
-                          onChange={e => handleUpdateSetReps(sIdx, parseInt(e.target.value) || 0)}
+                          onChange={(e) => handleUpdateSetReps(sIdx, parseInt(e.target.value) || 0)}
                           className="w-20 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm font-bold text-white text-center focus:outline-none focus:border-zinc-600"
                         />
                         <span className="text-xs text-zinc-500 hidden sm:inline">reps</span>
@@ -288,8 +309,8 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
                           onClick={() => handleToggleSetComplete(sIdx)}
                           className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer border ${
                             set.completed
-                              ? 'bg-emerald-500 border-emerald-400 text-black shadow-lg shadow-emerald-500/20'
-                              : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-700'
+                              ? "bg-emerald-500 border-emerald-400 text-black shadow-lg shadow-emerald-500/20"
+                              : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-700"
                           }`}
                         >
                           <Check className="w-5 h-5 stroke-[3]" />
@@ -305,7 +326,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
           {/* Exercise Nav Buttons */}
           <div className="flex justify-between items-center pt-4 border-t border-zinc-900">
             <button
-              onClick={() => setCurrentExerciseIndex(prev => Math.max(0, prev - 1))}
+              onClick={() => setCurrentExerciseIndex((prev) => Math.max(0, prev - 1))}
               disabled={currentExerciseIndex === 0}
               className="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-xs font-bold text-zinc-300 disabled:opacity-30 cursor-pointer"
             >
@@ -314,7 +335,11 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
 
             {currentExerciseIndex < routine.exercises.length - 1 ? (
               <button
-                onClick={() => setCurrentExerciseIndex(prev => Math.min(routine.exercises.length - 1, prev + 1))}
+                onClick={() =>
+                  setCurrentExerciseIndex((prev) =>
+                    Math.min(routine.exercises.length - 1, prev + 1),
+                  )
+                }
                 className="px-6 py-2.5 bg-white text-black hover:bg-zinc-200 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-lg"
               >
                 <span>Next Exercise</span>

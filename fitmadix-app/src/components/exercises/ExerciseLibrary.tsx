@@ -1,34 +1,43 @@
-import React, { useState, useContext } from 'react';
-import { Search, Dumbbell, Filter, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
-import { Exercise, ExerciseCategory } from '../../types/fitness';
-import { Modal } from '../ui/Modal';
-import { Badge } from '../ui/AppBadge';
-import { AuthenticatedContext } from '../../routes/_authenticated/route';
+import React, { useState, useContext } from "react";
+import { Search, Dumbbell, Filter, BookOpen, Layers, CheckCircle2 } from "lucide-react";
+import { Exercise, ExerciseCategory } from "../../types/fitness";
+import { Modal } from "../ui/Modal";
+import { Badge } from "../ui/AppBadge";
+import { AuthenticatedContext } from "../../routes/_authenticated/route";
 
 interface ExerciseLibraryProps {
   searchQuery?: string;
 }
 
-export const ExerciseLibrary: React.FC<ExerciseLibraryProps> = ({ searchQuery = '' }) => {
+export const ExerciseLibrary: React.FC<ExerciseLibraryProps> = ({ searchQuery = "" }) => {
   const context = useContext(AuthenticatedContext);
-  const [localSearch, setLocalSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [localSearch, setLocalSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
-  const categories: string[] = ['All', 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio'];
+  const categories: string[] = [
+    "All",
+    "Chest",
+    "Back",
+    "Legs",
+    "Shoulders",
+    "Arms",
+    "Core",
+    "Cardio",
+  ];
 
   const query = (localSearch || searchQuery).toLowerCase();
 
   const exercises = context?.exercises || [];
 
-  const filteredExercises = exercises.filter(ex => {
+  const filteredExercises = exercises.filter((ex) => {
     const matchesSearch = query
       ? ex.name.toLowerCase().includes(query) ||
         ex.primaryMuscle.toLowerCase().includes(query) ||
         ex.equipment.toLowerCase().includes(query)
       : true;
 
-    const matchesCat = selectedCategory === 'All' || ex.category === selectedCategory;
+    const matchesCat = selectedCategory === "All" || ex.category === selectedCategory;
 
     return matchesSearch && matchesCat;
   });
@@ -51,7 +60,7 @@ export const ExerciseLibrary: React.FC<ExerciseLibraryProps> = ({ searchQuery = 
             type="text"
             placeholder="Search exercises, muscles..."
             value={localSearch}
-            onChange={e => setLocalSearch(e.target.value)}
+            onChange={(e) => setLocalSearch(e.target.value)}
             className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
           />
         </div>
@@ -59,14 +68,14 @@ export const ExerciseLibrary: React.FC<ExerciseLibraryProps> = ({ searchQuery = 
 
       {/* Category Tabs */}
       <div className="flex flex-wrap items-center gap-2">
-        {categories.map(cat => (
+        {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedCategory === cat
-                ? 'bg-white text-black shadow-md'
-                : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700'
+                ? "bg-white text-black shadow-md"
+                : "bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700"
             }`}
           >
             {cat}
@@ -76,7 +85,7 @@ export const ExerciseLibrary: React.FC<ExerciseLibraryProps> = ({ searchQuery = 
 
       {/* Exercises Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredExercises.map(ex => (
+        {filteredExercises.map((ex) => (
           <div
             key={ex.id}
             onClick={() => setSelectedExercise(ex)}
@@ -100,14 +109,16 @@ export const ExerciseLibrary: React.FC<ExerciseLibraryProps> = ({ searchQuery = 
                 </p>
                 {ex.secondaryMuscles && ex.secondaryMuscles.length > 0 && (
                   <p className="text-xs text-zinc-500">
-                    <strong>Secondary:</strong> {ex.secondaryMuscles.join(', ')}
+                    <strong>Secondary:</strong> {ex.secondaryMuscles.join(", ")}
                   </p>
                 )}
               </div>
             </div>
 
             <div className="pt-4 mt-4 border-t border-zinc-900 flex justify-between items-center text-xs text-zinc-400 font-medium">
-              <span>Default: {ex.defaultSets} × {ex.defaultReps}</span>
+              <span>
+                Default: {ex.defaultSets} × {ex.defaultReps}
+              </span>
               <span className="text-blue-400 group-hover:underline">View Guide →</span>
             </div>
           </div>
@@ -131,9 +142,11 @@ export const ExerciseLibrary: React.FC<ExerciseLibraryProps> = ({ searchQuery = 
                 <p className="text-sm font-bold text-white">{selectedExercise.primaryMuscle}</p>
               </div>
               <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl">
-                <p className="text-[10px] font-bold uppercase text-zinc-500">Secondary Synergists</p>
+                <p className="text-[10px] font-bold uppercase text-zinc-500">
+                  Secondary Synergists
+                </p>
                 <p className="text-sm font-bold text-zinc-300">
-                  {selectedExercise.secondaryMuscles?.join(', ') || 'None'}
+                  {selectedExercise.secondaryMuscles?.join(", ") || "None"}
                 </p>
               </div>
             </div>
@@ -145,7 +158,10 @@ export const ExerciseLibrary: React.FC<ExerciseLibraryProps> = ({ searchQuery = 
               </h4>
               <ol className="space-y-2">
                 {selectedExercise.instructions.map((step, idx) => (
-                  <li key={idx} className="flex gap-3 text-xs text-zinc-300 bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
+                  <li
+                    key={idx}
+                    className="flex gap-3 text-xs text-zinc-300 bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80"
+                  >
                     <span className="w-5 h-5 rounded-full bg-zinc-800 text-white font-bold flex items-center justify-center text-[10px] shrink-0">
                       {idx + 1}
                     </span>

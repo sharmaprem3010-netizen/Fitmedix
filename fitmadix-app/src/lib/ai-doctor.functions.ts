@@ -82,23 +82,28 @@ export const sendChatMessage = createServerFn({ method: "POST" })
     const geminiContents = [
       ...(history ?? []).map((m) => messageSchema.parse(m)),
       { role: "user", content: data.message },
-    ].filter(m => m.role !== 'system').map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
+    ]
+      .filter((m) => m.role !== "system")
+      .map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: systemInstruction }]
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        contents: geminiContents,
-      }),
-    });
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemInstruction }],
+          },
+          contents: geminiContents,
+        }),
+      },
+    );
 
     if (!res.ok) {
       const text = await res.text();
@@ -107,7 +112,8 @@ export const sendChatMessage = createServerFn({ method: "POST" })
     }
 
     const json = (await res.json()) as any;
-    const reply = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "I'm sorry, I couldn't generate a reply.";
+    const reply =
+      json.candidates?.[0]?.content?.parts?.[0]?.text ?? "I'm sorry, I couldn't generate a reply.";
 
     await supabase.from("messages").insert({
       thread_id: data.threadId,
@@ -121,7 +127,10 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       const title = data.message.slice(0, 60);
       await supabase.from("threads").update({ title }).eq("id", data.threadId);
     } else {
-      await supabase.from("threads").update({ updated_at: new Date().toISOString() }).eq("id", data.threadId);
+      await supabase
+        .from("threads")
+        .update({ updated_at: new Date().toISOString() })
+        .eq("id", data.threadId);
     }
 
     return { reply };

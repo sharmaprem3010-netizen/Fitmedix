@@ -1,16 +1,16 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useContext } from 'react';
-import { OverviewDashboard } from '@/components/dashboard/OverviewDashboard';
-import { AuthenticatedContext } from './route';
+import { createFileRoute } from "@tanstack/react-router";
+import { useContext } from "react";
+import { OverviewDashboard } from "@/components/dashboard/OverviewDashboard";
+import { AuthenticatedContext } from "./route";
 
-export const Route = createFileRoute('/_authenticated/dashboard')({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardComponent,
 });
 
 function DashboardComponent() {
   const context = useContext(AuthenticatedContext);
   const navigate = Route.useNavigate();
-  
+
   if (!context) return null;
   const { vitals, routines, meals, macroTargets, workoutLogs, onStartWorkout, isLoading } = context;
 
