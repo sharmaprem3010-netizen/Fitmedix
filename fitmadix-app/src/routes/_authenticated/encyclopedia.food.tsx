@@ -25,25 +25,28 @@ function FoodEncyclopediaPage() {
     if (query !== transcript) setQuery(transcript);
   }
 
-  const handleSearch = useCallback(async (e?: React.FormEvent, directQuery?: string) => {
-    e?.preventDefault();
-    const searchTerm = directQuery ?? query;
-    if (!searchTerm.trim()) return;
-    
-    if (directQuery) setQuery(directQuery);
-    setLoading(true);
-    setResult(null);
-    try {
-      const res = await search({ data: { query: searchTerm, type: "food" } });
-      setResult(res);
-      // Auto-speak the description for non-readers
-      if (res.description) speak(res.description);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Search failed");
-    } finally {
-      setLoading(false);
-    }
-  }, [query, search, speak]);
+  const handleSearch = useCallback(
+    async (e?: React.FormEvent, directQuery?: string) => {
+      e?.preventDefault();
+      const searchTerm = directQuery ?? query;
+      if (!searchTerm.trim()) return;
+
+      if (directQuery) setQuery(directQuery);
+      setLoading(true);
+      setResult(null);
+      try {
+        const res = await search({ data: { query: searchTerm, type: "food" } });
+        setResult(res);
+        // Auto-speak the description for non-readers
+        if (res.description) speak(res.description);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Search failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [query, search, speak],
+  );
 
   const handleReset = () => {
     setResult(null);
@@ -69,12 +72,18 @@ function FoodEncyclopediaPage() {
     <div className="flex-1 overflow-y-auto bg-background">
       <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
         <div className="mb-6 flex items-center gap-3">
-          <Link to="/hub" className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground hover:bg-secondary hover:text-foreground" aria-label="Go back to hub">
+          <Link
+            to="/hub"
+            className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+            aria-label="Go back to hub"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
             <h1 className="text-xl font-semibold tracking-tight">🍎 Food Encyclopedia</h1>
-            <p className="text-xs text-muted-foreground">Search any food for nutrition & benefits</p>
+            <p className="text-xs text-muted-foreground">
+              Search any food for nutrition & benefits
+            </p>
           </div>
         </div>
 
@@ -105,8 +114,9 @@ function FoodEncyclopediaPage() {
             {categories.map((c) => (
               <button
                 key={c.name}
+                type="button"
                 onClick={() => handleSearch(undefined, c.name)}
-                className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card py-4 shadow-soft transition-transform hover:-translate-y-1 hover:shadow-elegant"
+                className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card py-4 shadow-soft transition-transform hover:-translate-y-1 hover:shadow-elegant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label={`Search for ${c.name}`}
               >
                 <span className="text-4xl">{c.emoji}</span>
@@ -127,8 +137,9 @@ function FoodEncyclopediaPage() {
           <div className="space-y-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
             {/* Back button */}
             <button
+              type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1"
               aria-label="Go back to categories"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Search again
@@ -137,19 +148,29 @@ function FoodEncyclopediaPage() {
             <div className="rounded-3xl border border-border bg-card p-6 shadow-elegant">
               <div className="flex items-start justify-between">
                 <h2 className="text-2xl font-semibold">{result.name}</h2>
-                <button onClick={() => speak(result.description)} className="text-primary hover:opacity-80" aria-label="Read aloud">
+                <button
+                  type="button"
+                  onClick={() => speak(result.description)}
+                  className="text-primary hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                  aria-label="Read aloud"
+                >
                   <Volume2 className="h-5 w-5" />
                 </button>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{result.description}</p>
-              
+
               <div className="mt-4 rounded-xl bg-secondary/50 p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Rating</span>
-                  <span className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                    result.health_rating === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 
-                    result.health_rating === 'okay' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' : 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
-                  }`}>
+                  <span
+                    className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                      result.health_rating === "good"
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+                        : result.health_rating === "okay"
+                          ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400"
+                          : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"
+                    }`}
+                  >
                     {result.health_rating?.toUpperCase() || "UNKNOWN"}
                   </span>
                 </div>
@@ -182,18 +203,26 @@ function FoodEncyclopediaPage() {
 
             {result.benefits?.length > 0 && (
               <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
-                <h3 className="font-medium text-emerald-700 dark:text-emerald-400">✅ Health Benefits</h3>
+                <h3 className="font-medium text-emerald-700 dark:text-emerald-400">
+                  ✅ Health Benefits
+                </h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                  {result.benefits.map((b: string, i: number) => <li key={i}>{b}</li>)}
+                  {result.benefits.map((b: string, i: number) => (
+                    <li key={i}>{b}</li>
+                  ))}
                 </ul>
               </div>
             )}
 
             {result.warnings?.length > 0 && result.warnings[0] !== "" && (
               <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5">
-                <h3 className="font-medium text-red-700 dark:text-red-400">⚠️ Things to watch out for</h3>
+                <h3 className="font-medium text-red-700 dark:text-red-400">
+                  ⚠️ Things to watch out for
+                </h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-red-600/80 dark:text-red-400/80">
-                  {result.warnings.map((w: string, i: number) => <li key={i}>{w}</li>)}
+                  {result.warnings.map((w: string, i: number) => (
+                    <li key={i}>{w}</li>
+                  ))}
                 </ul>
               </div>
             )}

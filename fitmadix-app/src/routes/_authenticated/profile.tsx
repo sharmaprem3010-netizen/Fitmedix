@@ -93,7 +93,7 @@ function ProfilePage() {
       if (error) throw error;
       toast.success("Profile saved successfully");
       // Invalidate React Query cache so dashboard picks up the changes immediately
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
+      queryClient.invalidateQueries({ queryKey: ["userSettings"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to save profile");
     } finally {
@@ -111,8 +111,9 @@ function ProfilePage() {
     <div className="min-h-dvh bg-background">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <button
+          type="button"
           onClick={() => navigate({ to: "/" })}
-          className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1"
         >
           <ArrowLeft className="h-4 w-4" /> Back to dashboard
         </button>
@@ -140,10 +141,12 @@ function ProfilePage() {
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-colors whitespace-nowrap
-                      ${activeTab === tab.id 
-                        ? "bg-secondary text-foreground" 
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"}`}
+                    className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
+                      ${
+                        activeTab === tab.id
+                          ? "bg-secondary text-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                      }`}
                   >
                     <tab.icon className="h-4 w-4" />
                     {tab.label}
@@ -155,8 +158,9 @@ function ProfilePage() {
               <form onSubmit={save} className="flex-1 grid gap-6">
                 {activeTab === "personal" && (
                   <div className="animate-in fade-in slide-in-from-right-4 duration-300 grid gap-5">
-                    <F label="Display Name">
+                    <F label="Display Name" required>
                       <input
+                        required
                         className="input"
                         value={p.display_name ?? ""}
                         onChange={(e) => setP({ ...p, display_name: e.target.value })}
@@ -171,7 +175,9 @@ function ProfilePage() {
                           max={130}
                           className="input"
                           value={p.age ?? ""}
-                          onChange={(e) => setP({ ...p, age: e.target.value ? Number(e.target.value) : null })}
+                          onChange={(e) =>
+                            setP({ ...p, age: e.target.value ? Number(e.target.value) : null })
+                          }
                           placeholder="e.g. 32"
                         />
                       </F>
@@ -217,7 +223,12 @@ function ProfilePage() {
                           max={300}
                           className="input"
                           value={p.height_cm ?? ""}
-                          onChange={(e) => setP({ ...p, height_cm: e.target.value ? Number(e.target.value) : null })}
+                          onChange={(e) =>
+                            setP({
+                              ...p,
+                              height_cm: e.target.value ? Number(e.target.value) : null,
+                            })
+                          }
                           placeholder="e.g. 175"
                         />
                       </F>
@@ -228,7 +239,12 @@ function ProfilePage() {
                           max={400}
                           className="input"
                           value={p.weight_kg ?? ""}
-                          onChange={(e) => setP({ ...p, weight_kg: e.target.value ? Number(e.target.value) : null })}
+                          onChange={(e) =>
+                            setP({
+                              ...p,
+                              weight_kg: e.target.value ? Number(e.target.value) : null,
+                            })
+                          }
                           placeholder="e.g. 70"
                         />
                       </F>
@@ -290,16 +306,23 @@ function ProfilePage() {
                         <option value="paleo">Paleo</option>
                       </select>
                     </F>
-                    
+
                     <div className="pt-4 mt-2 border-t border-border">
-                      <h3 className="text-sm font-semibold mb-4 text-foreground/80">Daily Macro Targets</h3>
+                      <h3 className="text-sm font-semibold mb-4 text-foreground/80">
+                        Daily Macro Targets
+                      </h3>
                       <div className="grid grid-cols-2 gap-4">
                         <F label="Target Calories (kcal)">
                           <input
                             type="number"
                             className="input"
                             value={p.target_calories ?? ""}
-                            onChange={(e) => setP({ ...p, target_calories: e.target.value ? Number(e.target.value) : null })}
+                            onChange={(e) =>
+                              setP({
+                                ...p,
+                                target_calories: e.target.value ? Number(e.target.value) : null,
+                              })
+                            }
                             placeholder="e.g. 2400"
                           />
                         </F>
@@ -308,7 +331,12 @@ function ProfilePage() {
                             type="number"
                             className="input"
                             value={p.target_protein ?? ""}
-                            onChange={(e) => setP({ ...p, target_protein: e.target.value ? Number(e.target.value) : null })}
+                            onChange={(e) =>
+                              setP({
+                                ...p,
+                                target_protein: e.target.value ? Number(e.target.value) : null,
+                              })
+                            }
                             placeholder="e.g. 150"
                           />
                         </F>
@@ -317,7 +345,12 @@ function ProfilePage() {
                             type="number"
                             className="input"
                             value={p.target_carbs ?? ""}
-                            onChange={(e) => setP({ ...p, target_carbs: e.target.value ? Number(e.target.value) : null })}
+                            onChange={(e) =>
+                              setP({
+                                ...p,
+                                target_carbs: e.target.value ? Number(e.target.value) : null,
+                              })
+                            }
                             placeholder="e.g. 250"
                           />
                         </F>
@@ -326,7 +359,12 @@ function ProfilePage() {
                             type="number"
                             className="input"
                             value={p.target_fats ?? ""}
-                            onChange={(e) => setP({ ...p, target_fats: e.target.value ? Number(e.target.value) : null })}
+                            onChange={(e) =>
+                              setP({
+                                ...p,
+                                target_fats: e.target.value ? Number(e.target.value) : null,
+                              })
+                            }
                             placeholder="e.g. 70"
                           />
                         </F>
@@ -339,9 +377,13 @@ function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
-                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    {saving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
                     Save Changes
                   </button>
                 </div>
@@ -355,10 +397,13 @@ function ProfilePage() {
   );
 }
 
-function F({ label, children }: { label: string; children: React.ReactNode }) {
+function F({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
   return (
     <label className="grid gap-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground pl-1">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground pl-1 flex items-center gap-1">
+        {label}
+        {required && <span className="text-destructive">*</span>}
+      </span>
       {children}
     </label>
   );
