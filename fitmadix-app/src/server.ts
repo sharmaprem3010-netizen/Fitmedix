@@ -10,7 +10,7 @@ type ServerEntry = {
 import serverEntry from "@tanstack/react-start/server-entry";
 
 async function getServerEntry(): Promise<ServerEntry> {
-  return (serverEntry.default ?? serverEntry) as ServerEntry;
+  return ((serverEntry as any).default ?? serverEntry) as ServerEntry;
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
