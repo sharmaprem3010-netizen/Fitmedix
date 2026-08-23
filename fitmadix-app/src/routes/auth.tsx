@@ -41,7 +41,9 @@ function AuthPage() {
   const authRedirectUrl =
     import.meta.env.VITE_DEV_SUPABASE_REDIRECT_URL ||
     import.meta.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-    `${window.location.origin}/auth/callback`;
+    (typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback`
+      : "/auth/callback");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
