@@ -23,6 +23,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const tabLabels: Record<NavigationTab, string> = {
     dashboard: "Performance",
+    home: "Home",
+    symptoms: "Symptoms Check",
+    reports: "My Reports",
+    medicines: "Medicines",
+    timeline: "Health Timeline",
+    progress: "My Progress",
+    accessibility: "Accessibility Settings",
     workouts: "Routines & Live Tracker",
     exercises: "Exercise Database",
     nutrition: "Macros & Meal Log",
@@ -66,7 +73,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             value={searchValue}
             onChange={handleSearchChange}
             placeholder="Search routines & exercises..."
-            className="h-9 w-32 sm:w-48 md:w-60 bg-zinc-900 border border-zinc-800 rounded-lg pl-9 pr-3 text-xs text-white placeholder-zinc-500 focus-visible:outline-none focus-visible:border-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-400 transition-all"
+            style={{ color: "white" }}
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-full py-2 pl-10 pr-4 text-sm placeholder:text-zinc-500 focus:outline-none focus-visible:ring-1 focus-visible:ring-zinc-700 transition-all"
           />
         </div>
 
@@ -76,15 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span>{streakDays} Days Streak</span>
         </div>
 
-        {/* AI Quick Button */}
-        <button
-          onClick={() => onSelectTab("ai-coach")}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-bold text-white transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 shrink-0"
-          type="button"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-          <span className="hidden sm:inline">AI Coach</span>
-        </button>
+
 
         {/* Dark/Light Mode Toggle */}
         <button

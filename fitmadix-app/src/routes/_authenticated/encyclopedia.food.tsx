@@ -165,10 +165,10 @@ function FoodEncyclopediaPage() {
                   <span
                     className={`rounded-full px-2 py-1 text-xs font-semibold ${
                       result.health_rating === "good"
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+                        ? "bg-emerald-500/20 text-emerald-400"
                         : result.health_rating === "okay"
-                          ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400"
-                          : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"
+                          ? "bg-amber-500/20 text-amber-400"
+                          : "bg-red-500/20 text-red-400"
                     }`}
                   >
                     {result.health_rating?.toUpperCase() || "UNKNOWN"}
@@ -203,7 +203,7 @@ function FoodEncyclopediaPage() {
 
             {result.benefits?.length > 0 && (
               <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
-                <h3 className="font-medium text-emerald-700 dark:text-emerald-400">
+                <h3 className="font-medium text-emerald-400">
                   ✅ Health Benefits
                 </h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
@@ -216,10 +216,10 @@ function FoodEncyclopediaPage() {
 
             {result.warnings?.length > 0 && result.warnings[0] !== "" && (
               <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5">
-                <h3 className="font-medium text-red-700 dark:text-red-400">
+                <h3 className="font-medium text-red-400">
                   ⚠️ Things to watch out for
                 </h3>
-                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-red-600/80 dark:text-red-400/80">
+                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-red-400/80">
                   {result.warnings.map((w: string, i: number) => (
                     <li key={i}>{w}</li>
                   ))}

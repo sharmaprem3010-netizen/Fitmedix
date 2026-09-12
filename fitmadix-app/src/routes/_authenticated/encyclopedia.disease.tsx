@@ -189,7 +189,7 @@ function DiseaseEncyclopediaPage() {
 
             {result.prevention?.length > 0 && (
               <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
-                <h3 className="text-sm font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-emerald-600 flex items-center gap-2">
                   <ShieldCheck className="h-4 w-4" /> Prevention
                 </h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
@@ -202,10 +202,10 @@ function DiseaseEncyclopediaPage() {
 
             {result.treatments?.length > 0 && (
               <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5">
-                <h3 className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                <h3 className="text-sm font-medium text-blue-600">
                   💊 Common Treatments
                 </h3>
-                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-blue-800/80 dark:text-blue-300/80">
+                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-blue-600/80">
                   {result.treatments.map((t: string, i: number) => (
                     <li key={i}>{t}</li>
                   ))}
@@ -214,10 +214,10 @@ function DiseaseEncyclopediaPage() {
             )}
 
             <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
-              <h3 className="text-sm font-medium text-amber-700 dark:text-amber-400">
+              <h3 className="text-sm font-medium text-amber-600">
                 🏥 When to see a doctor
               </h3>
-              <p className="mt-1 text-sm text-amber-800/80 dark:text-amber-300/80">
+              <p className="mt-1 text-sm text-amber-600/80">
                 {result.when_to_see_doctor}
               </p>
             </div>

@@ -89,7 +89,7 @@ function AuthPage() {
   const supportedLanguages = ["EN", "ES", "FR", "HI", "ZH"];
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-10">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="w-full max-w-md mx-auto relative rounded-3xl bg-card p-8 shadow-elegant border border-border">
         {/* Logo Image */}
         <div className="flex justify-center mb-6">
@@ -134,7 +134,8 @@ function AuthPage() {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   required
-                  className="w-full py-3.5 pl-12 pr-4 rounded-xl bg-input text-foreground font-medium outline-none transition-all text-base focus:ring-2 focus:ring-ring border border-transparent focus:border-transparent"
+                  style={{ color: "white" }}
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                 />
               </div>
             )}
@@ -160,7 +161,7 @@ function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full py-3.5 pl-12 pr-4 rounded-xl bg-input text-foreground font-medium outline-none transition-all text-base focus:ring-2 focus:ring-ring border border-transparent focus:border-transparent"
+                className="w-full py-3.5 pl-12 pr-4 rounded-xl bg-input text-foreground font-medium outline-none transition-all text-base focus:ring-2 focus:ring-ring border border-transparent"
               />
             </div>
 
@@ -186,7 +187,7 @@ function AuthPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full py-3.5 pl-12 pr-4 rounded-xl bg-input text-foreground font-medium outline-none transition-all text-base focus:ring-2 focus:ring-ring border border-transparent focus:border-transparent"
+                className="w-full py-3.5 pl-12 pr-4 rounded-xl bg-input text-foreground font-medium outline-none transition-all text-base focus:ring-2 focus:ring-ring border border-transparent"
               />
             </div>
 
@@ -214,8 +215,8 @@ function AuthPage() {
 
           <div className="relative my-8 text-center text-sm text-muted-foreground">
             <span className="relative z-10 px-4 bg-card">or continue with</span>
-            <div className="absolute top-1/2 left-0 w-[30%] h-px bg-border -z-0"></div>
-            <div className="absolute top-1/2 right-0 w-[30%] h-px bg-border -z-0"></div>
+            <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl z-0" />
+            <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl z-0" />
           </div>
 
           <div className="flex gap-4">
@@ -261,7 +262,7 @@ function AuthPage() {
 
         {showLanguageModal && (
           <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[9999] flex items-center justify-center"
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-9999 flex items-center justify-center"
             onClick={() => setShowLanguageModal(false)}
           >
             <div

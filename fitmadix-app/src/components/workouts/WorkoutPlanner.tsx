@@ -5,6 +5,8 @@ import { Card } from "../ui/AppCard";
 import { Button } from "../ui/AppButton";
 import { Badge } from "../ui/AppBadge";
 import { RoutineBuilderModal } from "./RoutineBuilderModal";
+import { useAccessibility } from "../AccessibilityProvider";
+import { usePageIntro } from "../../hooks/usePageIntro";
 
 interface WorkoutPlannerProps {
   routines: Routine[];
@@ -21,6 +23,11 @@ export const WorkoutPlanner: React.FC<WorkoutPlannerProps> = ({
   onDeleteRoutine,
   searchQuery = "",
 }) => {
+  const { language } = useAccessibility();
+  const intro = language.startsWith("en") ? "You are in Workouts. Say 'Start Workout' to begin."
+              : language.startsWith("hi") ? "आप वर्कआउट में हैं।" : "আপনি ওয়ার্কআউট পৃষ্ঠায় আছেন।";
+  usePageIntro(intro);
+
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("All");
 

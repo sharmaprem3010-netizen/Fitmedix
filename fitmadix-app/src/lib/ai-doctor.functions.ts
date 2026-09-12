@@ -27,8 +27,12 @@ const messageSchema = z.object({
 
 export const sendChatMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { threadId: string; message: string }) =>
-    z.object({ threadId: z.string().uuid(), message: z.string().min(1).max(4000) }).parse(input),
+  .validator((input: { threadId: string; message: string; language?: string }) =>
+    z.object({ 
+      threadId: z.string().uuid(), 
+      message: z.string().min(1).max(4000),
+      language: z.string().optional()
+    }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -68,16 +72,12 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       ? `\n\nPatient profile:\n- Name: ${profile.display_name ?? "N/A"}\n- Age: ${profile.age ?? "N/A"}\n- Sex: ${profile.sex ?? "N/A"}\n- Known history: ${profile.medical_history ?? "None reported"}\n- Allergies: ${profile.allergies ?? "None reported"}`
       : "";
 
-    const messages = [
-      { role: "system", content: SYSTEM_PROMPT + profileBlock },
-      ...(history ?? []).map((m) => messageSchema.parse(m)),
-      { role: "user", content: data.message },
-    ];
+    const languageInstruction = data.language ? `\n\nCRITICAL INSTRUCTION: You MUST respond entirely in the language corresponding to the language code: ${data.language}. Do not use English unless the requested language is English.` : "";
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("AI is not configured (GEMINI_API_KEY missing)");
 
-    const systemInstruction = SYSTEM_PROMPT + profileBlock;
+    const systemInstruction = SYSTEM_PROMPT + profileBlock + languageInstruction;
 
     const geminiContents = [
       ...(history ?? []).map((m) => messageSchema.parse(m)),
@@ -150,7 +150,7 @@ export const createThread = createServerFn({ method: "POST" })
 
 export const deleteThread = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { threadId: string }) =>
+  .validator((input: { threadId: string }) =>
     z.object({ threadId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {

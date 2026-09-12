@@ -33,3 +33,7 @@ dist-ssr
 
 .vercel
 .env
+eslint_output.txt
+playwright-report/
+test-results/
+.freebuff/

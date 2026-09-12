@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-
-type Language = "en-IN" | "hi-IN" | "bn-IN";
+import { type Language } from "@/components/AccessibilityProvider";
 
 interface UseTextToSpeechReturn {
   speak: (text: string, lang?: Language) => void;
@@ -42,22 +41,46 @@ export function useTextToSpeech(): UseTextToSpeechReturn {
 
       // Stop any current speech
       window.speechSynthesis.cancel();
+      
+      const voices = window.speechSynthesis.getVoices();
+      const prefix = lang.split("-")[0];
+      
+      const exactMatch = voices.find((v) => v.lang === lang);
+      const partialMatch = voices.find((v) => v.lang.startsWith(prefix));
+      
+      const hasNativeSupport = exactMatch || partialMatch;
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      utterance.rate = 0.95; // Slightly slower for clarity
-      utterance.pitch = 1;
-      utterance.volume = 1;
+      const performSpeak = (textToSpeak: string, speakLang: string, onEndFn?: () => void) => {
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.lang = speakLang;
+        utterance.rate = 0.95; // Slightly slower for clarity
+        utterance.pitch = 1;
+        utterance.volume = 1;
 
-      const voice = getBestVoice(lang);
-      if (voice) utterance.voice = voice;
+        const voice = getBestVoice(speakLang as Language);
+        if (voice) utterance.voice = voice;
 
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => {
+          if (onEndFn) {
+            onEndFn();
+          } else {
+            setIsSpeaking(false);
+          }
+        };
+        utterance.onerror = () => setIsSpeaking(false);
 
-      utteranceRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
+        utteranceRef.current = utterance;
+        window.speechSynthesis.speak(utterance);
+      };
+
+      if (!hasNativeSupport && !lang.startsWith("en")) {
+         performSpeak("Sorry, your language is not fully supported for voice output yet. I will speak in English.", "en-IN", () => {
+             performSpeak(text, "en-IN");
+         });
+      } else {
+         performSpeak(text, lang);
+      }
     },
     [isSupported, getBestVoice],
   );

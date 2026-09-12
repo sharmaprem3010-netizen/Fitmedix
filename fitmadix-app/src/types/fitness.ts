@@ -1,5 +1,12 @@
 export type NavigationTab =
   | "dashboard"
+  | "home"
+  | "symptoms"
+  | "reports"
+  | "medicines"
+  | "timeline"
+  | "progress"
+  | "accessibility"
   | "workouts"
   | "exercises"
   | "nutrition"

@@ -14,6 +14,8 @@ import { calculateTDEE, calculateMacroSplit } from "../../utils/calculators";
 import { ProgressRing } from "../ui/ProgressRing";
 import { Button } from "../ui/AppButton";
 import { Modal } from "../ui/Modal";
+import { useAccessibility } from "../AccessibilityProvider";
+import { usePageIntro } from "../../hooks/usePageIntro";
 
 interface NutritionTrackerProps {
   meals: MealItem[];
@@ -34,6 +36,16 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
   onUpdateMacroTargets,
   onUpdateUserMetrics,
 }) => {
+  const { autoSpeak, language, setLocalCommandHandler, voiceMode } = useAccessibility();
+  
+  const intro = language.startsWith("en") 
+    ? "You are in Nutrition. Say what you ate, for example, 'I ate two rotis and dal'."
+    : language.startsWith("hi")
+      ? "आप पोषण पृष्ठ पर हैं। बताएं कि आपने क्या खाया।"
+      : "আপনি পুষ্টি পৃষ্ঠায় আছেন। আপনি কী খেয়েছেন তা বলুন।";
+      
+  usePageIntro(intro);
+
   const [isMealModalOpen, setIsMealModalOpen] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
@@ -87,15 +99,160 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
     setIsCalculatorOpen(false);
   };
 
+  React.useEffect(() => {
+    setLocalCommandHandler((text: string) => {
+      const lower = text.toLowerCase();
+      // Simple voice NLP for logging food
+      if (/(ate|had|log|eat|kha|kheyechi|खाया|খেয়েছি)/.test(lower)) {
+        // Extract the food (everything after the verb, roughly)
+        const textParts = lower.split(/(?:ate|had|log|eat|khaaya|kheyechi|खाया|খেয়েছি)\s+(.*)/);
+        const foodItem = textParts[1] ? textParts[1].trim() : text;
+        
+        // Mock nutrient calculation based on typical Indian/Global diet
+        let estCal = 300; let estP = 10; let estC = 40; let estF = 10;
+        if (/roti|dal|rice/.test(lower)) { estCal = 450; estP = 15; estC = 60; estF = 12; }
+        if (/chicken|egg/.test(lower)) { estCal = 350; estP = 30; estC = 10; estF = 20; }
+
+        const newMeal: MealItem = {
+          id: `meal-${Date.now()}`,
+          name: foodItem.charAt(0).toUpperCase() + foodItem.slice(1) || "Voice Logged Meal",
+          servingSize: "1 Portion",
+          calories: estCal,
+          proteinG: estP,
+          carbsG: estC,
+          fatG: estF,
+          mealType: "Snack",
+          loggedAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        };
+
+        onAddMeal(newMeal);
+
+        const reply = language.startsWith("en") ? `Added ${foodItem}.`
+                    : language.startsWith("hi") ? `${foodItem} जोड़ दिया गया है।`
+                    : `${foodItem} যোগ করা হয়েছে।`;
+        autoSpeak(reply);
+        return true;
+      }
+      
+      // Delete last meal
+      if (/(delete|remove|undo|hata|muche|हटाओ|মুছে)/.test(lower)) {
+        if (meals.length > 0) {
+          const lastMeal = meals[meals.length - 1];
+          onDeleteMeal(lastMeal.id);
+          autoSpeak(language.startsWith("en") ? `Deleted ${lastMeal.name}.` : language.startsWith("hi") ? `${lastMeal.name} हटा दिया गया।` : `${lastMeal.name} মুছে ফেলা হয়েছে।`);
+        } else {
+          autoSpeak(language.startsWith("en") ? "No meals to delete." : language.startsWith("hi") ? "हटाने के लिए कोई भोजन नहीं है।" : "মুছে ফেলার জন্য কোনো খাবার নেই।");
+        }
+        return true;
+      }
+
+      return false;
+    });
+
+    return () => setLocalCommandHandler(null);
+  }, [setLocalCommandHandler, onAddMeal, onDeleteMeal, meals, autoSpeak, language]);
+
+  const { simpleMode } = useAccessibility();
+
+  if (simpleMode) {
+    return (
+      <div className="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto pb-32">
+        <h1 className="text-4xl font-extrabold text-foreground tracking-tight mb-8">
+          Nutrition
+        </h1>
+        
+        <div className="bg-card border-4 border-primary rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-xl">
+          <p className="text-2xl font-bold uppercase tracking-widest text-muted-foreground mb-4">
+            Daily Calories
+          </p>
+          <ProgressRing
+            value={totalCalories}
+            max={macroTargets.calories}
+            size={200}
+            strokeWidth={16}
+            color="#3b82f6"
+            label={`${totalCalories}`}
+            sublabel={`Target: ${macroTargets.calories} kcal`}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          <Button onClick={() => setIsMealModalOpen(true)} variant="primary" className="py-8 text-2xl rounded-3xl border-4 flex items-center justify-center gap-4">
+            <Plus className="w-8 h-8" />
+            <span>Log Meal</span>
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold">Today's Meals</h2>
+          {meals.map((m) => (
+            <div key={m.id} className="bg-card border-4 border-border rounded-3xl p-6 flex justify-between items-center shadow-lg">
+              <div>
+                <h4 className="text-2xl font-bold">{m.name}</h4>
+                <p className="text-lg text-muted-foreground mt-1">{m.calories} kcal</p>
+              </div>
+              <button
+                onClick={() => onDeleteMeal(m.id)}
+                className="p-4 bg-rose-500/10 text-rose-500 rounded-2xl hover:bg-rose-500/20 transition-colors"
+                aria-label="Delete meal"
+              >
+                <Trash2 className="w-8 h-8" />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <Modal
+          isOpen={isMealModalOpen}
+          onClose={() => setIsMealModalOpen(false)}
+          title="Log Meal"
+          subtitle="What did you eat?"
+          maxWidth="md"
+        >
+          <form onSubmit={handleSaveMeal} className="space-y-4">
+            <div>
+              <label className="block text-xl font-bold mb-2">Meal Name</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Rice and Dal"
+                value={mealName}
+                onChange={(e) => setMealName(e.target.value)}
+                className="w-full bg-background border-4 border-border rounded-2xl px-6 py-4 text-xl focus:outline-none focus:ring-4 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-xl font-bold mb-2">Calories</label>
+              <input
+                type="number"
+                value={calories}
+                onChange={(e) => setCalories(parseInt(e.target.value) || 0)}
+                className="w-full bg-background border-4 border-border rounded-2xl px-6 py-4 text-xl focus:outline-none focus:ring-4 focus:ring-primary"
+              />
+            </div>
+            <div className="flex gap-4 pt-4">
+              <Button type="button" variant="outline" onClick={() => setIsMealModalOpen(false)} className="flex-1 py-4 text-xl rounded-2xl">
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" className="flex-1 py-4 text-xl rounded-2xl">
+                Save
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto">
+    <div className="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto pb-32">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-800 pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
             Nutrition & Macro Intelligence
           </h1>
-          <p className="text-sm text-zinc-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Track daily macronutrients and optimize metabolic output
           </p>
         </div>
@@ -296,7 +453,7 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
               placeholder="e.g. Salmon & Sweet Potato Bowl"
               value={mealName}
               onChange={(e) => setMealName(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-zinc-600"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-zinc-600"
             />
           </div>
 

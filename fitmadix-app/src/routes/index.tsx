@@ -194,8 +194,7 @@ function Hero() {
           className="animate-float-up mx-auto mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg"
           style={{ animationDelay: "160ms" }}
         >
-          Describe how you feel and Fitmadix walks you through possible causes, red-flag warnings,
-          and next steps — grounded in general medical knowledge and clear about its limits.
+          Generate customized workouts, get macro-calculated meal plans, receive real-time fitness coaching, and check symptoms with a clinical-grade AI — all in one platform.
         </p>
         <div
           className="animate-float-up mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
@@ -260,64 +259,34 @@ function Hero() {
 function Features() {
   const items = [
     {
-      icon: Brain,
-      title: "Symptom analysis",
-      desc: "Describe what you feel in your own words. The AI asks clarifying questions like a real intake.",
-    },
-    {
-      icon: Stethoscope,
-      title: "Doctor-style guidance",
-      desc: "Possible causes, home care tips, and when to seek in-person care — explained plainly.",
-    },
-    {
-      icon: AlertTriangle,
-      title: "Red-flag warnings",
-      desc: "Clear alerts for emergency symptoms so you never miss something serious.",
-    },
-    {
-      icon: MessagesSquare,
-      title: "Saved consultations",
-      desc: "Every conversation is saved to your account so you can pick up where you left off.",
-    },
-    {
-      icon: Activity,
-      title: "Personalized to you",
-      desc: "Add age, sex, allergies, and history once — the AI uses it in every reply.",
-    },
-    {
-      icon: ShieldCheck,
-      title: "Private by default",
-      desc: "Your chats are only visible to you. Encrypted in transit and at rest.",
-    },
-    {
-      icon: Camera,
-      title: "Prescription reader",
-      desc: "Snap a photo of your prescription — AI explains each medicine, timing, and next steps.",
+      icon: Dumbbell,
+      title: "AI Workout Generation",
+      desc: "Custom routines tailored to your goals, equipment, and experience level. Generate weekly splits instantly.",
     },
     {
       icon: UtensilsCrossed,
-      title: "Diet scanner",
-      desc: "Photograph your meal and get instant nutritional advice with a simple health rating.",
+      title: "AI Meal Planning",
+      desc: "Get personalized macro targets and meal plans that align with your fitness goals and dietary preferences.",
     },
     {
-      icon: MapPin,
-      title: "Nearby facilities",
-      desc: "Find hospitals, clinics, and pharmacies near you with one tap. Navigate or call instantly.",
+      icon: Brain,
+      title: "AI Fitness Coaching",
+      desc: "Ask Coach Madix anything about form, plateau breaking, or sports science. Always available to guide you.",
     },
     {
-      icon: Mic,
-      title: "Voice-first input",
-      desc: "Speak your symptoms in Hindi, Bengali, or English — no typing needed.",
+      icon: Stethoscope,
+      title: "Health Information Assistant",
+      desc: "Check symptoms and get general health information, possible causes, and next steps — grounded in medical knowledge.",
     },
     {
-      icon: BookOpen,
-      title: "Health encyclopedias",
-      desc: "Search food, medicine, and disease info — AI-powered knowledge at your fingertips.",
+      icon: Activity,
+      title: "Personalized Fitness Guidance",
+      desc: "Connects your metrics, goals, and vitals to provide truly personalized advice for both fitness and health.",
     },
     {
-      icon: Dumbbell,
-      title: "Home workouts",
-      desc: "Guided exercises with timers, reps, and rest periods — no gym required.",
+      icon: ShieldCheck,
+      title: "Safe and Secure",
+      desc: "Your data is private. Medical safety is built-in with clear emergency warnings and disclaimers.",
     },
   ];
   return (
@@ -355,18 +324,23 @@ function HowItWorks() {
   const steps = [
     {
       n: "01",
-      title: "Create your account",
-      desc: "Sign up with email and add a basic profile so the AI can tailor its answers.",
+      title: "Create your profile",
+      desc: "Sign up and add your basic metrics like age, weight, and fitness level to tailor the AI's answers.",
     },
     {
       n: "02",
-      title: "Describe your symptoms",
-      desc: "Chat naturally. The AI asks follow-up questions the way a good doctor would.",
+      title: "Select your goal",
+      desc: "Tell Fitmadix what you want to achieve — from building muscle to losing weight or checking symptoms.",
     },
     {
       n: "03",
-      title: "Get clear guidance",
-      desc: "Possible causes, self-care steps, and when to seek professional help — with warnings when it matters.",
+      title: "Generate your plan",
+      desc: "Get an instant, structured workout split or a macro-calculated meal plan customized for you.",
+    },
+    {
+      n: "04",
+      title: "Get AI guidance",
+      desc: "Use Coach Madix or the Health Assistant to ask follow-up questions and stay on track.",
     },
   ];
   return (

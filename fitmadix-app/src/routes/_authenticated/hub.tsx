@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/hub")({
 function HubPage() {
   const navigate = useNavigate();
   const { speak } = useTextToSpeech();
-  const { autoSpeak, stopSpeaking, isSpeaking, language } = useAccessibility();
+  const { autoSpeak, stopSpeaking, isSpeaking, language, simpleMode } = useAccessibility();
   const t = hubTranslations[language] || hubTranslations["en-IN"];
 
   const readAllOptions = () => {
@@ -151,8 +151,65 @@ function HubPage() {
     },
   ];
 
+  if (simpleMode) {
+    return (
+      <div className="min-h-dvh w-full flex-1 overflow-y-auto bg-background pb-32">
+        <div className="mx-auto max-w-4xl px-4 py-8">
+          <div className="mb-8 flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-4xl font-extrabold tracking-tight">Fitmadix Hub</h1>
+              <LanguagePicker compact />
+            </div>
+            
+            <button
+              onClick={readAllOptions}
+              className={`flex w-full items-center justify-center gap-6 rounded-3xl border-4 p-8 text-left transition-all ${
+                isSpeaking
+                  ? "animate-pulse border-blue-500 bg-blue-500/10 text-blue-500 shadow-2xl"
+                  : "border-primary bg-primary/10 text-primary hover:bg-primary/20 shadow-xl"
+              }`}
+              aria-label={isSpeaking ? t.stopSpeaking : t.readAloud}
+            >
+              {isSpeaking ? (
+                <VolumeX className="h-16 w-16 shrink-0" />
+              ) : (
+                <Volume2 className="h-16 w-16 shrink-0" />
+              )}
+              <div>
+                <h2 className="text-3xl font-bold">{isSpeaking ? t.stopSpeaking : t.readAloud}</h2>
+                <p className="text-xl opacity-80 mt-2">{t.tapToHear}</p>
+              </div>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {features.map((f) => (
+              <Link
+                key={f.title}
+                to={f.link}
+                className={`flex items-center gap-6 rounded-3xl border-4 border-border bg-card p-6 shadow-xl transition-all focus:outline-none focus:ring-8 focus:ring-primary active:scale-95`}
+                aria-label={f.voice}
+                onFocus={() => autoSpeak(f.voice)}
+                onMouseEnter={() => autoSpeak(f.voice)}
+              >
+                <div
+                  className={`grid h-24 w-24 shrink-0 place-items-center rounded-2xl ${f.color} bg-opacity-20`}
+                >
+                  <span className="text-6xl" role="img" aria-hidden="true">
+                    {f.emoji}
+                  </span>
+                </div>
+                <h2 className="text-3xl font-extrabold leading-tight">{f.title}</h2>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-dvh w-full flex-1 overflow-y-auto bg-background">
+    <div className="min-h-dvh w-full flex-1 overflow-y-auto bg-background pb-32">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -28,7 +28,7 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 
 export const findNearbyFacilities = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { lat: number; lng: number; radius_km?: number }) =>
+  .validator((input: { lat: number; lng: number; radius_km?: number }) =>
     z
       .object({
         lat: z.number().min(-90).max(90),

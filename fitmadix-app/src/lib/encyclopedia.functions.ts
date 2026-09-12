@@ -55,7 +55,7 @@ Keep language simple (5th-grade level). Never diagnose.`,
 
 export const searchEncyclopedia = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (input: { query: string; type: "food" | "medicine" | "disease"; language?: string }) =>
       z
         .object({

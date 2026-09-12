@@ -93,7 +93,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
       {/* Grid Container matching the Bold Typography spec */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Main Hero Stat Section (Col 8) */}
-        <section className="md:col-span-8 border border-zinc-800 rounded-2xl bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between min-h-[340px] shadow-2xl relative overflow-hidden group">
+        <section className="md:col-span-8 border border-zinc-800 rounded-2xl bg-zinc-950 p-6 sm:p-8 flex flex-col justify-between min-h-85 shadow-2xl relative overflow-hidden group">
           {/* Subtle background glow */}
           <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -182,7 +182,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         {/* Right Column Metrics Stack (Col 4) */}
         <div className="md:col-span-4 flex flex-col gap-6">
           {/* Active Streak Card */}
-          <section className="border border-zinc-800 rounded-2xl bg-zinc-900/60 p-6 flex flex-col justify-between min-h-[160px] hover:border-zinc-700 transition-colors">
+          <section className="border border-zinc-800 rounded-2xl bg-zinc-900/60 p-6 flex flex-col justify-between min-h-40 hover:border-zinc-700 transition-colors">
             <div>
               <div className="flex justify-between items-center mb-1">
                 <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">
@@ -208,7 +208,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           </section>
 
           {/* Heart Rate Recovery Card */}
-          <section className="border border-zinc-800 rounded-2xl bg-zinc-950 p-6 flex flex-col justify-between min-h-[160px] hover:border-zinc-700 transition-colors">
+          <section className="border border-zinc-800 rounded-2xl bg-zinc-950 p-6 flex flex-col justify-between min-h-40 hover:border-zinc-700 transition-colors">
             <div>
               <div className="flex justify-between items-center mb-1">
                 <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">
@@ -238,7 +238,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         {/* Bottom Row - 3 Cards (Col 4 each) */}
 
         {/* Next Session Launcher */}
-        <section className="md:col-span-4 border border-zinc-800 rounded-2xl p-6 bg-gradient-to-br from-zinc-900 to-black flex flex-col justify-between relative overflow-hidden group">
+        <section className="md:col-span-4 border border-zinc-800 rounded-2xl p-6 bg-linear-to-br from-zinc-900 to-black flex flex-col justify-between relative overflow-hidden group">
           <div>
             <div className="flex justify-between items-center mb-4">
               <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">

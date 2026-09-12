@@ -25,7 +25,28 @@ interface AccessibilityContextType {
   fontScale: number;
   autoSpeak: (text: string) => void;
   stopSpeaking: () => void;
+  readPage: () => void;
   isSpeaking: boolean;
+  highContrast: boolean;
+  setHighContrast: (val: boolean) => void;
+  reducedMotion: boolean;
+  setReducedMotion: (val: boolean) => void;
+  simpleMode: boolean;
+  setSimpleMode: (val: boolean) => void;
+  voiceMode: boolean;
+  setVoiceMode: (val: boolean) => void;
+  lowLiteracyMode: boolean;
+  setLowLiteracyMode: (val: boolean) => void;
+  hasCompletedVoiceOnboarding: boolean;
+  setHasCompletedVoiceOnboarding: (val: boolean) => void;
+  localCommandHandler: ((text: string) => boolean) | null;
+  setLocalCommandHandler: (handler: ((text: string) => boolean) | null) => void;
+  // Global Voice Recognition State
+  transcript: string;
+  isListeningVoice: boolean;
+  startListeningVoice: () => void;
+  stopListeningVoice: () => void;
+  voiceError: string | null;
 }
 
 const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
@@ -55,46 +76,106 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
   const [language, setLanguageState] = useState<Language>("en-IN");
   const [fontSize, setFontSizeState] = useState<FontSize>("normal");
   const [isSpeaking, setIsSpeaking] = useState(false);
+  
+  // New Accessibility States
+  const [highContrast, setHighContrastState] = useState(false);
+  const [reducedMotion, setReducedMotionState] = useState(false);
+  const [simpleMode, setSimpleModeState] = useState(false);
+  const [voiceMode, setVoiceModeState] = useState(false);
+  const [lowLiteracyMode, setLowLiteracyModeState] = useState(false);
+  const [hasCompletedVoiceOnboarding, setHasCompletedVoiceOnboardingState] = useState(false);
+  const [localCommandHandlerState, setLocalCommandHandlerState] = useState<((text: string) => boolean) | null>(null);
+
+  const setLocalCommandHandler = useCallback((handler: ((text: string) => boolean) | null) => {
+    setLocalCommandHandlerState(() => handler);
+  }, []);
+
+  // Voice Recognition Global State
+  const [transcript, setTranscript] = useState("");
+  const [isListeningVoice, setIsListeningVoice] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const recognitionRef = React.useRef<any>(null);
 
   // Load persisted preferences
   useEffect(() => {
     try {
       const savedLang = localStorage.getItem("fitmadix-lang") as Language | null;
       const savedFont = localStorage.getItem("fitmadix-fontsize") as FontSize | null;
+      const savedHC = localStorage.getItem("fitmadix-highcontrast") === "true";
+      const savedRM = localStorage.getItem("fitmadix-reducedmotion") === "true";
+      const savedSM = localStorage.getItem("fitmadix-simplemode") === "true";
+      const savedVM = localStorage.getItem("fitmadix-voicemode") === "true";
+      const savedLLM = localStorage.getItem("fitmadix-lowliteracy") === "true";
+      const savedVO = localStorage.getItem("fitmadix-voiceonboarding") === "true";
+      
       if (savedLang && LANG_MAP[savedLang]) setLanguageState(savedLang);
       if (savedFont && FONT_SCALES[savedFont]) setFontSizeState(savedFont);
+      setHighContrastState(savedHC);
+      setReducedMotionState(savedRM);
+      setSimpleModeState(savedSM);
+      setVoiceModeState(savedVM);
+      setLowLiteracyModeState(savedLLM);
+      setHasCompletedVoiceOnboardingState(savedVO);
     } catch {
       /* SSR guard */
     }
   }, []);
 
-  // Apply font scale to root element
+  // Initialize SpeechRecognition on mount
   useEffect(() => {
-    try {
-      document.documentElement.style.fontSize = `${FONT_SCALES[fontSize] * 100}%`;
-    } catch {
-      /* SSR guard */
-    }
-  }, [fontSize]);
+    if (typeof window !== "undefined") {
+      // @ts-ignore
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
 
-  const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
-    try {
-      localStorage.setItem("fitmadix-lang", lang);
-      document.documentElement.lang = LANG_MAP[lang].code;
-    } catch {
-      /* SSR guard */
-    }
-  }, []);
+        recognitionRef.current.onstart = () => {
+          setIsListeningVoice(true);
+          setVoiceError(null);
+        };
 
-  const setFontSize = useCallback((size: FontSize) => {
-    setFontSizeState(size);
-    try {
-      localStorage.setItem("fitmadix-fontsize", size);
-    } catch {
-      /* SSR guard */
+        recognitionRef.current.onresult = (event: any) => {
+          const text = event.results[0][0].transcript;
+          setTranscript(text);
+          setIsListeningVoice(false);
+          setVoiceError(null);
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error("Speech recognition error", event.error);
+          setIsListeningVoice(false);
+
+          if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+            setVoiceError(language.startsWith("en") ? "Microphone permission denied." : "माइक्रोफ़ोन की अनुमति नहीं है");
+          } else if (event.error === "no-speech") {
+            setVoiceError(language.startsWith("en") ? "No speech detected." : "कोई आवाज़ नहीं");
+          } else if (event.error === "network") {
+            setVoiceError(language.startsWith("en") ? "Network error." : "नेटवर्क त्रुटि");
+          } else if (event.error !== "aborted") {
+            setVoiceError("Error: " + event.error);
+          }
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListeningVoice(false);
+        };
+      }
     }
-  }, []);
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, [language]);
+  
+  // Update recognition language when global language changes
+  useEffect(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = language;
+    }
+  }, [language]);
 
   const autoSpeak = useCallback(
     (text: string) => {
@@ -134,6 +215,120 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     setIsSpeaking(false);
   }, []);
 
+  const readPage = useCallback(() => {
+    if (typeof document !== "undefined") {
+      const main = document.querySelector("main");
+      if (main) {
+        // Strip out hidden elements and scripts, then get text
+        const text = main.innerText;
+        autoSpeak("Reading page... " + text);
+      } else {
+        autoSpeak("No main content found to read.");
+      }
+    }
+  }, [autoSpeak]);
+
+  const startListeningVoice = useCallback(() => {
+    if (!recognitionRef.current) {
+      setVoiceError("Speech recognition is not supported in this browser.");
+      return;
+    }
+    setTranscript("");
+    setVoiceError(null);
+    if (isSpeaking) {
+      stopSpeaking();
+    }
+    try {
+      recognitionRef.current.start();
+    } catch (err) {
+      console.error(err);
+    }
+  }, [isSpeaking, stopSpeaking]);
+
+  const stopListeningVoice = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    setIsListeningVoice(false);
+  }, []);
+
+  // Apply font scale to root element
+  useEffect(() => {
+    try {
+      document.documentElement.style.fontSize = `${FONT_SCALES[fontSize] * 100}%`;
+    } catch {
+      /* SSR guard */
+    }
+  }, [fontSize]);
+  
+  // Apply HTML classes for CSS overriding
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    
+    if (highContrast) {
+      document.documentElement.classList.add('high-contrast');
+    } else {
+      document.documentElement.classList.remove('high-contrast');
+    }
+    
+    if (reducedMotion) {
+      document.documentElement.classList.add('reduced-motion');
+    } else {
+      document.documentElement.classList.remove('reduced-motion');
+    }
+  }, [highContrast, reducedMotion]);
+
+  const setLanguage = useCallback((lang: Language) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem("fitmadix-lang", lang);
+      document.documentElement.lang = LANG_MAP[lang].code;
+    } catch {
+      /* SSR guard */
+    }
+  }, []);
+
+  const setFontSize = useCallback((size: FontSize) => {
+    setFontSizeState(size);
+    try {
+      localStorage.setItem("fitmadix-fontsize", size);
+    } catch {
+      /* SSR guard */
+    }
+  }, []);
+  
+  const setHighContrast = useCallback((val: boolean) => {
+    setHighContrastState(val);
+    try { localStorage.setItem("fitmadix-highcontrast", String(val)); } catch {}
+  }, []);
+
+  const setReducedMotion = useCallback((val: boolean) => {
+    setReducedMotionState(val);
+    try { localStorage.setItem("fitmadix-reducedmotion", String(val)); } catch {}
+  }, []);
+
+  const setSimpleMode = useCallback((val: boolean) => {
+    setSimpleModeState(val);
+    try { localStorage.setItem("fitmadix-simplemode", String(val)); } catch {}
+  }, []);
+
+  const setVoiceMode = useCallback((val: boolean) => {
+    setVoiceModeState(val);
+    try { localStorage.setItem("fitmadix-voicemode", String(val)); } catch {}
+  }, []);
+
+  const setLowLiteracyMode = useCallback((val: boolean) => {
+    setLowLiteracyModeState(val);
+    try { localStorage.setItem("fitmadix-lowliteracy", String(val)); } catch {}
+  }, []);
+
+  const setHasCompletedVoiceOnboarding = useCallback((val: boolean) => {
+    setHasCompletedVoiceOnboardingState(val);
+    try { localStorage.setItem("fitmadix-voiceonboarding", String(val)); } catch {}
+  }, []);
+
+
+
   const langInfo = LANG_MAP[language];
 
   return (
@@ -148,7 +343,27 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
         fontScale: FONT_SCALES[fontSize],
         autoSpeak,
         stopSpeaking,
+        readPage,
         isSpeaking,
+        highContrast,
+        setHighContrast,
+        reducedMotion,
+        setReducedMotion,
+        simpleMode,
+        setSimpleMode,
+        voiceMode,
+        setVoiceMode,
+        lowLiteracyMode,
+        setLowLiteracyMode,
+        hasCompletedVoiceOnboarding,
+        setHasCompletedVoiceOnboarding,
+        localCommandHandler: localCommandHandlerState,
+        setLocalCommandHandler,
+        transcript,
+        isListeningVoice,
+        startListeningVoice,
+        stopListeningVoice,
+        voiceError
       }}
     >
       {children}
@@ -170,7 +385,27 @@ export function useAccessibility() {
       fontScale: 1,
       autoSpeak: () => {},
       stopSpeaking: () => {},
+      readPage: () => {},
       isSpeaking: false,
+      highContrast: false,
+      setHighContrast: () => {},
+      reducedMotion: false,
+      setReducedMotion: () => {},
+      simpleMode: false,
+      setSimpleMode: () => {},
+      voiceMode: false,
+      setVoiceMode: () => {},
+      lowLiteracyMode: false,
+      setLowLiteracyMode: () => {},
+      hasCompletedVoiceOnboarding: false,
+      setHasCompletedVoiceOnboarding: () => {},
+      localCommandHandler: null,
+      setLocalCommandHandler: () => {},
+      transcript: "",
+      isListeningVoice: false,
+      startListeningVoice: () => {},
+      stopListeningVoice: () => {},
+      voiceError: null
     };
   }
   return ctx;

@@ -4,6 +4,8 @@ import { WeightLogEntry, StrengthRecord, WorkoutSessionLog } from "../../types/f
 import { Card } from "../ui/AppCard";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/AppButton";
+import { useAccessibility } from "../AccessibilityProvider";
+import { usePageIntro } from "../../hooks/usePageIntro";
 
 interface AnalyticsViewProps {
   weightLogs: WeightLogEntry[];
@@ -18,6 +20,12 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   workoutLogs,
   onAddWeightLog,
 }) => {
+  const { autoSpeak, language, setLocalCommandHandler } = useAccessibility();
+  
+  const intro = language.startsWith("en") ? "You are in Analytics. Say 'Read analytics' to hear your progress."
+              : language.startsWith("hi") ? "आप एनालिटिक्स में हैं।" : "আপনি অ্যানালিটিক্স পৃষ্ঠায় আছেন।";
+  usePageIntro(intro);
+
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
   const [newWeight, setNewWeight] = useState(81.0);
   const [newBodyFat, setNewBodyFat] = useState(14.5);
@@ -42,6 +50,23 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       ? (parseFloat(latestWeight) - initialWeight).toFixed(1)
       : "0.0";
 
+  React.useEffect(() => {
+    setLocalCommandHandler((text: string) => {
+      const lower = text.toLowerCase();
+      if (/read|analytics|progress|summary|tell me|पढ़ो|পড়ুন/.test(lower)) {
+        const summary = language.startsWith("en") 
+          ? `Your current weight is ${latestWeight} kilograms. You have completed ${workoutLogs.length} sessions so far.`
+          : language.startsWith("hi")
+            ? `आपका वर्तमान वजन ${latestWeight} किलो है। आपने अब तक ${workoutLogs.length} कसरत सत्र पूरे किए हैं।`
+            : `আপনার বর্তমান ওজন ${latestWeight} কেজি। আপনি এপর্যন্ত ${workoutLogs.length} টি ব্যায়াম সেশন সম্পন্ন করেছেন।`;
+        autoSpeak(summary);
+        return true;
+      }
+      return false;
+    });
+    return () => setLocalCommandHandler(null);
+  }, [setLocalCommandHandler, autoSpeak, language, latestWeight, workoutLogs.length]);
+
   return (
     <div className="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto">
       {/* Header */}
@@ -55,10 +80,33 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           </p>
         </div>
 
-        <Button onClick={() => setIsWeightModalOpen(true)} variant="primary" className="gap-2">
-          <Scale className="w-4 h-4" />
-          <span>Log Body Weight</span>
-        </Button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => {
+               const summary = language.startsWith("en") ? `Your current weight is ${latestWeight} kilograms. You have completed ${workoutLogs.length} sessions so far.` : `आपका वर्तमान वजन ${latestWeight} किलो है।`;
+               autoSpeak(summary);
+            }}
+            className="bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors text-sm"
+          >
+            Listen
+          </button>
+          <Button onClick={() => setIsWeightModalOpen(true)} variant="primary" className="gap-2">
+            <Scale className="w-4 h-4" />
+            <span>Log Body Weight</span>
+          </Button>
+        </div>
+      </div>
+      
+      {/* Text Summary for Low Literacy / Accessibility */}
+      <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 p-4 rounded-xl flex items-center gap-3">
+        <TrendingUp className="w-6 h-6 shrink-0" />
+        <p className="font-medium">
+          {language.startsWith("en") 
+            ? `Summary: Weight is ${latestWeight}kg. ${workoutLogs.length} workouts completed.`
+            : language.startsWith("hi")
+              ? `सारांश: वजन ${latestWeight}kg है। ${workoutLogs.length} वर्कआउट पूरे हुए।`
+              : `সারসংক্ষেপ: ওজন ${latestWeight}kg। ${workoutLogs.length} ওয়ার্কআউট সম্পন্ন হয়েছে।`}
+        </p>
       </div>
 
       {/* Top Stat Cards */}

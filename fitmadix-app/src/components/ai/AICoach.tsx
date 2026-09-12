@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles, Dumbbell, Utensils, Send, Plus, Check, Loader2, Bot, User } from "lucide-react";
 import { generateAIWorkout, generateAIMealPlan, askAICoach } from "../../services/aiService";
 import {
@@ -11,6 +11,10 @@ import {
 } from "../../types/fitness";
 import { Button } from "../ui/AppButton";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useVoiceInput } from "../../hooks/use-voice-input";
+import { Mic, MicOff } from "lucide-react";
 
 interface AICoachProps {
   onSaveGeneratedRoutine: (routine: Routine) => void;
@@ -52,6 +56,32 @@ export const AICoach: React.FC<AICoachProps> = ({
   ]);
   const [chatInput, setChatInput] = useState("");
   const [isAskingCoach, setIsAskingCoach] = useState(false);
+  const { isListening, transcript, startListening, stopListening, isSupported } = useVoiceInput();
+  const chatScrollRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (transcript) setChatInput((prev) => (prev ? prev + " " : "") + transcript);
+  }, [transcript]);
+
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTo({
+        top: chatScrollRef.current.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  }, [chatMessages, isAskingCoach]);
+
+  const buildUserContext = () => {
+    let contextStr = "";
+    if (userMetrics) {
+      contextStr += `User: ${userMetrics.age}y ${userMetrics.gender}, ${userMetrics.weightKg}kg, ${userMetrics.heightCm}cm. `;
+    }
+    if (vitals) {
+      contextStr += `Streak: ${vitals.activeStreakDays}d, HRV: ${vitals.recoveryScore}%.`;
+    }
+    return contextStr;
+  };
 
   const handleGenerateWorkout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +94,7 @@ export const AICoach: React.FC<AICoachProps> = ({
         daysPerWeek,
         equipment,
         targetFocus,
+        userContext: buildUserContext(),
       });
       setGeneratedWorkout(result);
     } catch (err) {
@@ -113,6 +144,7 @@ export const AICoach: React.FC<AICoachProps> = ({
         dietType,
         goal: mealGoal,
         allergies,
+        userContext: buildUserContext(),
       });
       setGeneratedMealPlan(result);
     } catch (err) {
@@ -135,12 +167,7 @@ export const AICoach: React.FC<AICoachProps> = ({
 
     try {
       let contextStr = `Goal: ${workoutGoal}, Level: ${experienceLevel}. `;
-      if (userMetrics) {
-        contextStr += `User: ${userMetrics.age}y ${userMetrics.gender}, ${userMetrics.weightKg}kg, ${userMetrics.heightCm}cm. `;
-      }
-      if (vitals) {
-        contextStr += `Streak: ${vitals.activeStreakDays}d, HRV: ${vitals.recoveryScore}%.`;
-      }
+      contextStr += buildUserContext();
       const response = await askAICoach(userQ, contextStr);
       setChatMessages((prev) => [...prev, { sender: "coach", text: response }]);
     } catch (err) {
@@ -510,9 +537,9 @@ export const AICoach: React.FC<AICoachProps> = ({
 
       {/* Mode 3: Interactive Coach Chat */}
       {activeSubTab === "chat" && (
-        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl flex flex-col h-[520px]">
+        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl flex flex-col h-130">
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+          <div ref={chatScrollRef} className="flex-1 overflow-y-auto space-y-4 pr-2">
             {chatMessages.map((msg, idx) => (
               <div
                 key={idx}
@@ -530,7 +557,15 @@ export const AICoach: React.FC<AICoachProps> = ({
                       : "bg-zinc-900 border border-zinc-800 text-zinc-200"
                   }`}
                 >
-                  {msg.text}
+                  {msg.sender === "user" ? (
+                    msg.text
+                  ) : (
+                    <div className="prose prose-sm prose-invert max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {msg.text}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
                 {msg.sender === "user" && (
                   <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 shrink-0">
@@ -550,16 +585,37 @@ export const AICoach: React.FC<AICoachProps> = ({
           {/* Input Box */}
           <form
             onSubmit={handleSendChatMessage}
-            className="mt-4 pt-4 border-t border-zinc-800 flex gap-2"
+            className="mt-4 pt-4 border-t border-zinc-800 flex gap-2 items-center"
           >
-            <input
-              type="text"
-              placeholder="Ask Coach Madix anything about form, plateau, nutrition, supplements..."
+            {isSupported && (
+              <button
+                type="button"
+                onClick={isListening ? stopListening : startListening}
+                className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors ${
+                  isListening
+                    ? "bg-red-500/10 text-red-500 border border-red-500/20 animate-pulse"
+                    : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
+                }`}
+                title={isListening ? "Stop listening" : "Start speaking"}
+              >
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </button>
+            )}
+            <textarea
+              placeholder="Ask Coach Madix anything about form, plateau, nutrition..."
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendChatMessage(e);
+                }
+              }}
+              rows={1}
+              style={{ color: "white" }}
+              className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-600 min-h-11 max-h-30 resize-none"
             />
-            <Button type="submit" variant="primary" disabled={isAskingCoach}>
+            <Button type="submit" variant="primary" disabled={isAskingCoach || !chatInput.trim()}>
               <Send className="w-4 h-4" />
             </Button>
           </form>

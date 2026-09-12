@@ -30,7 +30,7 @@ Rules:
 
 export const analyzePrescription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { imageBase64: string; language?: string }) =>
+  .validator((input: { imageBase64: string; language?: string }) =>
     z
       .object({
         imageBase64: z.string().min(100).max(10_000_000),

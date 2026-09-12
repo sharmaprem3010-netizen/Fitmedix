@@ -16,7 +16,7 @@ Structure:
 
 export const searchFoodLogItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { query: string }) =>
+  .validator((input: { query: string }) =>
     z.object({ query: z.string().min(1).max(200) }).parse(input),
   )
   .handler(async ({ data }) => {

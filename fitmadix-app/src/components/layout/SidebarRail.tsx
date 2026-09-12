@@ -44,39 +44,30 @@ export const SidebarRail: React.FC<SidebarRailProps> = ({
 
   const sections: NavSection[] = [
     {
-      title: "Fitness",
+      title: "My Health",
       items: [
-        { id: "hub", label: "Health Hub", icon: <Home className="w-5 h-5" /> },
-        { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-        { id: "workouts", label: "Workouts", icon: <Dumbbell className="w-5 h-5" /> },
-        { id: "exercises", label: "Exercise DB", icon: <BookOpen className="w-5 h-5" /> },
-        { id: "nutrition", label: "Nutrition", icon: <Utensils className="w-5 h-5" /> },
+        { id: "dashboard", label: "Home", icon: <Home className="w-5 h-5" /> },
+        { id: "chat", label: "AI Health", icon: <MessageSquare className="w-5 h-5" /> },
+        { id: "symptoms", label: "Symptoms", icon: <Stethoscope className="w-5 h-5" /> },
+        { id: "reports", label: "Reports", icon: <ClipboardList className="w-5 h-5" /> },
+        { id: "medicines", label: "Medicines", icon: <Pill className="w-5 h-5" /> },
+        { id: "timeline", label: "Timeline", icon: <Activity className="w-5 h-5" /> },
+      ],
+    },
+    {
+      title: "Lifestyle",
+      items: [
         { id: "ai-coach", label: "AI Coach", icon: <Sparkles className="w-5 h-5" /> },
-        { id: "analytics", label: "Analytics", icon: <LineChart className="w-5 h-5" /> },
-        { id: "vitals", label: "Vitals", icon: <Activity className="w-5 h-5" /> },
+        { id: "nutrition", label: "Nutrition", icon: <Utensils className="w-5 h-5" /> },
+        { id: "workouts", label: "Fitness", icon: <Dumbbell className="w-5 h-5" /> },
+        { id: "analytics", label: "Progress", icon: <LineChart className="w-5 h-5" /> },
       ],
     },
     {
-      title: "Health",
+      title: "Settings",
       items: [
-        { id: "chat", label: "AI Doctor", icon: <MessageSquare className="w-5 h-5" /> },
-        { id: "food-scan", label: "Food Scanner", icon: <ScanLine className="w-5 h-5" /> },
-        { id: "prescription", label: "Prescriptions", icon: <ClipboardList className="w-5 h-5" /> },
-        { id: "nearby", label: "Nearby Help", icon: <MapPin className="w-5 h-5" /> },
-        { id: "food-log", label: "Food Logs", icon: <UtensilsCrossed className="w-5 h-5" /> },
-        { id: "exercise", label: "Home Workouts", icon: <Dumbbell className="w-5 h-5" /> },
-      ],
-    },
-    {
-      title: "Encyclopedia",
-      items: [
-        { id: "encyclopedia-food", label: "Food Info", icon: <Apple className="w-5 h-5" /> },
-        { id: "encyclopedia-medicine", label: "Medicines", icon: <Pill className="w-5 h-5" /> },
-        {
-          id: "encyclopedia-disease",
-          label: "Diseases",
-          icon: <Stethoscope className="w-5 h-5" />,
-        },
+        { id: "accessibility", label: "Accessibility", icon: <ScanLine className="w-5 h-5" /> },
+        { id: "profile", label: "Profile", icon: <User className="w-5 h-5" /> },
       ],
     },
   ];
@@ -190,7 +181,7 @@ export const SidebarRail: React.FC<SidebarRailProps> = ({
       <div className="px-2">
         <button
           onClick={onOpenProfile}
-          className={`w-full flex items-center gap-3 rounded-xl border border-zinc-700 bg-gradient-to-tr from-zinc-800 to-zinc-950 hover:border-zinc-500 transition-colors text-zinc-300 hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 ${
+          className={`w-full flex items-center gap-3 rounded-xl border border-zinc-700 bg-linear-to-tr from-zinc-800 to-zinc-950 hover:border-zinc-500 transition-colors text-zinc-300 hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 ${
             isExpanded ? "px-3 py-2.5" : "p-3 justify-center"
           }`}
           title="User Profile & Settings"

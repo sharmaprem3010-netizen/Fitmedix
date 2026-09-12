@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Routine, WorkoutSessionLog, ExerciseLog, SetLog } from "../../types/fitness";
 import { estimateCalorieBurn, calculateOneRepMax } from "../../utils/calculators";
+import { useAccessibility } from "../AccessibilityProvider";
 
 interface LiveWorkoutSessionProps {
   routine: Routine;
@@ -28,6 +29,8 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
+  
+  const { autoSpeak, language, setLocalCommandHandler, simpleMode } = useAccessibility();
 
   // Rest Timer State
   const [restSecondsRemaining, setRestSecondsRemaining] = useState<number | null>(null);
@@ -73,6 +76,65 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
 
   const currentExercise = routine.exercises[currentExerciseIndex];
   const currentLog = exerciseLogs[currentExerciseIndex];
+
+  // Voice Intro for Current Exercise
+  useEffect(() => {
+    const txt = language.startsWith("en") ? `Next exercise: ${currentExercise.exerciseName}, ${currentExercise.sets} sets of ${currentExercise.reps}.`
+              : language.startsWith("hi") ? `अगला व्यायाम: ${currentExercise.exerciseName}`
+              : `পরবর্তী ব্যায়াম: ${currentExercise.exerciseName}`;
+    autoSpeak(txt);
+  }, [currentExerciseIndex, language, autoSpeak]);
+
+  // Voice Command Handler
+  useEffect(() => {
+    setLocalCommandHandler((text: string) => {
+      const lower = text.toLowerCase();
+      
+      if (/(next|agla|পরবর্তী)/.test(lower)) {
+        if (currentExerciseIndex < routine.exercises.length - 1) {
+          setCurrentExerciseIndex(prev => prev + 1);
+        }
+        return true;
+      }
+      
+      if (/(pause|ruk|थामুন)/.test(lower)) {
+        setIsTimerRunning(false);
+        autoSpeak(language.startsWith("en") ? "Workout paused." : "कसरत रोक दी गई है।");
+        return true;
+      }
+
+      if (/(resume|start|shuru|start workout)/.test(lower)) {
+        setIsTimerRunning(true);
+        autoSpeak(language.startsWith("en") ? "Workout resumed." : "कसरत फिर से शुरू।");
+        return true;
+      }
+
+      if (/(finish|stop|complete)/.test(lower)) {
+        handleFinish();
+        return true;
+      }
+      
+      if (/(cancel|abort|radd|বাতিল)/.test(lower)) {
+        onCancelWorkout();
+        autoSpeak(language.startsWith("en") ? "Workout cancelled." : "कसरत रद्द की गई।");
+        return true;
+      }
+
+      if (/(done|complete set|ho gaya)/.test(lower)) {
+        // Find first incomplete set
+        const incompleteSetIdx = currentLog.sets.findIndex(s => !s.completed);
+        if (incompleteSetIdx !== -1) {
+          handleToggleSetComplete(incompleteSetIdx);
+          autoSpeak(language.startsWith("en") ? "Set marked as complete. Rest now." : "सेट पूरा हुआ। आराम करें।");
+        }
+        return true;
+      }
+
+      return false;
+    });
+
+    return () => setLocalCommandHandler(null);
+  }, [setLocalCommandHandler, currentExerciseIndex, routine.exercises.length, currentLog, language, autoSpeak, onCancelWorkout]);
 
   const handleToggleSetComplete = (setIndex: number) => {
     setExerciseLogs((prev) => {
@@ -148,8 +210,82 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
       exerciseLogs,
       completed: true,
     };
+    
+    autoSpeak(language.startsWith("en") ? "Workout finished. Great job!" : language.startsWith("hi") ? "कसरत पूरी हुई। बहुत बढ़िया!" : "ব্যায়াম শেষ। দারুণ কাজ!");
+    
     onFinishWorkout(sessionLog);
   };
+
+  if (simpleMode) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex flex-col overflow-y-auto text-foreground animate-fade-in pb-32">
+        <header className="p-6 border-b-4 border-border flex flex-col items-center gap-4">
+          <h2 className="text-4xl font-bold text-center">{routine.title}</h2>
+          <div className="text-5xl font-mono font-bold text-primary">{formatTime(elapsedSeconds)}</div>
+          
+          <div className="flex gap-4 w-full max-w-sm mt-4">
+            <button
+              onClick={onCancelWorkout}
+              className="flex-1 py-4 text-2xl font-bold bg-rose-500/10 text-rose-500 border-4 border-rose-500/50 rounded-2xl"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleFinish}
+              className="flex-1 py-4 text-2xl font-bold bg-emerald-500 text-black border-4 border-emerald-600 rounded-2xl"
+            >
+              Finish
+            </button>
+          </div>
+        </header>
+
+        <div className="flex-1 p-6 flex flex-col items-center">
+          <h3 className="text-3xl font-bold mb-8 text-center">{currentExercise.exerciseName}</h3>
+          
+          <div className="w-full max-w-md space-y-4">
+            {currentLog.sets.map((set, sIdx) => (
+              <button
+                key={sIdx}
+                onClick={() => handleToggleSetComplete(sIdx)}
+                className={`w-full p-6 flex items-center justify-between rounded-3xl border-4 transition-all ${
+                  set.completed 
+                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-600" 
+                    : "bg-card border-border hover:border-primary"
+                }`}
+              >
+                <div className="text-left">
+                  <div className="text-xl font-bold text-muted-foreground">Set {set.setNumber}</div>
+                  <div className="text-3xl font-bold mt-2">{set.reps} reps</div>
+                </div>
+                <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center ${set.completed ? "border-emerald-500 bg-emerald-500 text-black" : "border-muted-foreground text-transparent"}`}>
+                  <Check className="w-10 h-10" />
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-4 mt-12 w-full max-w-md">
+            <button
+              onClick={() => setCurrentExerciseIndex((prev) => Math.max(0, prev - 1))}
+              disabled={currentExerciseIndex === 0}
+              className="flex-1 py-6 text-2xl font-bold bg-secondary border-4 border-border rounded-3xl disabled:opacity-50"
+            >
+              Back
+            </button>
+            <button
+              onClick={() =>
+                setCurrentExerciseIndex((prev) => Math.min(routine.exercises.length - 1, prev + 1))
+              }
+              disabled={currentExerciseIndex === routine.exercises.length - 1}
+              className="flex-1 py-6 text-2xl font-bold bg-primary text-primary-foreground border-4 border-primary rounded-3xl disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col overflow-hidden text-white animate-fade-in">
@@ -287,7 +423,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
                           onChange={(e) =>
                             handleUpdateSetWeight(sIdx, parseFloat(e.target.value) || 0)
                           }
-                          className="w-20 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm font-bold text-white text-center focus:outline-none focus:border-zinc-600"
+                          className="w-20 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-zinc-600"
                         />
                         <span className="text-xs text-zinc-500 hidden sm:inline">kg</span>
                       </div>
@@ -298,7 +434,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
                           type="number"
                           value={set.reps}
                           onChange={(e) => handleUpdateSetReps(sIdx, parseInt(e.target.value) || 0)}
-                          className="w-20 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm font-bold text-white text-center focus:outline-none focus:border-zinc-600"
+                          className="w-20 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-zinc-600"
                         />
                         <span className="text-xs text-zinc-500 hidden sm:inline">reps</span>
                       </div>
@@ -313,7 +449,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
                               : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-700"
                           }`}
                         >
-                          <Check className="w-5 h-5 stroke-[3]" />
+                          <Check className="w-5 h-5 stroke-3" />
                         </button>
                       </div>
                     </div>
@@ -351,7 +487,7 @@ export const LiveWorkoutSession: React.FC<LiveWorkoutSessionProps> = ({
                 className="px-6 py-2.5 bg-emerald-500 text-black hover:bg-emerald-400 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-lg"
               >
                 <span>FINISH WORKOUT</span>
-                <Check className="w-4 h-4 stroke-[3]" />
+                <Check className="w-4 h-4 stroke-3" />
               </button>
             )}
           </div>

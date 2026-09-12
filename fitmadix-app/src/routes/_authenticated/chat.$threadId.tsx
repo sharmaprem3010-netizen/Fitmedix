@@ -21,6 +21,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { createThread, deleteThread, sendChatMessage } from "@/lib/ai-doctor.functions";
 import { useVoiceInput } from "@/hooks/use-voice-input";
 import { SpeakButton } from "@/components/SpeakButton";
+import { useAccessibility } from "@/components/AccessibilityProvider";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   component: ChatThread,
@@ -50,6 +53,8 @@ function ChatThread() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const { language, autoSpeak, voiceMode, lowLiteracyMode } = useAccessibility();
 
   // Load threads
   useEffect(() => {
@@ -95,7 +100,12 @@ function ChatThread() {
       { id: tempId, role: "user", content: text, created_at: new Date().toISOString() },
     ]);
     try {
-      const { reply } = await send({ data: { threadId, message: text } });
+      const { reply } = await send({ data: { threadId, message: text, language } });
+      
+      // Auto-read response if voice/low-literacy mode is active
+      if (voiceMode || lowLiteracyMode) {
+        autoSpeak(reply);
+      }
       setMessages((m) => [
         ...m,
         {
@@ -265,8 +275,13 @@ function ChatThread() {
         <div className="border-b border-border/60 bg-chart-4/5 px-4 py-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <AlertTriangle className="h-3.5 w-3.5 text-chart-4" />
-            Not a substitute for a real doctor. For emergencies call your local emergency number.
+            Fitmadix provides general health information only and is not a substitute for a qualified healthcare professional.
           </span>
+        </div>
+        
+        {/* Screen Reader Announcements */}
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          {busy ? "AI is typing..." : messages.length > 0 && messages[messages.length - 1].role === "assistant" ? `AI says: ${messages[messages.length - 1].content}` : ""}
         </div>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto">
@@ -392,7 +407,11 @@ function Bubble({
           </span>
         ) : (
           <>
-            <SimpleMarkdown text={content} />
+            <div className="prose prose-invert prose-sm max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {content}
+              </ReactMarkdown>
+            </div>
             {!isUser && content && (
               <div className="mt-2 flex justify-end">
                 <SpeakButton text={content} />
@@ -454,50 +473,3 @@ function Dot({ delay = 0 }: { delay?: number }) {
   );
 }
 
-// Minimal markdown-ish renderer: paragraphs, bullet lists, bold, and inline code.
-function SimpleMarkdown({ text }: { text: string }) {
-  const blocks = text.split(/\n{2,}/);
-  return (
-    <div className="space-y-3 leading-relaxed">
-      {blocks.map((block, i) => {
-        const lines = block.split("\n");
-        const isList = lines.every((l) => /^\s*([-*•]|\d+\.)\s+/.test(l));
-        if (isList) {
-          return (
-            <ul key={i} className="list-disc space-y-1 pl-5">
-              {lines.map((l, j) => (
-                <li key={j}>{formatInline(l.replace(/^\s*([-*•]|\d+\.)\s+/, ""))}</li>
-              ))}
-            </ul>
-          );
-        }
-        return (
-          <p key={i} className="whitespace-pre-wrap">
-            {formatInline(block)}
-          </p>
-        );
-      })}
-    </div>
-  );
-}
-
-function formatInline(t: string): React.ReactNode {
-  const parts: React.ReactNode[] = [];
-  const regex = /(\*\*[^*]+\*\*|`[^`]+`)/g;
-  let last = 0;
-  let m: RegExpExecArray | null;
-  while ((m = regex.exec(t))) {
-    if (m.index > last) parts.push(t.slice(last, m.index));
-    const tok = m[0];
-    if (tok.startsWith("**")) parts.push(<strong key={m.index}>{tok.slice(2, -2)}</strong>);
-    else
-      parts.push(
-        <code key={m.index} className="rounded bg-muted px-1 py-0.5 text-xs">
-          {tok.slice(1, -1)}
-        </code>,
-      );
-    last = m.index + tok.length;
-  }
-  if (last < t.length) parts.push(t.slice(last));
-  return parts;
-}

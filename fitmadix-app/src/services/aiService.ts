@@ -17,6 +17,7 @@ export async function generateAIWorkout(params: {
   daysPerWeek: number;
   equipment: string;
   targetFocus: string;
+  userContext?: string;
 }): Promise<AIWorkoutPlan> {
   const result = await generateAIWorkoutServer({ data: params });
   return {
@@ -39,6 +40,7 @@ export async function generateAIMealPlan(params: {
   dietType: string;
   goal: string;
   allergies: string;
+  userContext?: string;
 }): Promise<AIMealPlan> {
   const result = await generateAIMealPlanServer({ data: params });
   return {

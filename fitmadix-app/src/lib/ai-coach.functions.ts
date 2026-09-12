@@ -31,13 +31,14 @@ Rules:
 
 export const generateAIWorkoutServer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (input: {
       goal: string;
       experienceLevel: string;
       daysPerWeek: number;
       equipment: string;
       targetFocus: string;
+      userContext?: string;
     }) =>
       z
         .object({
@@ -46,6 +47,7 @@ export const generateAIWorkoutServer = createServerFn({ method: "POST" })
           daysPerWeek: z.number(),
           equipment: z.string(),
           targetFocus: z.string(),
+          userContext: z.string().optional(),
         })
         .parse(input),
   )
@@ -59,6 +61,7 @@ export const generateAIWorkoutServer = createServerFn({ method: "POST" })
 - Training Days per Week: ${data.daysPerWeek}
 - Available Equipment: ${data.equipment}
 - Target Focus / Split Type: ${data.targetFocus}
+${data.userContext ? `- User Context: ${data.userContext}` : ""}
 
 Return ONLY the JSON object, no other text.`;
 
@@ -121,14 +124,15 @@ Rules:
 
 export const generateAIMealPlanServer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { calorieTarget: number; dietType: string; goal: string; allergies: string }) =>
+  .validator(
+    (input: { calorieTarget: number; dietType: string; goal: string; allergies: string; userContext?: string }) =>
       z
         .object({
           calorieTarget: z.number(),
           dietType: z.string(),
           goal: z.string(),
           allergies: z.string(),
+          userContext: z.string().optional(),
         })
         .parse(input),
   )
@@ -141,6 +145,7 @@ export const generateAIMealPlanServer = createServerFn({ method: "POST" })
 - Dietary Focus: ${data.dietType}
 - Goal: ${data.goal}
 - Allergies/Restrictions: ${data.allergies || "None"}
+${data.userContext ? `- User Context: ${data.userContext}` : ""}
 
 Return ONLY the JSON object, no other text.`;
 
@@ -194,7 +199,7 @@ Rules:
 
 export const askAICoachServer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { query: string; context: string }) =>
+  .validator((input: { query: string; context: string }) =>
     z
       .object({
         query: z.string().min(1).max(2000),
