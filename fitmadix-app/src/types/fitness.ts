@@ -23,6 +23,9 @@ export type NavigationTab =
   | "exercise"
   | "encyclopedia-food"
   | "encyclopedia-medicine"
+  | "encyclopedia"
+  | "products"
+  | "admin"
   | "encyclopedia-disease";
 
 export type ExerciseCategory =

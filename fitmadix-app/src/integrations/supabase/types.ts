@@ -6,6 +6,76 @@ export type Database = {
   };
   public: {
     Tables: {
+      encyclopedia_entries: {
+        Row: { id: string; slug: string; title: string; category: string; subcategory: string | null; description: string | null; image_url: string | null; content: string | null; benefits_uses: string | null; risks_limitations: string | null; warnings: string | null; status: string; language: string; last_reviewed_at: string | null; created_at: string; updated_at: string; };
+        Insert: { id?: string; slug: string; title: string; category: string; subcategory?: string | null; description?: string | null; image_url?: string | null; content?: string | null; benefits_uses?: string | null; risks_limitations?: string | null; warnings?: string | null; status?: string; language?: string; last_reviewed_at?: string | null; created_at?: string; updated_at?: string; };
+        Update: { id?: string; slug?: string; title?: string; category?: string; subcategory?: string | null; description?: string | null; image_url?: string | null; content?: string | null; benefits_uses?: string | null; risks_limitations?: string | null; warnings?: string | null; status?: string; language?: string; last_reviewed_at?: string | null; created_at?: string; updated_at?: string; };
+        Relationships: [];
+      };
+      medicine_details: {
+        Row: { entry_id: string; generic_name: string | null; brand_names: string[] | null; drug_class: string | null; available_forms: string[] | null; prescription_status: string | null; common_strengths: string[] | null; possible_interactions: string | null; storage_info: string | null; };
+        Insert: { entry_id: string; generic_name?: string | null; brand_names?: string[] | null; drug_class?: string | null; available_forms?: string[] | null; prescription_status?: string | null; common_strengths?: string[] | null; possible_interactions?: string | null; storage_info?: string | null; };
+        Update: { entry_id?: string; generic_name?: string | null; brand_names?: string[] | null; drug_class?: string | null; available_forms?: string[] | null; prescription_status?: string | null; common_strengths?: string[] | null; possible_interactions?: string | null; storage_info?: string | null; };
+        Relationships: [{ foreignKeyName: 'medicine_details_entry_id_fkey', columns: ['entry_id'], isOneToOne: true, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      food_details: {
+        Row: { entry_id: string; calories_per_100g: number | null; protein_per_100g: number | null; carbs_per_100g: number | null; fat_per_100g: number | null; fiber_per_100g: number | null; serving_size_info: string | null; allergy_info: string | null; };
+        Insert: { entry_id: string; calories_per_100g?: number | null; protein_per_100g?: number | null; carbs_per_100g?: number | null; fat_per_100g?: number | null; fiber_per_100g?: number | null; serving_size_info?: string | null; allergy_info?: string | null; };
+        Update: { entry_id?: string; calories_per_100g?: number | null; protein_per_100g?: number | null; carbs_per_100g?: number | null; fat_per_100g?: number | null; fiber_per_100g?: number | null; serving_size_info?: string | null; allergy_info?: string | null; };
+        Relationships: [{ foreignKeyName: 'food_details_entry_id_fkey', columns: ['entry_id'], isOneToOne: true, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      exercise_details: {
+        Row: { entry_id: string; difficulty: string | null; primary_muscles: string[] | null; secondary_muscles: string[] | null; equipment: string[] | null; instructions: string[] | null; common_mistakes: string[] | null; safety_considerations: string | null; beginner_modification: string | null; advanced_modification: string | null; };
+        Insert: { entry_id: string; difficulty?: string | null; primary_muscles?: string[] | null; secondary_muscles?: string[] | null; equipment?: string[] | null; instructions?: string[] | null; common_mistakes?: string[] | null; safety_considerations?: string | null; beginner_modification?: string | null; advanced_modification?: string | null; };
+        Update: { entry_id?: string; difficulty?: string | null; primary_muscles?: string[] | null; secondary_muscles?: string[] | null; equipment?: string[] | null; instructions?: string[] | null; common_mistakes?: string[] | null; safety_considerations?: string | null; beginner_modification?: string | null; advanced_modification?: string | null; };
+        Relationships: [{ foreignKeyName: 'exercise_details_entry_id_fkey', columns: ['entry_id'], isOneToOne: true, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      condition_details: {
+        Row: { entry_id: string; common_symptoms: string[] | null; common_causes: string[] | null; evaluation_methods: string | null; management_approaches: string | null; emergency_warning_signs: string | null; };
+        Insert: { entry_id: string; common_symptoms?: string[] | null; common_causes?: string[] | null; evaluation_methods?: string | null; management_approaches?: string | null; emergency_warning_signs?: string | null; };
+        Update: { entry_id?: string; common_symptoms?: string[] | null; common_causes?: string[] | null; evaluation_methods?: string | null; management_approaches?: string | null; emergency_warning_signs?: string | null; };
+        Relationships: [{ foreignKeyName: 'condition_details_entry_id_fkey', columns: ['entry_id'], isOneToOne: true, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      nutrient_details: {
+        Row: { entry_id: string; food_sources: string[] | null; deficiency_info: string | null; toxicity_info: string | null; supplement_info: string | null; recommended_intake: string | null; };
+        Insert: { entry_id: string; food_sources?: string[] | null; deficiency_info?: string | null; toxicity_info?: string | null; supplement_info?: string | null; recommended_intake?: string | null; };
+        Update: { entry_id?: string; food_sources?: string[] | null; deficiency_info?: string | null; toxicity_info?: string | null; supplement_info?: string | null; recommended_intake?: string | null; };
+        Relationships: [{ foreignKeyName: 'nutrient_details_entry_id_fkey', columns: ['entry_id'], isOneToOne: true, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      test_details: {
+        Row: { entry_id: string; why_ordered: string | null; what_it_measures: string | null; preparation: string | null; results_meaning: string | null; limitations: string | null; };
+        Insert: { entry_id: string; why_ordered?: string | null; what_it_measures?: string | null; preparation?: string | null; results_meaning?: string | null; limitations?: string | null; };
+        Update: { entry_id?: string; why_ordered?: string | null; what_it_measures?: string | null; preparation?: string | null; results_meaning?: string | null; limitations?: string | null; };
+        Relationships: [{ foreignKeyName: 'test_details_entry_id_fkey', columns: ['entry_id'], isOneToOne: true, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      health_products: {
+        Row: { entry_id: string; product_type: string | null; specifications: Json | null; advantages: string[] | null; limitations: string[] | null; suitable_use_cases: string[] | null; };
+        Insert: { entry_id: string; product_type?: string | null; specifications?: Json | null; advantages?: string[] | null; limitations?: string[] | null; suitable_use_cases?: string[] | null; };
+        Update: { entry_id?: string; product_type?: string | null; specifications?: Json | null; advantages?: string[] | null; limitations?: string[] | null; suitable_use_cases?: string[] | null; };
+        Relationships: [{ foreignKeyName: 'health_products_entry_id_fkey', columns: ['entry_id'], isOneToOne: true, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      product_sellers: {
+        Row: { id: string; entry_id: string | null; seller_name: string; price: number | null; currency: string | null; availability: string | null; purchase_url: string | null; last_updated: string; };
+        Insert: { id?: string; entry_id?: string | null; seller_name: string; price?: number | null; currency?: string | null; availability?: string | null; purchase_url?: string | null; last_updated?: string; };
+        Update: { id?: string; entry_id?: string | null; seller_name?: string; price?: number | null; currency?: string | null; availability?: string | null; purchase_url?: string | null; last_updated?: string; };
+        Relationships: [{ foreignKeyName: 'product_sellers_entry_id_fkey', columns: ['entry_id'], isOneToOne: false, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      encyclopedia_sources: {
+        Row: { id: string; entry_id: string | null; source_name: string; source_url: string | null; accessed_at: string; };
+        Insert: { id?: string; entry_id?: string | null; source_name: string; source_url?: string | null; accessed_at?: string; };
+        Update: { id?: string; entry_id?: string | null; source_name?: string; source_url?: string | null; accessed_at?: string; };
+        Relationships: [{ foreignKeyName: 'encyclopedia_sources_entry_id_fkey', columns: ['entry_id'], isOneToOne: false, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }];
+      };
+      encyclopedia_relations: {
+        Row: { id: string; source_id: string | null; target_id: string | null; relation_type: string | null; };
+        Insert: { id?: string; source_id?: string | null; target_id?: string | null; relation_type?: string | null; };
+        Update: { id?: string; source_id?: string | null; target_id?: string | null; relation_type?: string | null; };
+        Relationships: [
+          { foreignKeyName: 'encyclopedia_relations_source_id_fkey', columns: ['source_id'], isOneToOne: false, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] },
+          { foreignKeyName: 'encyclopedia_relations_target_id_fkey', columns: ['target_id'], isOneToOne: false, referencedRelation: 'encyclopedia_entries', referencedColumns: ['id'] }
+        ];
+      };
+
       activity_logs: {
         Row: {
           activity_type: string;
@@ -495,7 +565,8 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      encyclopedia_category: "medicine" | "food" | "exercise" | "condition" | "nutrient" | "test" | "term" | "product";
+      content_status: "draft" | "in_review" | "published" | "archived";
     };
     CompositeTypes: {
       [_ in never]: never;

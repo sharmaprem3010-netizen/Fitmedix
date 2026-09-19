@@ -108,7 +108,7 @@ function ProfilePage() {
   ] as const;
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="min-h-dvh bg-background w-full overflow-y-auto">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <button
           type="button"

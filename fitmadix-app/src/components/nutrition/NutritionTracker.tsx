@@ -245,50 +245,50 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
   }
 
   return (
-    <div className="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto pb-32">
+    <div className="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto pb-32 bg-background text-foreground animate-fade-in">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-800 pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-            Nutrition & Macro Intelligence
+          <h1 className="text-4xl font-extrabold tracking-tight">
+            Nutrition & Macros
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-2">
             Track daily macronutrients and optimize metabolic output
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button onClick={() => setIsCalculatorOpen(true)} variant="secondary" className="gap-2">
-            <Calculator className="w-4 h-4 text-blue-400" />
+        <div className="flex items-center gap-4">
+          <Button onClick={() => setIsCalculatorOpen(true)} variant="outline" className="gap-2 shadow-sm">
+            <Calculator className="w-5 h-5 text-blue-500" />
             <span>TDEE Calculator</span>
           </Button>
 
-          <Button onClick={() => setIsMealModalOpen(true)} variant="primary" className="gap-2">
-            <Plus className="w-4 h-4" />
+          <Button onClick={() => setIsMealModalOpen(true)} variant="primary" className="gap-2 shadow-sm">
+            <Plus className="w-5 h-5" />
             <span>Log Meal</span>
           </Button>
         </div>
       </div>
 
       {/* Hero Macro Overview Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Calorie Ring Summary (Col 5) */}
-        <div className="lg:col-span-5 bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-2xl relative">
-          <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">
+        <div className="lg:col-span-5 bg-card border border-border rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-elegant relative">
+          <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-6">
             Daily Calorie Balance
           </p>
 
           <ProgressRing
             value={totalCalories}
             max={macroTargets.calories}
-            size={160}
-            strokeWidth={10}
-            color="#ffffff"
+            size={180}
+            strokeWidth={12}
+            color="var(--color-primary)"
             label={`${totalCalories}`}
             sublabel={`Target: ${macroTargets.calories} kcal`}
           />
 
-          <p className="text-xs text-zinc-400 mt-4 font-medium">
+          <p className="text-sm text-muted-foreground mt-6 font-medium">
             {macroTargets.calories - totalCalories > 0
               ? `${macroTargets.calories - totalCalories} kcal remaining for today`
               : "Daily calorie target reached"}
@@ -296,55 +296,52 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
         </div>
 
         {/* Individual Macro Bars (Col 7) */}
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-6">
           {/* Protein */}
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
+          <div className="bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between shadow-sm transition-transform hover:-translate-y-1">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-emerald-400">Protein</p>
-              <p className="text-3xl font-extrabold text-white mt-1">
-                {totalProtein}{" "}
-                <span className="text-sm font-normal text-zinc-500">/ {macroTargets.protein}g</span>
+              <p className="text-sm font-bold uppercase tracking-wider text-emerald-500">Protein</p>
+              <p className="text-4xl font-extrabold text-foreground mt-2">
+                {totalProtein} <span className="text-base font-medium text-muted-foreground">/ {macroTargets.protein}g</span>
               </p>
             </div>
-            <div className="h-2 bg-zinc-900 rounded-full overflow-hidden mt-4">
+            <div className="h-3 bg-secondary rounded-full overflow-hidden mt-6">
               <div
-                className="h-full bg-emerald-500 transition-all duration-500"
+                className="h-full bg-emerald-500 transition-all duration-500 rounded-full"
                 style={{ width: `${Math.min(100, (totalProtein / macroTargets.protein) * 100)}%` }}
               ></div>
             </div>
           </div>
 
           {/* Carbs */}
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
+          <div className="bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between shadow-sm transition-transform hover:-translate-y-1">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-400">
-                Carbohydrates
+              <p className="text-sm font-bold uppercase tracking-wider text-blue-500">
+                Carbs
               </p>
-              <p className="text-3xl font-extrabold text-white mt-1">
-                {totalCarbs}{" "}
-                <span className="text-sm font-normal text-zinc-500">/ {macroTargets.carbs}g</span>
+              <p className="text-4xl font-extrabold text-foreground mt-2">
+                {totalCarbs} <span className="text-base font-medium text-muted-foreground">/ {macroTargets.carbs}g</span>
               </p>
             </div>
-            <div className="h-2 bg-zinc-900 rounded-full overflow-hidden mt-4">
+            <div className="h-3 bg-secondary rounded-full overflow-hidden mt-6">
               <div
-                className="h-full bg-blue-500 transition-all duration-500"
+                className="h-full bg-blue-500 transition-all duration-500 rounded-full"
                 style={{ width: `${Math.min(100, (totalCarbs / macroTargets.carbs) * 100)}%` }}
               ></div>
             </div>
           </div>
 
           {/* Fats */}
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
+          <div className="bg-surface border border-border rounded-3xl p-6 flex flex-col justify-between shadow-sm transition-transform hover:-translate-y-1">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-amber-400">Fats</p>
-              <p className="text-3xl font-extrabold text-white mt-1">
-                {totalFat}{" "}
-                <span className="text-sm font-normal text-zinc-500">/ {macroTargets.fat}g</span>
+              <p className="text-sm font-bold uppercase tracking-wider text-amber-500">Fats</p>
+              <p className="text-4xl font-extrabold text-foreground mt-2">
+                {totalFat} <span className="text-base font-medium text-muted-foreground">/ {macroTargets.fat}g</span>
               </p>
             </div>
-            <div className="h-2 bg-zinc-900 rounded-full overflow-hidden mt-4">
+            <div className="h-3 bg-secondary rounded-full overflow-hidden mt-6">
               <div
-                className="h-full bg-amber-500 transition-all duration-500"
+                className="h-full bg-amber-500 transition-all duration-500 rounded-full"
                 style={{ width: `${Math.min(100, (totalFat / macroTargets.fat) * 100)}%` }}
               ></div>
             </div>
@@ -353,79 +350,86 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
       </div>
 
       {/* Water Intake Tracker */}
-      <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl">
-            <Droplets className="w-6 h-6" />
+      <div className="bg-card border border-border rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="p-4 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-2xl">
+            <Droplets className="w-8 h-8" />
           </div>
           <div>
-            <h4 className="text-base font-bold text-white tracking-tight">Hydration Tracker</h4>
-            <p className="text-xs text-zinc-400">
+            <h4 className="text-xl font-bold text-foreground tracking-tight">Hydration Tracker</h4>
+            <p className="text-sm text-muted-foreground mt-1">
               {loggedWaterMl} ml logged / {macroTargets.waterMl} ml daily goal
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
           <button
             onClick={() => setLoggedWaterMl((prev) => prev + 250)}
-            className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs font-bold text-white cursor-pointer"
+            className="flex-1 sm:flex-none px-4 py-3 bg-surface hover:bg-secondary border border-border rounded-xl text-sm font-bold text-foreground cursor-pointer transition-colors shadow-sm"
           >
-            + 250ml Glass
+            + 250ml
           </button>
           <button
             onClick={() => setLoggedWaterMl((prev) => prev + 500)}
-            className="px-3 py-1.5 bg-blue-500 text-black font-bold text-xs rounded-lg hover:bg-blue-400 cursor-pointer"
+            className="flex-1 sm:flex-none px-4 py-3 bg-blue-500 text-blue-950 font-bold text-sm rounded-xl hover:bg-blue-400 cursor-pointer transition-colors shadow-sm"
           >
-            + 500ml Bottle
+            + 500ml
           </button>
         </div>
       </div>
 
       {/* Meals Log Table */}
-      <div className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/40">
-          <h3 className="text-base font-bold text-white">Today's Logged Meals</h3>
-          <span className="text-xs text-zinc-400">{meals.length} items logged</span>
+      <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-elegant">
+        <div className="px-8 py-6 border-b border-border flex justify-between items-center bg-surface">
+          <h3 className="text-lg font-bold text-foreground">Today's Logged Meals</h3>
+          <span className="text-sm font-medium text-muted-foreground bg-secondary px-3 py-1 rounded-full">{meals.length} items logged</span>
         </div>
 
         {meals.length === 0 ? (
-          <div className="p-12 text-center text-zinc-500 text-xs">
-            No meals logged today. Click "Log Meal" to add your food entries.
+          <div className="p-16 text-center flex flex-col items-center">
+            <Utensils className="w-12 h-12 text-muted-foreground/30 mb-4" />
+            <p className="text-muted-foreground text-sm font-medium">
+              No meals logged today. Click "Log Meal" to add your food entries.
+            </p>
           </div>
         ) : (
-          <div className="divide-y divide-zinc-900">
+          <div className="divide-y divide-border">
             {meals.map((m) => (
               <div
                 key={m.id}
-                className="px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-zinc-900/30 transition-colors"
+                className="px-8 py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-secondary/50 transition-colors"
               >
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold px-2 py-0.5 bg-zinc-800 text-zinc-300 rounded">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold px-2.5 py-1 bg-surface border border-border text-foreground rounded-md shadow-sm uppercase tracking-wide">
                       {m.mealType}
                     </span>
-                    <h4 className="text-sm font-bold text-white">{m.name}</h4>
+                    <h4 className="text-lg font-bold text-foreground">{m.name}</h4>
                   </div>
-                  <p className="text-xs text-zinc-500 mt-0.5">
+                  <p className="text-sm text-muted-foreground mt-2 font-medium">
                     {m.servingSize} • Logged at {m.loggedAt}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-sm font-extrabold text-white">{m.calories} kcal</p>
-                    <p className="text-[10px] text-zinc-400">
-                      P: {m.proteinG}g • C: {m.carbsG}g • F: {m.fatG}g
-                    </p>
+                <div className="flex items-center gap-8 w-full sm:w-auto justify-between sm:justify-end">
+                  <div className="text-right flex flex-row sm:flex-col items-center sm:items-end gap-4 sm:gap-1">
+                    <p className="text-xl font-extrabold text-foreground">{m.calories} kcal</p>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground bg-surface px-2 py-1 rounded border border-border">
+                      <span className="text-emerald-500">P: {m.proteinG}g</span>
+                      <span>•</span>
+                      <span className="text-blue-500">C: {m.carbsG}g</span>
+                      <span>•</span>
+                      <span className="text-amber-500">F: {m.fatG}g</span>
+                    </div>
                   </div>
 
                   <button
                     onClick={() => onDeleteMeal(m.id)}
-                    className="p-2 text-zinc-600 hover:text-rose-400 transition-colors cursor-pointer"
+                    className="p-3 bg-surface hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 border border-border hover:border-rose-500/30 rounded-xl transition-all cursor-pointer shadow-sm"
                     title="Delete meal entry"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -442,9 +446,9 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
         subtitle="Add nutrition data to your daily tracker"
         maxWidth="md"
       >
-        <form onSubmit={handleSaveMeal} className="space-y-4">
+        <form onSubmit={handleSaveMeal} className="space-y-5">
           <div>
-            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+            <label className="block text-sm font-bold text-foreground mb-2">
               Meal Name
             </label>
             <input
@@ -453,19 +457,19 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
               placeholder="e.g. Salmon & Sweet Potato Bowl"
               value={mealName}
               onChange={(e) => setMealName(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-zinc-600"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              <label className="block text-sm font-bold text-foreground mb-2">
                 Meal Slot
               </label>
               <select
                 value={mealType}
                 onChange={(e) => setMealType(e.target.value as any)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
               >
                 <option value="Breakfast">Breakfast</option>
                 <option value="Lunch">Lunch</option>
@@ -475,55 +479,55 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              <label className="block text-sm font-bold text-foreground mb-2">
                 Calories (kcal)
               </label>
               <input
                 type="number"
                 value={calories}
                 onChange={(e) => setCalories(parseInt(e.target.value) || 0)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              <label className="block text-sm font-bold text-emerald-500 mb-2">
                 Protein (g)
               </label>
               <input
                 type="number"
                 value={proteinG}
                 onChange={(e) => setProteinG(parseInt(e.target.value) || 0)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              <label className="block text-sm font-bold text-blue-500 mb-2">
                 Carbs (g)
               </label>
               <input
                 type="number"
                 value={carbsG}
                 onChange={(e) => setCarbsG(parseInt(e.target.value) || 0)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              <label className="block text-sm font-bold text-amber-500 mb-2">
                 Fat (g)
               </label>
               <input
                 type="number"
                 value={fatG}
                 onChange={(e) => setFatG(parseInt(e.target.value) || 0)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
+          <div className="flex justify-end gap-4 pt-6 border-t border-border mt-2">
             <Button type="button" variant="outline" onClick={() => setIsMealModalOpen(false)}>
               Cancel
             </Button>
@@ -542,10 +546,10 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
         subtitle="Mifflin-St Jeor formula calculation for customized macro split"
         maxWidth="lg"
       >
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              <label className="block text-sm font-bold text-foreground mb-2">
                 Weight (kg)
               </label>
               <input
@@ -554,11 +558,11 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
                 onChange={(e) =>
                   setCalcMetrics({ ...calcMetrics, weightKg: parseFloat(e.target.value) || 70 })
                 }
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+              <label className="block text-sm font-bold text-foreground mb-2">
                 Height (cm)
               </label>
               <input
@@ -567,30 +571,30 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
                 onChange={(e) =>
                   setCalcMetrics({ ...calcMetrics, heightCm: parseFloat(e.target.value) || 175 })
                 }
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Age</label>
+              <label className="block text-sm font-bold text-foreground mb-2">Age</label>
               <input
                 type="number"
                 value={calcMetrics.age}
                 onChange={(e) =>
                   setCalcMetrics({ ...calcMetrics, age: parseInt(e.target.value) || 25 })
                 }
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Gender</label>
+              <label className="block text-sm font-bold text-foreground mb-2">Gender</label>
               <select
                 value={calcMetrics.gender}
                 onChange={(e) => setCalcMetrics({ ...calcMetrics, gender: e.target.value as any })}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
               >
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -599,7 +603,7 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+            <label className="block text-sm font-bold text-foreground mb-2">
               Activity Multiplier
             </label>
             <select
@@ -607,7 +611,7 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
               onChange={(e) =>
                 setCalcMetrics({ ...calcMetrics, activityLevel: e.target.value as any })
               }
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
             >
               <option value="sedentary">Sedentary (Desk job, no workouts)</option>
               <option value="light">Lightly Active (1-3 workouts/week)</option>
@@ -618,13 +622,13 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">
+            <label className="block text-sm font-bold text-foreground mb-2">
               Fitness Goal
             </label>
             <select
               value={calcMetrics.goal}
               onChange={(e) => setCalcMetrics({ ...calcMetrics, goal: e.target.value as any })}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
             >
               <option value="cut">Fat Loss (-20% Calorie Deficit)</option>
               <option value="maintain">Maintenance (Recomposition)</option>
@@ -632,7 +636,7 @@ export const NutritionTracker: React.FC<NutritionTrackerProps> = ({
             </select>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
+          <div className="flex justify-end gap-4 pt-6 border-t border-border mt-2">
             <Button variant="outline" onClick={() => setIsCalculatorOpen(false)}>
               Cancel
             </Button>

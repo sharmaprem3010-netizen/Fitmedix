@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as EncyclopediaRouteRouteImport } from './routes/encyclopedia/route'
 import { Route as FoodRouteImport } from './routes/food'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as ProductsRouteRouteImport } from './routes/products/route'
 import { Route as AuthenticatedAccessibilityRouteImport } from './routes/_authenticated/accessibility'
 import { Route as AuthenticatedAiCoachRouteImport } from './routes/_authenticated/ai-coach'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
@@ -32,6 +36,12 @@ import { Route as AuthenticatedSymptomsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
 import { Route as AuthenticatedWorkoutsRouteImport } from './routes/_authenticated/workouts'
+import { Route as AdminEncyclopediaRouteImport } from './routes/admin/encyclopedia'
+import { Route as EncyclopediaIndexRouteImport } from './routes/encyclopedia/index'
+import { Route as EncyclopediaSearchRouteImport } from './routes/encyclopedia/search'
+import { Route as ProductsIndexRouteImport } from './routes/products/index'
+import { Route as ProductsSlugRouteImport } from './routes/products/$slug'
+import { Route as ProductsCompareRouteImport } from './routes/products/compare'
 import { Route as AuthenticatedChatIndexRouteImport } from './routes/_authenticated/chat.index'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 import { Route as AuthenticatedEncyclopediaDiseaseRouteImport } from './routes/_authenticated/encyclopedia.disease'
@@ -39,6 +49,8 @@ import { Route as AuthenticatedEncyclopediaFoodRouteImport } from './routes/_aut
 import { Route as AuthenticatedEncyclopediaMedicineRouteImport } from './routes/_authenticated/encyclopedia.medicine'
 import { Route as AuthenticatedExerciseWorkoutIdRouteImport } from './routes/_authenticated/exercise.$workoutId'
 import { Route as AuthenticatedFoodLogSettingsRouteImport } from './routes/_authenticated/food-log.settings'
+import { Route as EncyclopediaCategoryIndexRouteImport } from './routes/encyclopedia/$category/index'
+import { Route as EncyclopediaCategorySlugRouteImport } from './routes/encyclopedia/$category/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,14 +61,34 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EncyclopediaRouteRoute = EncyclopediaRouteRouteImport.update({
+  id: '/encyclopedia',
+  path: '/encyclopedia',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FoodRoute = FoodRouteImport.update({
   id: '/food',
   path: '/food',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRouteRoute = ProductsRouteRouteImport.update({
+  id: '/products',
+  path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAccessibilityRoute =
@@ -156,6 +188,36 @@ const AuthenticatedWorkoutsRoute = AuthenticatedWorkoutsRouteImport.update({
   path: '/workouts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AdminEncyclopediaRoute = AdminEncyclopediaRouteImport.update({
+  id: '/encyclopedia',
+  path: '/encyclopedia',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const EncyclopediaIndexRoute = EncyclopediaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EncyclopediaRouteRoute,
+} as any)
+const EncyclopediaSearchRoute = EncyclopediaSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => EncyclopediaRouteRoute,
+} as any)
+const ProductsIndexRoute = ProductsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProductsRouteRoute,
+} as any)
+const ProductsSlugRoute = ProductsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ProductsRouteRoute,
+} as any)
+const ProductsCompareRoute = ProductsCompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => ProductsRouteRoute,
+} as any)
 const AuthenticatedChatIndexRoute = AuthenticatedChatIndexRouteImport.update({
   id: '/chat/',
   path: '/chat/',
@@ -197,11 +259,27 @@ const AuthenticatedFoodLogSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedFoodLogRoute,
   } as any)
+const EncyclopediaCategoryIndexRoute =
+  EncyclopediaCategoryIndexRouteImport.update({
+    id: '/$category/',
+    path: '/$category/',
+    getParentRoute: () => EncyclopediaRouteRoute,
+  } as any)
+const EncyclopediaCategorySlugRoute =
+  EncyclopediaCategorySlugRouteImport.update({
+    id: '/$category/$slug',
+    path: '/$category/$slug',
+    getParentRoute: () => EncyclopediaRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/encyclopedia': typeof EncyclopediaRouteRouteWithChildren
+  '/products': typeof ProductsRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/food': typeof FoodRoute
+  '/onboarding': typeof OnboardingRoute
   '/accessibility': typeof AuthenticatedAccessibilityRoute
   '/ai-coach': typeof AuthenticatedAiCoachRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
@@ -221,18 +299,28 @@ export interface FileRoutesByFullPath {
   '/timeline': typeof AuthenticatedTimelineRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/workouts': typeof AuthenticatedWorkoutsRoute
+  '/admin/encyclopedia': typeof AdminEncyclopediaRoute
+  '/encyclopedia/search': typeof EncyclopediaSearchRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/products/compare': typeof ProductsCompareRoute
+  '/encyclopedia/': typeof EncyclopediaIndexRoute
+  '/products/': typeof ProductsIndexRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
   '/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
   '/encyclopedia/medicine': typeof AuthenticatedEncyclopediaMedicineRoute
   '/exercise/$workoutId': typeof AuthenticatedExerciseWorkoutIdRoute
   '/food-log/settings': typeof AuthenticatedFoodLogSettingsRoute
+  '/encyclopedia/$category/$slug': typeof EncyclopediaCategorySlugRoute
   '/chat/': typeof AuthenticatedChatIndexRoute
+  '/encyclopedia/$category/': typeof EncyclopediaCategoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/food': typeof FoodRoute
+  '/onboarding': typeof OnboardingRoute
   '/accessibility': typeof AuthenticatedAccessibilityRoute
   '/ai-coach': typeof AuthenticatedAiCoachRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
@@ -252,20 +340,32 @@ export interface FileRoutesByTo {
   '/timeline': typeof AuthenticatedTimelineRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/workouts': typeof AuthenticatedWorkoutsRoute
+  '/admin/encyclopedia': typeof AdminEncyclopediaRoute
+  '/encyclopedia/search': typeof EncyclopediaSearchRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/products/compare': typeof ProductsCompareRoute
+  '/encyclopedia': typeof EncyclopediaIndexRoute
+  '/products': typeof ProductsIndexRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
   '/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
   '/encyclopedia/medicine': typeof AuthenticatedEncyclopediaMedicineRoute
   '/exercise/$workoutId': typeof AuthenticatedExerciseWorkoutIdRoute
   '/food-log/settings': typeof AuthenticatedFoodLogSettingsRoute
+  '/encyclopedia/$category/$slug': typeof EncyclopediaCategorySlugRoute
   '/chat': typeof AuthenticatedChatIndexRoute
+  '/encyclopedia/$category': typeof EncyclopediaCategoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/encyclopedia': typeof EncyclopediaRouteRouteWithChildren
+  '/products': typeof ProductsRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/food': typeof FoodRoute
+  '/onboarding': typeof OnboardingRoute
   '/_authenticated/accessibility': typeof AuthenticatedAccessibilityRoute
   '/_authenticated/ai-coach': typeof AuthenticatedAiCoachRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
@@ -285,20 +385,32 @@ export interface FileRoutesById {
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
   '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/_authenticated/workouts': typeof AuthenticatedWorkoutsRoute
+  '/admin/encyclopedia': typeof AdminEncyclopediaRoute
+  '/encyclopedia/search': typeof EncyclopediaSearchRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/products/compare': typeof ProductsCompareRoute
+  '/encyclopedia/': typeof EncyclopediaIndexRoute
+  '/products/': typeof ProductsIndexRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
   '/_authenticated/encyclopedia/disease': typeof AuthenticatedEncyclopediaDiseaseRoute
   '/_authenticated/encyclopedia/food': typeof AuthenticatedEncyclopediaFoodRoute
   '/_authenticated/encyclopedia/medicine': typeof AuthenticatedEncyclopediaMedicineRoute
   '/_authenticated/exercise/$workoutId': typeof AuthenticatedExerciseWorkoutIdRoute
   '/_authenticated/food-log/settings': typeof AuthenticatedFoodLogSettingsRoute
+  '/encyclopedia/$category/$slug': typeof EncyclopediaCategorySlugRoute
   '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
+  '/encyclopedia/$category/': typeof EncyclopediaCategoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
+    | '/encyclopedia'
+    | '/products'
     | '/auth'
     | '/food'
+    | '/onboarding'
     | '/accessibility'
     | '/ai-coach'
     | '/analytics'
@@ -318,18 +430,28 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/vitals'
     | '/workouts'
+    | '/admin/encyclopedia'
+    | '/encyclopedia/search'
+    | '/products/$slug'
+    | '/products/compare'
+    | '/encyclopedia/'
+    | '/products/'
     | '/chat/$threadId'
     | '/encyclopedia/disease'
     | '/encyclopedia/food'
     | '/encyclopedia/medicine'
     | '/exercise/$workoutId'
     | '/food-log/settings'
+    | '/encyclopedia/$category/$slug'
     | '/chat/'
+    | '/encyclopedia/$category/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/auth'
     | '/food'
+    | '/onboarding'
     | '/accessibility'
     | '/ai-coach'
     | '/analytics'
@@ -349,19 +471,31 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/vitals'
     | '/workouts'
+    | '/admin/encyclopedia'
+    | '/encyclopedia/search'
+    | '/products/$slug'
+    | '/products/compare'
+    | '/encyclopedia'
+    | '/products'
     | '/chat/$threadId'
     | '/encyclopedia/disease'
     | '/encyclopedia/food'
     | '/encyclopedia/medicine'
     | '/exercise/$workoutId'
     | '/food-log/settings'
+    | '/encyclopedia/$category/$slug'
     | '/chat'
+    | '/encyclopedia/$category'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
+    | '/encyclopedia'
+    | '/products'
     | '/auth'
     | '/food'
+    | '/onboarding'
     | '/_authenticated/accessibility'
     | '/_authenticated/ai-coach'
     | '/_authenticated/analytics'
@@ -381,20 +515,32 @@ export interface FileRouteTypes {
     | '/_authenticated/timeline'
     | '/_authenticated/vitals'
     | '/_authenticated/workouts'
+    | '/admin/encyclopedia'
+    | '/encyclopedia/search'
+    | '/products/$slug'
+    | '/products/compare'
+    | '/encyclopedia/'
+    | '/products/'
     | '/_authenticated/chat/$threadId'
     | '/_authenticated/encyclopedia/disease'
     | '/_authenticated/encyclopedia/food'
     | '/_authenticated/encyclopedia/medicine'
     | '/_authenticated/exercise/$workoutId'
     | '/_authenticated/food-log/settings'
+    | '/encyclopedia/$category/$slug'
     | '/_authenticated/chat/'
+    | '/encyclopedia/$category/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  EncyclopediaRouteRoute: typeof EncyclopediaRouteRouteWithChildren
+  ProductsRouteRoute: typeof ProductsRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   FoodRoute: typeof FoodRoute
+  OnboardingRoute: typeof OnboardingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -413,6 +559,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -420,11 +573,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/encyclopedia': {
+      id: '/encyclopedia'
+      path: '/encyclopedia'
+      fullPath: '/encyclopedia'
+      preLoaderRoute: typeof EncyclopediaRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/food': {
       id: '/food'
       path: '/food'
       fullPath: '/food'
       preLoaderRoute: typeof FoodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/accessibility': {
@@ -560,6 +734,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkoutsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/admin/encyclopedia': {
+      id: '/admin/encyclopedia'
+      path: '/encyclopedia'
+      fullPath: '/admin/encyclopedia'
+      preLoaderRoute: typeof AdminEncyclopediaRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/encyclopedia/': {
+      id: '/encyclopedia/'
+      path: '/'
+      fullPath: '/encyclopedia/'
+      preLoaderRoute: typeof EncyclopediaIndexRouteImport
+      parentRoute: typeof EncyclopediaRouteRoute
+    }
+    '/encyclopedia/search': {
+      id: '/encyclopedia/search'
+      path: '/search'
+      fullPath: '/encyclopedia/search'
+      preLoaderRoute: typeof EncyclopediaSearchRouteImport
+      parentRoute: typeof EncyclopediaRouteRoute
+    }
+    '/products/': {
+      id: '/products/'
+      path: '/'
+      fullPath: '/products/'
+      preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof ProductsRouteRoute
+    }
+    '/products/$slug': {
+      id: '/products/$slug'
+      path: '/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof ProductsSlugRouteImport
+      parentRoute: typeof ProductsRouteRoute
+    }
+    '/products/compare': {
+      id: '/products/compare'
+      path: '/compare'
+      fullPath: '/products/compare'
+      preLoaderRoute: typeof ProductsCompareRouteImport
+      parentRoute: typeof ProductsRouteRoute
+    }
     '/_authenticated/chat/': {
       id: '/_authenticated/chat/'
       path: '/chat'
@@ -608,6 +824,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/food-log/settings'
       preLoaderRoute: typeof AuthenticatedFoodLogSettingsRouteImport
       parentRoute: typeof AuthenticatedFoodLogRoute
+    }
+    '/encyclopedia/$category/': {
+      id: '/encyclopedia/$category/'
+      path: '/$category'
+      fullPath: '/encyclopedia/$category/'
+      preLoaderRoute: typeof EncyclopediaCategoryIndexRouteImport
+      parentRoute: typeof EncyclopediaRouteRoute
+    }
+    '/encyclopedia/$category/$slug': {
+      id: '/encyclopedia/$category/$slug'
+      path: '/$category/$slug'
+      fullPath: '/encyclopedia/$category/$slug'
+      preLoaderRoute: typeof EncyclopediaCategorySlugRouteImport
+      parentRoute: typeof EncyclopediaRouteRoute
     }
   }
 }
@@ -694,11 +924,60 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AdminRouteRouteChildren {
+  AdminEncyclopediaRoute: typeof AdminEncyclopediaRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminEncyclopediaRoute: AdminEncyclopediaRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
+interface EncyclopediaRouteRouteChildren {
+  EncyclopediaSearchRoute: typeof EncyclopediaSearchRoute
+  EncyclopediaIndexRoute: typeof EncyclopediaIndexRoute
+  EncyclopediaCategorySlugRoute: typeof EncyclopediaCategorySlugRoute
+  EncyclopediaCategoryIndexRoute: typeof EncyclopediaCategoryIndexRoute
+}
+
+const EncyclopediaRouteRouteChildren: EncyclopediaRouteRouteChildren = {
+  EncyclopediaSearchRoute: EncyclopediaSearchRoute,
+  EncyclopediaIndexRoute: EncyclopediaIndexRoute,
+  EncyclopediaCategorySlugRoute: EncyclopediaCategorySlugRoute,
+  EncyclopediaCategoryIndexRoute: EncyclopediaCategoryIndexRoute,
+}
+
+const EncyclopediaRouteRouteWithChildren =
+  EncyclopediaRouteRoute._addFileChildren(EncyclopediaRouteRouteChildren)
+
+interface ProductsRouteRouteChildren {
+  ProductsSlugRoute: typeof ProductsSlugRoute
+  ProductsCompareRoute: typeof ProductsCompareRoute
+  ProductsIndexRoute: typeof ProductsIndexRoute
+}
+
+const ProductsRouteRouteChildren: ProductsRouteRouteChildren = {
+  ProductsSlugRoute: ProductsSlugRoute,
+  ProductsCompareRoute: ProductsCompareRoute,
+  ProductsIndexRoute: ProductsIndexRoute,
+}
+
+const ProductsRouteRouteWithChildren = ProductsRouteRoute._addFileChildren(
+  ProductsRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  EncyclopediaRouteRoute: EncyclopediaRouteRouteWithChildren,
+  ProductsRouteRoute: ProductsRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   FoodRoute: FoodRoute,
+  OnboardingRoute: OnboardingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -25,8 +25,7 @@ import { saveUserSettingsToDb } from "@/services/fitnessService";
 import type { UserSettingsRow } from "@/services/fitnessService";
 
 // Components
-import { SidebarRail } from "@/components/layout/SidebarRail";
-import { Navbar } from "@/components/layout/Navbar";
+import { AppNavigation } from "@/components/layout/AppNavigation";
 import { LiveWorkoutSession } from "@/components/workouts/LiveWorkoutSession";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/AppButton";
@@ -97,10 +96,10 @@ function AuthenticatedLayout() {
   else if (currentPath.includes("/prescription")) activeTab = "prescription";
   else if (currentPath.includes("/nearby")) activeTab = "nearby";
   else if (currentPath.includes("/profile")) activeTab = "profile";
-  else if (currentPath.includes("/encyclopedia-food") || currentPath.includes("/encyclopedia/food")) activeTab = "encyclopedia-food";
-  else if (currentPath.includes("/encyclopedia-medicine") || currentPath.includes("/encyclopedia/medicine")) activeTab = "encyclopedia-medicine";
-  else if (currentPath.includes("/encyclopedia/disease") || currentPath.includes("/encyclopedia-disease")) activeTab = "encyclopedia-disease";
   else if (currentPath.includes("/exercise")) activeTab = "exercise";
+  else if (currentPath.startsWith("/encyclopedia")) activeTab = "encyclopedia";
+  else if (currentPath.startsWith("/products")) activeTab = "products";
+  else if (currentPath.startsWith("/admin")) activeTab = "admin";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeLiveWorkout, setActiveLiveWorkout] = useState<Routine | null>(null);
@@ -214,7 +213,12 @@ function AuthenticatedLayout() {
       nearby: "/nearby",
       profile: "/profile",
       exercise: "/exercise",
-      "encyclopedia-disease": "/encyclopedia/disease",
+      encyclopedia: "/encyclopedia",
+      products: "/products",
+      admin: "/admin/encyclopedia",
+      "encyclopedia-disease": "/encyclopedia",
+      "encyclopedia-food": "/encyclopedia",
+      "encyclopedia-medicine": "/encyclopedia",
       "symptoms": "/symptoms",
       "reports": "/reports",
       "medicines": "/medicines",
@@ -335,57 +339,14 @@ function AuthenticatedLayout() {
     <div
       className={`h-dvh w-full flex overflow-hidden select-none font-sans ${isDark ? "bg-black text-white" : "bg-zinc-100 text-zinc-900"}`}
     >
-      {/* Sidebar Rail */}
-      <SidebarRail
-        activeTab={activeTab}
-        onTabChange={handleNavigate}
-        onOpenProfile={() => setIsProfileOpen(true)}
-      />
-
-      {/* Main App Container */}
-      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        {/* Top Header */}
-        <Navbar
-          activeTab={activeTab}
-          streakDays={dynamicVitals.activeStreakDays}
-          onSelectTab={handleNavigate}
-          onSearchQuery={setSearchQuery}
-          isDarkMode={isDark}
-          onToggleDarkMode={handleToggleDarkMode}
-        />
-
-        {/* View Switcher via Tanstack Router Outlet */}
-        <div className="flex-1 flex overflow-hidden">
+      {/* Global Application Navigation */}
+      <AppNavigation onOpenProfile={() => setIsProfileOpen(true)} />
+      <main className="flex-1 h-full flex flex-col min-w-0 md:pt-16 pb-14 md:pb-0 relative overflow-y-auto overflow-x-hidden">
+        <div className="flex-1 flex flex-col min-h-0 w-full relative z-10">
           <AuthenticatedContext.Provider value={context}>
             <Outlet />
           </AuthenticatedContext.Provider>
         </div>
-
-        {/* Mobile Bottom Navigation */}
-        {!voiceMode && (
-          <nav className="sm:hidden h-20 shrink-0 bg-zinc-950/90 backdrop-blur-md border-t border-zinc-800 flex items-center justify-around z-20 px-2 pb-safe">
-            <button onClick={() => handleNavigate("dashboard")} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${activeTab === "dashboard" ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`} aria-label="Home">
-              <LayoutDashboard className="w-6 h-6 min-w-6 min-h-6" />
-              <span className="text-[10px] font-bold">Home</span>
-            </button>
-            <button onClick={() => handleNavigate("chat")} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${activeTab === "chat" ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`} aria-label="AI Health">
-              <MessageSquare className="w-6 h-6 min-w-6 min-h-6" />
-              <span className="text-[10px] font-bold">AI</span>
-            </button>
-            <button onClick={() => handleNavigate("symptoms")} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${activeTab === "symptoms" ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`} aria-label="Symptoms">
-              <Stethoscope className="w-6 h-6 min-w-6 min-h-6" />
-              <span className="text-[10px] font-bold">Health</span>
-            </button>
-            <button onClick={() => handleNavigate("analytics")} className={`flex flex-col items-center gap-1 p-2 rounded-lg ${activeTab === "analytics" ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`} aria-label="Progress">
-              <Activity className="w-6 h-6 min-w-6 min-h-6" />
-              <span className="text-[10px] font-bold">Progress</span>
-            </button>
-            <button onClick={() => setIsProfileOpen(true)} className={`flex flex-col items-center gap-1 p-2 rounded-lg text-zinc-500 hover:text-zinc-300`} aria-label="Profile">
-              <User className="w-6 h-6 min-w-6 min-h-6" />
-              <span className="text-[10px] font-bold">Profile</span>
-            </button>
-          </nav>
-        )}
 
         {/* Global Voice Button Container */}
         {voiceMode && (

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Play, Plus, Dumbbell, Clock, Flame, Trash2, Tag } from "lucide-react";
-import { Routine, WorkoutSessionLog } from "../../types/fitness";
-import { Card } from "../ui/AppCard";
+import { Play, Plus, Dumbbell, Clock, Trash2 } from "lucide-react";
+import { Routine } from "../../types/fitness";
 import { Button } from "../ui/AppButton";
 import { Badge } from "../ui/AppBadge";
 import { RoutineBuilderModal } from "./RoutineBuilderModal";
@@ -46,12 +45,12 @@ export const WorkoutPlanner: React.FC<WorkoutPlannerProps> = ({
   });
 
   return (
-    <div className="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto">
+    <div className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto max-w-5xl mx-auto w-full">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-800 pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">Workout Routines</h1>
-          <p className="text-sm text-zinc-400 mt-1">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Workout Routines</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Pick a structured split or create your custom workout routine
           </p>
         </div>
@@ -68,10 +67,10 @@ export const WorkoutPlanner: React.FC<WorkoutPlannerProps> = ({
           <button
             key={cat}
             onClick={() => setSelectedCategoryFilter(cat)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
               selectedCategoryFilter === cat
-                ? "bg-white text-black shadow-md"
-                : "bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700"
+                ? "bg-foreground text-background shadow-md"
+                : "bg-surface text-muted-foreground hover:text-foreground border border-border hover:border-foreground/30"
             }`}
           >
             {cat}
@@ -79,75 +78,64 @@ export const WorkoutPlanner: React.FC<WorkoutPlannerProps> = ({
         ))}
       </div>
 
-      {/* Routine Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Routine List View */}
+      <div className="flex flex-col gap-4">
         {filteredRoutines.map((routine) => {
           return (
-            <Card
+            <div
               key={routine.id}
-              variant="dark"
-              className="flex flex-col justify-between group hover:border-zinc-700 transition-all relative"
+              className="flex flex-col sm:flex-row gap-6 bg-card border border-border rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow items-center justify-between group"
             >
-              <div>
+              <div className="flex-1 w-full">
                 {/* Badge Row */}
-                <div className="flex justify-between items-center mb-3">
-                  <Badge variant="zinc">{routine.category}</Badge>
-                  <div className="flex items-center gap-2 text-xs text-zinc-500 font-bold">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="px-2 py-1 bg-surface border border-border rounded-md text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {routine.category}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-bold">
                     <Clock className="w-3.5 h-3.5" />
                     <span>{routine.durationMinutes} mins</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-bold">
+                    <Dumbbell className="w-3.5 h-3.5" />
+                    <span>{routine.exercises.length} exercises</span>
                   </div>
                 </div>
 
                 {/* Title & Subtitle */}
-                <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-emerald-400 transition-colors">
+                <h3 className="text-xl font-bold text-foreground tracking-tight">
                   {routine.title}
                 </h3>
-                <p className="text-xs text-zinc-400 mt-1 mb-4">{routine.subtitle}</p>
+                <p className="text-sm text-muted-foreground mt-1">{routine.subtitle}</p>
 
                 {/* Exercises Preview */}
-                <div className="space-y-2 border-t border-b border-zinc-900 py-3 mb-6">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                    Exercises ({routine.exercises.length})
-                  </p>
-                  <ul className="space-y-1">
-                    {routine.exercises.slice(0, 4).map((ex, idx) => (
-                      <li key={idx} className="text-xs text-zinc-300 flex justify-between">
-                        <span>{ex.exerciseName}</span>
-                        <span className="text-zinc-500 font-mono">
-                          {ex.sets} × {ex.reps}
-                        </span>
-                      </li>
-                    ))}
-                    {routine.exercises.length > 4 && (
-                      <li className="text-[11px] text-zinc-500 italic">
-                        +{routine.exercises.length - 4} more exercises
-                      </li>
-                    )}
-                  </ul>
-                </div>
+                <p className="text-xs text-muted-foreground mt-3 font-medium flex items-center gap-2 overflow-hidden whitespace-nowrap text-ellipsis">
+                  {routine.exercises.slice(0, 3).map(e => e.exerciseName).join(" • ")}
+                  {routine.exercises.length > 3 && ` • +${routine.exercises.length - 3} more`}
+                </p>
               </div>
 
               {/* Card Footer Actions */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full sm:w-auto shrink-0 mt-4 sm:mt-0">
                 <button
                   onClick={() => onStartWorkout(routine)}
-                  className="flex-1 py-3 bg-white text-black font-bold text-xs rounded-xl hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                  className="flex-1 sm:flex-none px-6 py-3 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <Play className="w-3.5 h-3.5 fill-black" />
-                  <span>START WORKOUT</span>
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>Start</span>
                 </button>
 
                 {routine.isCustom && (
                   <button
                     onClick={() => onDeleteRoutine(routine.id)}
-                    className="p-3 bg-zinc-900 hover:bg-rose-500/10 hover:text-rose-400 border border-zinc-800 rounded-xl text-zinc-500 transition-colors cursor-pointer"
+                    className="p-3 bg-surface hover:bg-chart-4/10 hover:text-chart-4 border border-border rounded-xl text-muted-foreground transition-colors cursor-pointer shrink-0"
                     title="Delete custom routine"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
               </div>
-            </Card>
+            </div>
           );
         })}
       </div>

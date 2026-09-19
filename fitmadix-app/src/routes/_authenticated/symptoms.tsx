@@ -51,7 +51,7 @@ function SymptomsPage() {
           setFollowUp(null);
           setAnalyzed(true);
           const disclaimer = language.startsWith("en") 
-            ? "Thank you. Based on this, you should rest and stay hydrated. Remember, I am an AI, not a doctor. Please consult a physician if symptoms persist."
+            ? "Thank you. Based on this, you should rest and stay hydrated. Remember, I am an AI, not a medical professional. Please consult a physician if symptoms persist."
             : language.startsWith("hi")
               ? "धन्यवाद। आपको आराम करना चाहिए। याद रखें, मैं एआई हूँ, डॉक्टर नहीं।"
               : "ধন্যবাদ। আপনার বিশ্রাম নেওয়া উচিত। মনে রাখবেন, আমি এআই, ডাক্তার নই।";
@@ -60,7 +60,7 @@ function SymptomsPage() {
         } else {
           setAnalyzed(true);
           const disclaimer = language.startsWith("en") 
-            ? "I have noted your symptoms. Remember, I am an AI, not a doctor. Please consult a physician if symptoms persist."
+            ? "I have noted your symptoms. Remember, I am an AI, not a medical professional. Please consult a physician if symptoms persist."
             : "मैंने आपके लक्षणों को नोट कर लिया है। कृपया डॉक्टर से सलाह लें।";
           autoSpeak(disclaimer);
           return true;

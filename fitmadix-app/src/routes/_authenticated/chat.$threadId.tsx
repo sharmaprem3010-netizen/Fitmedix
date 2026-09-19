@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   ArrowUp,
+  Dumbbell,
   HeartPulse,
   Loader2,
   LogOut,
@@ -14,7 +15,9 @@ import {
   Plus,
   Trash2,
   User,
+  Utensils,
   X,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -142,7 +145,7 @@ function ChatThread() {
   };
 
   const removeThread = async (id: string) => {
-    if (!confirm("Delete this consultation?")) return;
+    if (!confirm("Delete this conversation?")) return;
     try {
       await remove({ data: { threadId: id } });
       const next = threads.filter((t) => t.id !== id);
@@ -185,14 +188,14 @@ function ChatThread() {
           onClick={newThread}
           className="mx-3 mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5"
         >
-          <Plus className="h-3.5 w-3.5" /> New consultation
+          <Plus className="h-3.5 w-3.5" /> New conversation
         </button>
         <div className="mt-4 flex-1 overflow-y-auto px-2 pb-2">
           <p className="px-2 pb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Recent
           </p>
           {threads.length === 0 && (
-            <p className="px-2 py-4 text-xs text-muted-foreground">No consultations yet.</p>
+            <p className="px-2 py-4 text-xs text-muted-foreground">No conversations yet.</p>
           )}
           <ul className="space-y-0.5">
             {threads.map((t) => {
@@ -218,7 +221,7 @@ function ChatThread() {
                   <button
                     onClick={() => removeThread(t.id)}
                     className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted-foreground opacity-0 transition-opacity hover:bg-background hover:text-destructive group-hover:opacity-100"
-                    aria-label="Delete consultation"
+                    aria-label="Delete conversation"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -268,14 +271,14 @@ function ChatThread() {
               <ArrowLeft className="h-3.5 w-3.5" /> Home
             </Link>
           </div>
-          <div className="text-xs text-muted-foreground">AI doctor · general information only</div>
+          <div className="text-xs text-muted-foreground">AI Coach · health & fitness guidance</div>
         </header>
 
         {/* Safety banner */}
         <div className="border-b border-border/60 bg-chart-4/5 px-4 py-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <AlertTriangle className="h-3.5 w-3.5 text-chart-4" />
-            Fitmadix provides general health information only and is not a substitute for a qualified healthcare professional.
+            Coach Madix provides health & fitness guidance. It cannot diagnose or treat medical conditions.
           </span>
         </div>
         
@@ -320,7 +323,7 @@ function ChatThread() {
                 }
               }}
               rows={1}
-              placeholder="Describe your symptoms…"
+              placeholder="Ask Coach Madix..."
               className="min-h-11 max-h-40 flex-1 resize-none rounded-2xl border border-border bg-card px-4 py-3 text-sm outline-none ring-primary/40 focus:ring-2"
               disabled={busy}
             />
@@ -347,30 +350,57 @@ function ChatThread() {
 }
 
 function Welcome({ onPick }: { onPick: (t: string) => void }) {
-  const prompts = [
-    "I've had a headache for 3 days, mostly behind my eyes.",
-    "My throat has been sore since yesterday and I feel a bit warm.",
-    "I've been feeling short of breath after climbing stairs.",
-    "I have a rash on my forearm that itches.",
+  const categories = [
+    {
+      title: "Workout",
+      icon: <Dumbbell className="h-5 w-5 text-emerald-500" />,
+      prompts: ["I want to improve my squat form.", "Build me a 3-day split."],
+    },
+    {
+      title: "Nutrition",
+      icon: <Utensils className="h-5 w-5 text-blue-500" />,
+      prompts: ["Suggest a high protein breakfast.", "How many carbs should I eat?"],
+    },
+    {
+      title: "Recovery",
+      icon: <HeartPulse className="h-5 w-5 text-amber-500" />,
+      prompts: ["I'm feeling tired, should I skip?", "Best stretches for back pain."],
+    },
   ];
+
   return (
-    <div className="py-10 text-center">
-      <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow">
-        <HeartPulse className="h-6 w-6" />
-      </span>
-      <h1 className="mt-4 text-2xl font-semibold tracking-tight">How are you feeling today?</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Describe your symptoms in your own words. I'll ask a couple of follow-ups.
-      </p>
-      <div className="mx-auto mt-6 grid max-w-lg gap-2 text-left">
-        {prompts.map((p) => (
-          <button
-            key={p}
-            onClick={() => onPick(p)}
-            className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-elegant"
-          >
-            {p}
-          </button>
+    <div className="py-12 animate-fade-in">
+      <div className="text-center mb-10">
+        <span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-primary/10 text-primary shadow-sm mb-6">
+          <Sparkles className="h-8 w-8" />
+        </span>
+        <h1 className="text-4xl font-extrabold tracking-tight">How can Coach Madix help?</h1>
+        <p className="mt-3 text-base text-muted-foreground max-w-md mx-auto">
+          Get personalized advice for your fitness, nutrition, and wellness journey.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        {categories.map((cat, i) => (
+          <div key={i} className="bg-surface border border-border rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-background rounded-xl border border-border shadow-sm">
+                {cat.icon}
+              </div>
+              <h3 className="font-bold text-foreground text-lg">{cat.title}</h3>
+            </div>
+            <div className="space-y-3">
+              {cat.prompts.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => onPick(p)}
+                  className="w-full text-left rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground shadow-sm transition-all hover:border-primary hover:-translate-y-0.5"
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>
@@ -391,7 +421,7 @@ function Bubble({
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
       {!isUser && (
         <span className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-primary text-primary-foreground">
-          <HeartPulse className="h-3.5 w-3.5" />
+          <Sparkles className="h-3.5 w-3.5" />
         </span>
       )}
       <div

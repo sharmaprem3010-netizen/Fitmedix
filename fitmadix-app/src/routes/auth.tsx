@@ -18,6 +18,7 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in or create your Fitmadix account." },
     ],
   }),
+  ssr: false,
   component: AuthPage,
 });
 
@@ -31,10 +32,15 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState("EN");
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: redirect ?? "/chat", replace: true });
+      if (data.session) navigate({ to: redirect ?? "/dashboard", replace: true });
     });
   }, [navigate, redirect]);
 
@@ -54,13 +60,14 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created — welcome!");
+        toast.success("Account created — let's set up your profile!");
+        navigate({ to: "/onboarding", replace: true });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Signed in");
+        navigate({ to: redirect ?? "/dashboard", replace: true });
       }
-      navigate({ to: redirect ?? "/chat", replace: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       toast.error(msg);
@@ -75,7 +82,7 @@ function AuthPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/chat`,
+          redirectTo: `${window.location.origin}/dashboard`,
         },
       });
       if (error) throw error;
@@ -87,6 +94,8 @@ function AuthPage() {
   };
 
   const supportedLanguages = ["EN", "ES", "FR", "HI", "ZH"];
+
+  if (!mounted) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
