@@ -1,0 +1,252 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  FileText,
+  Activity,
+  Pill,
+  FolderHeart,
+  Brain,
+  ArrowRight,
+  ShieldCheck,
+  Check,
+  Sparkles,
+  Shield,
+  Heart,
+  HelpCircle,
+  Volume2,
+} from 'lucide-react';
+import { useLanguage } from './LanguageContext.tsx';
+import { useVoice } from '../voice/VoiceContext.tsx';
+import { FitmadixLogo } from '../../components/ui/Logo.tsx';
+import { HealthInsightsSection } from '../insights/HealthInsightsSection.tsx';
+
+export const IntroPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const { speak, isVoiceMode } = useVoice();
+
+  const handleReadIntro = () => {
+    speak(
+      `Fitmadix. Your health, our priority. ${t.introHeadline} ${t.introSubheadline}. Explore verified medical information, laboratory decrypter, drug interaction checker, and secure health records.`
+    );
+  };
+
+  const pillars = [
+    {
+      title: 'Lab Report Decrypter',
+      desc: 'Instant visual breakdown of blood tests (CBC, Lipids, Metabolic) with reference gauges and questions for your doctor.',
+      icon: Activity,
+      tag: 'Interactive Diagnostic Tool',
+    },
+    {
+      title: 'Medication Safety Checker',
+      desc: 'Real-time drug-to-drug contraindication detection, pharmacokinetic mechanisms, and food precaution guides.',
+      icon: Pill,
+      tag: 'Pharmacology Safety Core',
+    },
+    {
+      title: 'Human Body Systems Explorer',
+      desc: 'Anatomical exploration of cardiovascular, respiratory, neural, and digestive physiology with recommended clinical screenings.',
+      icon: Brain,
+      tag: 'Physiology Explorer',
+    },
+    {
+      title: 'Verified Health Insights',
+      desc: 'Peer-reviewed medical snippets generated via Gemini 3.8 Flash grounded in WHO, AHA, and NIH clinical literature.',
+      icon: Sparkles,
+      tag: 'Medical Intelligence',
+    },
+    {
+      title: 'Emergency Medical ID (ICE)',
+      desc: 'Generate printable paramedic-ready health cards with blood type, allergies, medications, and emergency contacts.',
+      icon: Shield,
+      tag: 'First Responder Safety',
+    },
+    {
+      title: 'Encrypted Records Vault',
+      desc: 'Private, end-to-end encrypted storage for lab tests and clinical documents under your exclusive client ownership.',
+      icon: FolderHeart,
+      tag: 'Zero-Knowledge Security',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between selection:bg-[#00A88F]/20 selection:text-[#002B49] bg-medical-grid">
+      {/* Top Header with Official Logo */}
+      <header className="border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-2xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+          <Link to="/intro" className="group flex items-center">
+            <FitmadixLogo size="md" showTagline={false} />
+          </Link>
+
+          <div className="flex items-center gap-3">
+            {isVoiceMode && (
+              <button
+                onClick={handleReadIntro}
+                className="hidden sm:inline-flex text-xs text-[#00A88F] bg-[#F0FDF9] hover:bg-[#E0FBF4] px-3.5 py-1.5 rounded-full font-bold border border-[#00A88F]/30 transition-colors cursor-pointer"
+              >
+                <Volume2 className="w-3.5 h-3.5 mr-1.5" />
+                <span>Read aloud</span>
+              </button>
+            )}
+            <Link
+              to="/login"
+              className="px-4 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+            >
+              {t.logIn}
+            </Link>
+            <Link
+              to="/signup"
+              className="px-4 py-2 text-xs font-bold text-white bg-[#002B49] hover:bg-[#001D33] rounded-xl transition-colors shadow-xs"
+            >
+              {t.signUp}
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 flex-1 space-y-16">
+        <div className="max-w-3xl space-y-6 text-left">
+          {/* Unboxed Metadata Kicker */}
+          <div className="flex items-center gap-2 text-xs font-bold text-[#00A88F] tracking-wide uppercase">
+            <span className="w-2 h-2 rounded-full bg-[#00A88F] animate-pulse" />
+            <span>Clinical Intelligence Platform</span>
+            <span aria-hidden="true">·</span>
+            <span>Multilingual</span>
+            <span aria-hidden="true">·</span>
+            <span>WCAG AA Accessible</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#002B49] leading-[1.1]">
+            Your Health, <span className="text-[#00A88F]">Our Priority.</span>
+          </h1>
+
+          <p className="text-base sm:text-xl text-slate-600 leading-relaxed font-normal">
+            Understand your health. Make better-informed decisions. An accessible, privacy-first digital health platform built on verified medical literature, interactive clinical decrypters, and zero fabricated data.
+          </p>
+
+          {/* Action Row */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <button
+              onClick={() => navigate('/home')}
+              className="px-6 py-3.5 text-sm font-bold text-white bg-[#00A88F] hover:bg-[#00947D] active:bg-[#007D69] rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer flex items-center gap-2"
+            >
+              <span>{t.exploreFitmadix}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <Link
+              to="/signup"
+              className="px-6 py-3.5 text-sm font-bold text-[#002B49] bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-colors cursor-pointer shadow-2xs"
+            >
+              {t.signUp}
+            </Link>
+            <Link
+              to="/language"
+              className="px-4 py-3.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              Language Switcher
+            </Link>
+          </div>
+
+          {/* Medical Responsibility Note */}
+          <div className="pt-3 flex items-start gap-2.5 text-xs text-slate-500">
+            <ShieldCheck className="w-4 h-4 text-[#00A88F] shrink-0 mt-0.5" />
+            <p>
+              Strictly evidence-backed health guidance. Never substitutes for licensed professional medical advice, clinical diagnosis, or emergency dispatch.
+            </p>
+          </div>
+        </div>
+
+        {/* Evidence Credibility Ticker */}
+        <div className="p-4 bg-white/90 border border-slate-200/90 rounded-2xl shadow-2xs flex flex-wrap items-center justify-between gap-4 text-xs">
+          <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+            Empirical Medical References:
+          </span>
+          <div className="flex flex-wrap items-center gap-4 font-semibold text-slate-600 text-xs">
+            <span>🏛 American Heart Association (AHA)</span>
+            <span>·</span>
+            <span>🏛 World Health Organization (WHO)</span>
+            <span>·</span>
+            <span>🏛 National Institutes of Health (NIH)</span>
+            <span>·</span>
+            <span>🏛 Mayo Clinic Clinical Standards</span>
+            <span>·</span>
+            <span>🏛 FDA National Drug Code</span>
+          </div>
+        </div>
+
+        {/* Feature Pillars Grid */}
+        <div className="pt-6 border-t border-slate-200">
+          <div className="mb-8 text-left">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#00A88F]">
+              Platform Architecture
+            </span>
+            <h2 className="text-2xl font-bold text-[#002B49] tracking-tight mt-1">
+              Engineered For Clinical Clarity & Life Safety
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Interactive diagnostic tools and privacy-first records designed without synthetic or fabricated data.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+            {pillars.map((pillar, idx) => {
+              const Icon = pillar.icon;
+              return (
+                <div
+                  key={idx}
+                  onClick={() => navigate('/home')}
+                  className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs hover:border-[#00A88F]/50 hover:shadow-sm transition-all flex flex-col justify-between group cursor-pointer"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="w-10 h-10 rounded-xl bg-[#F0FDF9] text-[#00A88F] flex items-center justify-center group-hover:bg-[#00A88F] group-hover:text-white transition-colors">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        {pillar.tag}
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-bold text-slate-900 group-hover:text-[#002B49] transition-colors">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">{pillar.desc}</p>
+                  </div>
+
+                  <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-semibold">
+                    <span className="flex items-center gap-1 text-[#00A88F]">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Empirical Standard V2</span>
+                    </span>
+                    <span className="text-slate-400 group-hover:text-[#00A88F] transition-colors">
+                      Explore Tool →
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Live Health Insights Section on Landing Page */}
+        <div className="pt-6">
+          <HealthInsightsSection limit={3} />
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 bg-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <FitmadixLogo size="sm" showTagline={true} />
+          <div className="flex items-center gap-5 font-semibold text-slate-600">
+            <Link to="/language" className="hover:text-[#00A88F]">Language</Link>
+            <Link to="/voice-mode" className="hover:text-[#00A88F]">Voice Mode</Link>
+            <Link to="/home" className="hover:text-[#00A88F]">Dashboard</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
