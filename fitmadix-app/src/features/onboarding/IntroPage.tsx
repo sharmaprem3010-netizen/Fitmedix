@@ -14,14 +14,17 @@ import {
   Heart,
   HelpCircle,
   Volume2,
+  Lock,
 } from 'lucide-react';
 import { useLanguage } from './LanguageContext.tsx';
 import { useVoice } from '../voice/VoiceContext.tsx';
+import { useAuth } from '../authentication/AuthContext.tsx';
 import { FitmadixLogo } from '../../components/ui/Logo.tsx';
 import { HealthInsightsSection } from '../insights/HealthInsightsSection.tsx';
 
 export const IntroPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { t } = useLanguage();
   const { speak, isVoiceMode } = useVoice();
 
@@ -29,6 +32,19 @@ export const IntroPage: React.FC = () => {
     speak(
       `Fitmadix. Your health, our priority. ${t.introHeadline} ${t.introSubheadline}. Explore verified medical information, laboratory decrypter, drug interaction checker, and secure health records.`
     );
+  };
+
+  const handleExplore = (targetPath: string = '/home') => {
+    if (isAuthenticated) {
+      navigate(targetPath);
+    } else {
+      navigate('/login', {
+        state: {
+          from: { pathname: targetPath },
+          message: 'Sign in to access your FitMadix Health Dashboard and clinical tools.',
+        },
+      });
+    }
   };
 
   const pillars = [
@@ -129,18 +145,27 @@ export const IntroPage: React.FC = () => {
           {/* Action Row */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
-              onClick={() => navigate('/home')}
+              onClick={() => handleExplore('/home')}
               className="px-6 py-3.5 text-sm font-bold text-white bg-[#00A88F] hover:bg-[#00947D] active:bg-[#007D69] rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer flex items-center gap-2"
             >
-              <span>{t.exploreFitmadix}</span>
+              <span>{isAuthenticated ? 'Open Health Dashboard' : t.exploreFitmadix}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-            <Link
-              to="/signup"
-              className="px-6 py-3.5 text-sm font-bold text-[#002B49] bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-colors cursor-pointer shadow-2xs"
-            >
-              {t.signUp}
-            </Link>
+            {!isAuthenticated ? (
+              <Link
+                to="/signup"
+                className="px-6 py-3.5 text-sm font-bold text-[#002B49] bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-colors cursor-pointer shadow-2xs"
+              >
+                {t.signUp}
+              </Link>
+            ) : (
+              <Link
+                to="/explore"
+                className="px-6 py-3.5 text-sm font-bold text-[#002B49] bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-colors cursor-pointer shadow-2xs"
+              >
+                Explore Clinical Tools
+              </Link>
+            )}
             <Link
               to="/language"
               className="px-4 py-3.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
@@ -196,7 +221,7 @@ export const IntroPage: React.FC = () => {
               return (
                 <div
                   key={idx}
-                  onClick={() => navigate('/home')}
+                  onClick={() => handleExplore('/explore')}
                   className="p-6 bg-white border border-slate-200/90 rounded-2xl shadow-2xs hover:border-[#00A88F]/50 hover:shadow-sm transition-all flex flex-col justify-between group cursor-pointer"
                 >
                   <div className="space-y-3">
@@ -221,7 +246,7 @@ export const IntroPage: React.FC = () => {
                       <span>Empirical Standard V2</span>
                     </span>
                     <span className="text-slate-400 group-hover:text-[#00A88F] transition-colors">
-                      Explore Tool →
+                      {isAuthenticated ? 'Open Tool →' : 'Sign In to Access →'}
                     </span>
                   </div>
                 </div>
@@ -243,7 +268,12 @@ export const IntroPage: React.FC = () => {
           <div className="flex items-center gap-5 font-semibold text-slate-600">
             <Link to="/language" className="hover:text-[#00A88F]">Language</Link>
             <Link to="/voice-mode" className="hover:text-[#00A88F]">Voice Mode</Link>
-            <Link to="/home" className="hover:text-[#00A88F]">Dashboard</Link>
+            <button
+              onClick={() => handleExplore('/home')}
+              className="hover:text-[#00A88F] cursor-pointer"
+            >
+              Dashboard
+            </button>
           </div>
         </div>
       </footer>

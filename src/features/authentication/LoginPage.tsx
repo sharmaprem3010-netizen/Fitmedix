@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Lock, Mail, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import { useAuth } from './AuthContext.tsx';
 import { Input } from '../../components/ui/Input.tsx';
 import { Button } from '../../components/ui/Button.tsx';
@@ -8,11 +8,16 @@ import { FitmadixLogo } from '../../components/ui/Logo.tsx';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Read any redirect notice passed by route guard
+  const redirectNotice = (location.state as any)?.message;
+  const targetDestination = (location.state as any)?.from?.pathname || '/home';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,9 +33,22 @@ export const LoginPage: React.FC = () => {
     setLoading(false);
 
     if (res.success) {
-      navigate('/home');
+      navigate(targetDestination, { replace: true });
     } else {
       setError(res.error || 'Authentication failed. Please verify credentials.');
+    }
+  };
+
+  const handleDemoSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    const res = await login({
+      email: 'alex.morgan@fitmadix.health',
+      password: 'ClinicalPassword123!',
+    });
+    setLoading(false);
+    if (res.success) {
+      navigate(targetDestination, { replace: true });
     }
   };
 
@@ -45,11 +63,38 @@ export const LoginPage: React.FC = () => {
       </div>
 
       <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl shadow-sm p-6 sm:p-8 space-y-6">
+        {redirectNotice && (
+          <div role="status" className="p-3.5 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl font-medium flex items-start gap-2">
+            <span className="text-amber-600 font-bold text-sm leading-none mt-0.5">🔒</span>
+            <div>
+              <p className="font-bold">Authentication Required</p>
+              <p className="text-amber-800 mt-0.5">{redirectNotice}</p>
+            </div>
+          </div>
+        )}
+
         {error && (
           <div role="alert" className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-medium">
             {error}
           </div>
         )}
+
+        {/* 1-Tap Quick Demo Sign In for Easy Mobile & Device Testing */}
+        <button
+          type="button"
+          onClick={handleDemoSignIn}
+          disabled={loading}
+          className="w-full py-3 px-4 text-xs font-bold text-[#002B49] bg-[#F0FDF9] hover:bg-[#E0FBF4] border border-[#00A88F]/40 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs group"
+        >
+          <Sparkles className="w-4 h-4 text-[#00A88F] group-hover:scale-110 transition-transform" />
+          <span>Quick Demo Sign In (1-Tap Instant Access)</span>
+        </button>
+
+        <div className="relative flex items-center justify-center text-xs text-slate-400">
+          <div className="border-t border-slate-200 w-full" />
+          <span className="bg-white px-2.5 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Or sign in with email</span>
+          <div className="border-t border-slate-200 w-full" />
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input

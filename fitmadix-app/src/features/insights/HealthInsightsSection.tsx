@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
   RefreshCw,
@@ -16,8 +17,11 @@ import {
   Share2,
   Search,
   Filter,
+  Lock,
+  ArrowRight,
 } from 'lucide-react';
 import { useVoice } from '../voice/VoiceContext.tsx';
+import { useAuth } from '../authentication/AuthContext.tsx';
 
 export interface MedicalInsight {
   id: string;
@@ -42,6 +46,8 @@ export const HealthInsightsSection: React.FC<HealthInsightsSectionProps> = ({
   limit,
   showTitle = true,
 }) => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { speak, isVoiceMode } = useVoice();
   const [insights, setInsights] = useState<MedicalInsight[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -99,8 +105,30 @@ export const HealthInsightsSection: React.FC<HealthInsightsSectionProps> = ({
     );
   };
 
+  const handleCardClick = (item: MedicalInsight) => {
+    if (!isAuthenticated) {
+      navigate('/login', {
+        state: {
+          from: { pathname: '/home' },
+          message: 'Sign-in required: Access to clinical dossiers and full physiological mechanisms is protected.',
+        },
+      });
+      return;
+    }
+    setActiveInsight(item);
+  };
+
   const handleReadSnippet = (e: React.MouseEvent, item: MedicalInsight) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate('/login', {
+        state: {
+          from: { pathname: '/home' },
+          message: 'Sign in to listen to audio readouts of clinical health insights.',
+        },
+      });
+      return;
+    }
     speak(`${item.title}. ${item.snippet} Evidence source: ${item.evidenceSource}.`);
   };
 
@@ -245,7 +273,7 @@ export const HealthInsightsSection: React.FC<HealthInsightsSectionProps> = ({
             return (
               <article
                 key={item.id}
-                onClick={() => setActiveInsight(item)}
+                onClick={() => handleCardClick(item)}
                 className="group p-6 bg-white/95 backdrop-blur-xs border border-slate-200/90 rounded-2xl shadow-2xs hover:border-[#00A88F] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between relative bg-medical-grid"
               >
                 <div className="space-y-3">
@@ -318,6 +346,45 @@ export const HealthInsightsSection: React.FC<HealthInsightsSectionProps> = ({
               </article>
             );
           })}
+        </div>
+      )}
+
+      {/* Lock Overlay when Unauthenticated */}
+      {!isAuthenticated && !loading && (
+        <div className="mt-6 p-6 sm:p-8 bg-gradient-to-br from-slate-900 to-[#002B49] text-white rounded-2xl shadow-md border border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-5 text-left">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-teal-500/20 text-[#00D2B4] flex items-center justify-center shrink-0 border border-teal-500/30">
+              <Lock className="w-6 h-6 text-[#00D2B4]" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-wider font-bold bg-teal-900/60 text-teal-300 px-2 py-0.5 rounded border border-teal-700/50">
+                  Protected Medical Content
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-white">
+                Sign In to Access Complete Clinical Health Insights
+              </h3>
+              <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+                Full physiological mechanisms, evidence-backed patient guidance, multi-category search, and audio readouts are restricted to authenticated FitMadix members.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() =>
+              navigate('/login', {
+                state: {
+                  from: { pathname: '/home' },
+                  message: 'Sign in to access complete verified health insights and clinical dossiers.',
+                },
+              })
+            }
+            className="w-full sm:w-auto px-6 py-3 bg-[#00A88F] hover:bg-[#00947D] active:bg-[#007D69] text-white text-xs font-bold rounded-xl transition-all shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Sign In to Unlock Insights</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       )}
 

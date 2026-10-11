@@ -10,7 +10,7 @@ export const FloatingVoiceBar: React.FC = () => {
 
   if (!isVoiceMode) {
     return (
-      <aside aria-label="Voice accessibility quick toggle" className="fixed bottom-20 md:bottom-6 right-4 z-40">
+      <aside aria-label="Voice accessibility quick toggle" className="fixed bottom-22 md:bottom-6 right-3 sm:right-4 z-40 pb-safe">
         <button
           onClick={toggleVoiceMode}
           className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-full bg-white text-slate-800 border border-slate-200/90 shadow-md hover:bg-[#F0FDF9] hover:border-[#00A88F] hover:text-[#00A88F] transition-all cursor-pointer group"
@@ -37,7 +37,7 @@ export const FloatingVoiceBar: React.FC = () => {
   return (
     <aside
       aria-label="Fitmadix Voice Assistant Controller"
-      className="fixed bottom-18 md:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[92%] sm:w-auto bg-[#002B49] text-white rounded-full px-4 py-2.5 shadow-xl border border-slate-700/60 flex items-center justify-between gap-3 sm:gap-5 animate-in slide-in-from-bottom-3"
+      className="fixed bottom-22 md:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[94%] sm:w-auto bg-[#002B49] text-white rounded-full px-3.5 sm:px-4 py-2 sm:py-2.5 shadow-xl border border-slate-700/60 flex items-center justify-between gap-2.5 sm:gap-5 animate-in slide-in-from-bottom-3"
     >
       {/* Live Voice Indicator & Waveform */}
       <div className="flex items-center gap-2.5">

@@ -1,6 +1,21 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Volume2, VolumeX, ShieldAlert, Sparkles, User, FileText, Compass, Home, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Volume2,
+  VolumeX,
+  ShieldAlert,
+  Sparkles,
+  User,
+  FileText,
+  Compass,
+  Home,
+  Activity,
+  Menu,
+  X,
+  LogOut,
+  Globe,
+  Eye,
+} from 'lucide-react';
 import { useLanguage } from '../../features/onboarding/LanguageContext.tsx';
 import { useVoice } from '../../features/voice/VoiceContext.tsx';
 import { useAccessibility } from '../accessibility/AccessibilityContext.tsx';
@@ -12,8 +27,10 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   const { t } = useLanguage();
   const { isVoiceMode, toggleVoiceMode, speak, isSpeaking } = useVoice();
   const { highContrast, toggleHighContrast } = useAccessibility();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { to: '/home', label: t.navHome, icon: Home },
@@ -29,6 +46,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
     if (nextState) {
       speak('Voice mode enabled. Fitmadix will read screen elements aloud.');
     }
+  };
+
+  const handleLogout = async () => {
+    setMobileMenuOpen(false);
+    await logout();
+    navigate('/intro');
   };
 
   return (
@@ -105,17 +128,26 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               )}
             </button>
 
-            {/* Profile or Sign In */}
+            {/* Profile or Sign In (Desktop/Tablet) */}
             {isAuthenticated ? (
-              <Link
-                to="/profile"
-                className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors whitespace-nowrap shrink-0 border border-slate-200"
-              >
-                <div className="w-5 h-5 rounded-full bg-[#00A88F] text-white flex items-center justify-center text-[10px] font-bold">
-                  {(user?.fullName || 'U').charAt(0).toUpperCase()}
-                </div>
-                <span className="max-w-[110px] truncate">{user?.fullName || 'Profile'}</span>
-              </Link>
+              <div className="hidden sm:flex items-center gap-2">
+                <Link
+                  to="/profile"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors whitespace-nowrap shrink-0 border border-slate-200"
+                >
+                  <div className="w-5 h-5 rounded-full bg-[#00A88F] text-white flex items-center justify-center text-[10px] font-bold">
+                    {(user?.fullName || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <span className="max-w-[110px] truncate">{user?.fullName || 'Profile'}</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
+                  title="Sign out of account"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
             ) : (
               <Link
                 to="/login"
@@ -124,12 +156,69 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                 Sign In
               </Link>
             )}
+
+            {/* Mobile / Tablet Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              aria-label={mobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile / Tablet Drawer Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-4 shadow-xl animate-in slide-in-from-top-2">
+            {isAuthenticated && (
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-[#00A88F] text-white flex items-center justify-center font-bold text-sm">
+                    {(user?.fullName || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">{user?.fullName || 'User'}</p>
+                    <p className="text-[10px] text-slate-500 font-mono truncate max-w-[200px]">{user?.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
+
+            {/* Quick Access Grid in Mobile Drawer */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <Link
+                to="/language"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium"
+              >
+                <Globe className="w-4 h-4 text-[#00A88F]" />
+                <span>Language</span>
+              </Link>
+
+              <button
+                onClick={() => {
+                  toggleHighContrast();
+                }}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium text-left cursor-pointer"
+              >
+                <Eye className="w-4 h-4 text-[#00A88F]" />
+                <span>{highContrast ? 'Normal' : 'High Contrast'}</span>
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content Stage */}
-      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 focus:outline-none">
+      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 focus:outline-none overflow-x-hidden">
         {children}
       </main>
 
@@ -174,9 +263,9 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         </div>
       </footer>
 
-      {/* Mobile Navigation Bar */}
+      {/* Mobile Navigation Bar with Safe Area Bottom */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 flex items-center justify-around py-2 px-1 shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 flex items-center justify-around py-1.5 px-2 pb-safe shadow-lg"
         aria-label="Mobile Navigation"
       >
         {navLinks.map((item) => {
@@ -186,18 +275,20 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
             <Link
               key={item.to}
               to={item.to}
-              className={`flex flex-col items-center justify-center py-1 px-2 text-[10px] font-semibold transition-colors whitespace-nowrap min-w-[56px] min-h-[44px] ${
-                isActive ? 'text-[#00A88F]' : 'text-slate-500 hover:text-slate-900'
+              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap min-w-[56px] min-h-[44px] ${
+                isActive
+                  ? 'text-[#00A88F] bg-[#F0FDF9]'
+                  : 'text-slate-500 hover:text-slate-900 active:bg-slate-50'
               }`}
             >
               <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'text-[#00A88F]' : 'text-slate-400'}`} />
-              <span>{item.label}</span>
+              <span className="leading-tight">{item.label}</span>
             </Link>
           );
         })}
       </nav>
       {/* Spacer for mobile bottom bar */}
-      <div className="md:hidden h-16" aria-hidden="true" />
+      <div className="md:hidden h-20 pb-safe" aria-hidden="true" />
     </div>
   );
 };
