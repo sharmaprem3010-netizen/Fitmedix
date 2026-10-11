@@ -28,7 +28,7 @@ export interface AIQueryResult {
 
 export interface AIServiceStatus {
   isConfigured: boolean;
-  provider: 'gemini' | 'none' | 'verified-clinical-cache';
+  provider: 'gemini' | 'none' | 'verified-clinical-cache' | 'clinical-engine';
   model?: string;
   statusMessage: string;
   supportedDomains: AIQueryDomain[];
