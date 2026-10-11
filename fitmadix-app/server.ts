@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
+import { generateClinicalEducationResponse } from './src/services/ai/aiService.ts';
 
 dotenv.config();
 
@@ -127,49 +128,64 @@ Strict Requirements:
 3. Keep takeaways concise, high-yield, and scientifically rigorous.
 4. Output must be a JSON array of objects.`;
 
-    const aiCall = ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: promptText,
-      config: {
-        systemInstruction:
-          'You are a senior medical science communicator for Fitmadix. Provide verified, source-grounded health insights with clinical accuracy. Output pure JSON matching the requested schema.',
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.STRING },
-              title: { type: Type.STRING },
-              category: { type: Type.STRING },
-              snippet: { type: Type.STRING },
-              clinicalContext: { type: Type.STRING },
-              evidenceSource: { type: Type.STRING },
-              actionableAdvice: { type: Type.STRING },
-              tags: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
+    // Multi-model fallback cascade starting with fast and reliable gemini-2.5-flash
+    const candidateModels = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+    let parsed: any = null;
+    let successfulModel = '';
+
+    for (const modelName of candidateModels) {
+      try {
+        const aiCall = ai.models.generateContent({
+          model: modelName,
+          contents: promptText,
+          config: {
+            systemInstruction:
+              'You are a senior medical science communicator for Fitmadix. Provide verified, source-grounded health insights with clinical accuracy. Output pure JSON matching the requested schema.',
+            responseMimeType: 'application/json',
+            responseSchema: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  id: { type: Type.STRING },
+                  title: { type: Type.STRING },
+                  category: { type: Type.STRING },
+                  snippet: { type: Type.STRING },
+                  clinicalContext: { type: Type.STRING },
+                  evidenceSource: { type: Type.STRING },
+                  actionableAdvice: { type: Type.STRING },
+                  tags: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING },
+                  },
+                  icon: { type: Type.STRING },
+                },
+                required: ['id', 'title', 'category', 'snippet', 'clinicalContext', 'evidenceSource', 'actionableAdvice', 'tags'],
               },
-              icon: { type: Type.STRING },
             },
-            required: ['id', 'title', 'category', 'snippet', 'clinicalContext', 'evidenceSource', 'actionableAdvice', 'tags'],
           },
-        },
-      },
-    });
+        });
 
-    // 5-second timeout safety
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('AI generation timeout')), 5000)
-    );
+        const timeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('AI generation timeout')), 6000)
+        );
 
-    const response: any = await Promise.race([aiCall, timeout]);
-    const parsed = JSON.parse(response.text?.trim() || '[]');
+        const response: any = await Promise.race([aiCall, timeout]);
+        const text = response.text?.trim() || '[]';
+        parsed = JSON.parse(text);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          successfulModel = modelName;
+          break;
+        }
+      } catch {
+        // Continue to next candidate model
+      }
+    }
 
     if (Array.isArray(parsed) && parsed.length > 0) {
       return res.json({
         success: true,
-        source: 'gemini-3.8-flash-grounded',
+        source: successfulModel || 'gemini-2.5-flash-grounded',
         insights: parsed,
       });
     }
@@ -180,10 +196,9 @@ Strict Requirements:
       insights: getFilteredFallbacks(category),
     });
   } catch (err: any) {
-    // If quota exhausted (429 / RESOURCE_EXHAUSTED), set a cooldown to avoid repeated failing calls
     const errString = String(err?.message || err);
-    if (errString.includes('429') || errString.includes('RESOURCE_EXHAUSTED') || errString.includes('quota')) {
-      geminiQuotaExhaustedUntil = Date.now() + 60 * 60 * 1000; // 1 hour cooldown
+    if (errString.includes('429') || errString.includes('RESOURCE_EXHAUSTED')) {
+      geminiQuotaExhaustedUntil = Date.now() + 60 * 1000; // 1 minute brief backoff
     }
     return res.json({
       success: true,
@@ -239,66 +254,101 @@ app.post('/api/ai-chat', async (req, res) => {
     });
   }
 
-  // If no Gemini key available, provide structured empirical educational response
-  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY' || apiKey.length < 10) {
+  // If in quota cooldown or no valid key, generate rich clinical response immediately
+  const isInQuotaCooldown = Date.now() < geminiQuotaExhaustedUntil;
+  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY' || apiKey.length < 10 || isInQuotaCooldown) {
+    const clinicalRes = generateClinicalEducationResponse(prompt, domain);
     return res.json({
       success: true,
-      answer: `Fitmadix Clinical Intelligence summary for: "${prompt.trim()}".\n\nIn standard clinical medicine, health metrics and terminology should always be evaluated within complete patient context. For biomarkers like blood counts or lipid fractions, healthy ranges established by the American Heart Association and Mayo Clinic require analyzing individual cardiovascular risk factors, age, and dietary habits.\n\nAlways review specific test results and potential pharmacological interactions directly with your licensed primary care physician.`,
-      sources: ['Mayo Clinic Patient Guides', 'American Heart Association Standards'],
-      confidence: 'educational-grounding',
-      suggestedFollowUps: [
-        'How do I interpret my lab reference range?',
-        'What questions should I ask my doctor at my next visit?',
-      ],
+      answer: clinicalRes.answer,
+      sources: clinicalRes.sources,
+      confidence: clinicalRes.confidence,
+      suggestedFollowUps: clinicalRes.suggestedFollowUps,
     });
   }
 
   try {
-    const systemPrompt = `You are the Fitmadix Medical Intelligence Assistant, a senior clinical educator specializing in patient health literacy and terminology explanation.
+    const systemPrompt = `You are the Fitmadix Medical Intelligence Assistant, a senior clinical educator specializing in patient health literacy, vitals interpretation, and terminology explanation.
 Domain: ${domain || 'General Clinical Education'}.
 User Language: ${userContext?.language || 'en'}.
 
 Strict Clinical Directives:
-1. Ground all explanations in empirical, peer-reviewed medical standards (WHO, AHA, CDC, NIH, Mayo Clinic, Lancet).
-2. Translate complex clinical abbreviations (e.g., CBC, MCV, LDL-C, eGFR, HbA1c, TSH) into clear, comforting, accurate patient language.
-3. NEVER make definitive personal medical diagnoses or prescribe pharmaceutical regimens.
-4. Always distinguish between normal physiological ranges and factors that influence test variations (hydration, recent meals, exercise).
-5. Suggest 2-3 specific, high-yield questions the patient can bring to their physician.
-6. If the query is in Spanish, Hindi, or Bengali, provide the answer fluently in that language while preserving clinical accuracy.`;
+1. Directly answer the user's inquiry, question, or scenario with compassionate, high-yield, scientifically grounded explanation.
+2. If the user mentions vitals (such as Blood Pressure like 120/80 or 140/90, Heart Rate/BPM, Blood Glucose), analyze the specific numbers provided, classify them according to AHA/ACC/ADA guidelines, explain physiological implications, and suggest lifestyle steps.
+3. If the user input is very short or a greeting (e.g., "hi", "help", "a"), respond warmly and explain what you can assist with: analyzing blood pressure readings, decoding lab tests, medication interactions, exercise guidelines, or nutrition.
+4. Ground explanations in empirical medical standards (WHO, AHA, CDC, NIH, Mayo Clinic, Lancet).
+5. Translate complex clinical abbreviations (e.g., BP, CBC, MCV, LDL-C, eGFR, HbA1c, TSH) into clear patient language.
+6. NEVER make definitive personal medical diagnoses or prescribe pharmaceutical regimens.
+7. Distinguish between normal physiological ranges and factors that influence test variations (hydration, recent meals, exercise, stress).
+8. Suggest 2-3 specific, high-yield questions the patient can bring to their physician.
+9. If the query is in Spanish, Hindi, or Bengali, provide the answer fluently in that language while preserving clinical accuracy.`;
 
-    const chatCall = ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        systemInstruction: systemPrompt,
-      },
-    });
+    // Multi-model candidate cascade
+    const candidateModels = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+    let answerText = '';
+    let usedModel = 'gemini-2.5-flash';
 
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('AI response timeout')), 7000)
-    );
+    for (const modelName of candidateModels) {
+      try {
+        const chatCall = ai.models.generateContent({
+          model: modelName,
+          contents: prompt,
+          config: {
+            systemInstruction: systemPrompt,
+          },
+        });
 
-    const response: any = await Promise.race([chatCall, timeout]);
-    const answerText = response.text?.trim() || '';
+        const timeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('AI response timeout')), 7000)
+        );
 
+        const response: any = await Promise.race([chatCall, timeout]);
+        const text = response.text?.trim() || '';
+        if (text && text.length > 20) {
+          answerText = text;
+          usedModel = modelName;
+          break;
+        }
+      } catch {
+        // Try next candidate model
+      }
+    }
+
+    if (answerText) {
+      return res.json({
+        success: true,
+        answer: answerText,
+        sources: ['World Health Organization (WHO)', 'NIH National Library of Medicine', 'American Heart Association'],
+        confidence: `verified-${usedModel}`,
+        suggestedFollowUps: [
+          'How does this relate to my long-term cardiovascular health?',
+          'What lifestyle factors could influence these readings?',
+          'What questions should I ask my doctor about this?',
+        ],
+      });
+    }
+
+    // If no candidate model returned text, use enriched clinical engine
+    const clinicalRes = generateClinicalEducationResponse(prompt, domain);
     return res.json({
       success: true,
-      answer: answerText,
-      sources: ['World Health Organization (WHO)', 'NIH National Library of Medicine', 'American Heart Association'],
-      confidence: 'verified-gemini-3.8-flash',
-      suggestedFollowUps: [
-        'How does this relate to my long-term health goals?',
-        'What lifestyle factors could influence these readings?',
-      ],
+      answer: clinicalRes.answer,
+      sources: clinicalRes.sources,
+      confidence: clinicalRes.confidence,
+      suggestedFollowUps: clinicalRes.suggestedFollowUps,
     });
   } catch (err: any) {
-    console.warn('AI chat error fallback:', err?.message || err);
+    const errString = String(err?.message || err);
+    if (errString.includes('429') || errString.includes('RESOURCE_EXHAUSTED')) {
+      geminiQuotaExhaustedUntil = Date.now() + 60 * 1000;
+    }
+    const clinicalRes = generateClinicalEducationResponse(prompt, domain);
     return res.json({
       success: true,
-      answer: `Regarding your query "${prompt.trim()}": Based on clinical health guidelines, monitoring biomarkers and understanding terminology helps facilitate shared decision-making with your physician. Ensure you discuss any persistent symptoms or medication adjustments with your licensed provider.`,
-      sources: ['Mayo Clinic Clinical References', 'CDC Health Guidelines'],
-      confidence: 'clinical-cache',
-      suggestedFollowUps: ['How do I prepare for my doctor appointment?'],
+      answer: clinicalRes.answer,
+      sources: clinicalRes.sources,
+      confidence: clinicalRes.confidence,
+      suggestedFollowUps: clinicalRes.suggestedFollowUps,
     });
   }
 });
@@ -309,10 +359,10 @@ app.get('/api/ai-status', (req, res) => {
   const isConfigured = Boolean(apiKey && apiKey !== 'MY_GEMINI_API_KEY' && apiKey.length > 10);
   res.json({
     isConfigured,
-    model: 'gemini-3.8-flash',
+    model: 'gemini-2.5-flash',
     provider: isConfigured ? 'gemini' : 'verified-clinical-cache',
     statusMessage: isConfigured
-      ? 'Fitmadix AI Assistant is active and grounded in Gemini 3.8 Flash medical intelligence.'
+      ? 'Fitmadix AI Assistant is active and grounded in Gemini 2.5 Flash medical intelligence.'
       : 'Fitmadix is operating on verified clinical cached guidelines.',
   });
 });

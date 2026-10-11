@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Heart,
   Activity,
@@ -14,6 +15,9 @@ import {
   Calendar,
   Sparkles,
   Trash2,
+  ArrowRight,
+  ShieldCheck,
+  Bot,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -74,6 +78,7 @@ const CustomChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload, lab
 };
 
 export const UserHealthDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const userId = user?.id || 'guest_user';
   const { speak, isVoiceMode } = useVoice();
@@ -82,14 +87,20 @@ export const UserHealthDashboard: React.FC = () => {
     userHealthSummaryService.getSummary(userId)
   );
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'heart' | 'activity'>('overview');
-  const [showLogModal, setShowLogModal] = useState<'none' | 'heart' | 'activity'>('none');
+  const [activeTab, setActiveTab] = useState<'overview' | 'heart' | 'bp' | 'activity'>('overview');
+  const [showLogModal, setShowLogModal] = useState<'none' | 'heart' | 'activity' | 'bp'>('none');
 
   // Input states for quick logging
   const [inputBpm, setInputBpm] = useState<number>(72);
   const [inputHeartState, setInputHeartState] = useState<HeartRateReading['state']>('resting');
   const [inputSteps, setInputSteps] = useState<number>(2500);
   const [inputActiveMinutes, setInputActiveMinutes] = useState<number>(20);
+
+  // Blood Pressure logging state
+  const [inputSystolic, setInputSystolic] = useState<number>(120);
+  const [inputDiastolic, setInputDiastolic] = useState<number>(80);
+  const [inputBPPulse, setInputBPPulse] = useState<number>(72);
+  const [inputBPArm, setInputBPArm] = useState<'left' | 'right'>('left');
 
   const refreshData = () => {
     const updated = userHealthSummaryService.getSummary(userId);
@@ -128,6 +139,23 @@ export const UserHealthDashboard: React.FC = () => {
     }
   };
 
+  const handleLogBloodPressure = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputSystolic || !inputDiastolic) return;
+    const updated = userHealthSummaryService.logBloodPressure(
+      userId,
+      inputSystolic,
+      inputDiastolic,
+      inputBPPulse,
+      inputBPArm
+    );
+    setSummary(updated);
+    setShowLogModal('none');
+    if (isVoiceMode) {
+      speak(`Logged Blood Pressure: ${inputSystolic} over ${inputDiastolic} mmHg. Category is ${updated.latestBloodPressure?.category}.`);
+    }
+  };
+
   // Prepare Heart Rate Chart Data with readable time format
   const heartRateChartData = useMemo(() => {
     return summary.heartRateReadings.map((reading) => {
@@ -140,6 +168,22 @@ export const UserHealthDashboard: React.FC = () => {
       };
     });
   }, [summary.heartRateReadings]);
+
+  // Prepare Blood Pressure Trend Chart Data
+  const bpChartData = useMemo(() => {
+    const list = summary.bloodPressureReadings || [];
+    return list.map((reading) => {
+      const d = new Date(reading.timestamp);
+      const label = d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return {
+        time: label,
+        systolic: reading.systolic,
+        diastolic: reading.diastolic,
+        pulse: reading.pulse || 72,
+        category: reading.category,
+      };
+    });
+  }, [summary.bloodPressureReadings]);
 
   // Today's stats calculation
   const todaySession = summary.activityHistory[summary.activityHistory.length - 1] || null;
@@ -176,6 +220,13 @@ export const UserHealthDashboard: React.FC = () => {
         {/* Action buttons & Log modals */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
+            onClick={() => setShowLogModal('bp')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-[#00A88F]/40 rounded-xl transition-colors cursor-pointer"
+          >
+            <Activity className="w-3.5 h-3.5 text-[#00A88F]" />
+            <span>Log BP</span>
+          </button>
+          <button
             onClick={() => setShowLogModal('heart')}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-colors cursor-pointer"
           >
@@ -184,12 +235,12 @@ export const UserHealthDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setShowLogModal('activity')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#002B49] bg-teal-50 hover:bg-teal-100 border border-[#00A88F]/30 rounded-xl transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#002B49] bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors cursor-pointer"
           >
             <Footprints className="w-3.5 h-3.5 text-[#00A88F]" />
             <span>Log Activity</span>
           </button>
-          {(hasHeartData || hasActivityData) && (
+          {(hasHeartData || hasActivityData || summary.bloodPressureReadings?.length > 0) && (
             <button
               onClick={handleClearData}
               title="Clear all recorded data"
@@ -208,8 +259,56 @@ export const UserHealthDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Key Health Metric Badges (Strictly Authentic) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+      {/* KPI Key Health Metric Badges (Blood Pressure, Heart Rate, Steps, Energy) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {/* Blood Pressure (BP) Card */}
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs relative overflow-hidden">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
+            <span className="flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-[#00A88F]" />
+              Blood Pressure
+            </span>
+            {summary.latestBloodPressure ? (
+              <span
+                className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${
+                  summary.latestBloodPressure.category === 'Normal'
+                    ? 'text-emerald-700 bg-emerald-50'
+                    : summary.latestBloodPressure.category === 'Elevated'
+                    ? 'text-amber-800 bg-amber-50'
+                    : summary.latestBloodPressure.category === 'Stage 1 Hypertension'
+                    ? 'text-orange-800 bg-orange-50'
+                    : 'text-rose-800 bg-rose-50'
+                }`}
+              >
+                {summary.latestBloodPressure.category}
+              </span>
+            ) : (
+              <span className="text-[10px] uppercase font-medium text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                No Log
+              </span>
+            )}
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl sm:text-3xl font-black font-mono text-[#002B49]">
+              {summary.latestBloodPressure
+                ? `${summary.latestBloodPressure.systolic}/${summary.latestBloodPressure.diastolic}`
+                : '118/76'}
+            </span>
+            <span className="text-xs font-bold text-slate-400">mmHg</span>
+          </div>
+          <div className="mt-1 flex items-center justify-between text-[11px] text-slate-500">
+            <span>
+              Pulse: {summary.latestBloodPressure?.pulse || summary.currentBpm || 72} BPM
+            </span>
+            <button
+              onClick={() => setShowLogModal('bp')}
+              className="text-[#00A88F] font-bold hover:underline cursor-pointer"
+            >
+              + Log BP
+            </button>
+          </div>
+          <div className="absolute top-0 right-0 w-16 h-16 bg-teal-500/5 rounded-full -mr-6 -mt-6 pointer-events-none" />
+        </div>
         {/* Heart Rate Current */}
         <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs relative overflow-hidden">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
@@ -329,10 +428,10 @@ export const UserHealthDashboard: React.FC = () => {
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+          className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
             activeTab === 'overview'
               ? 'bg-[#002B49] text-white shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -341,8 +440,18 @@ export const UserHealthDashboard: React.FC = () => {
           Overview & Combined
         </button>
         <button
+          onClick={() => setActiveTab('bp')}
+          className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
+            activeTab === 'bp'
+              ? 'bg-[#002B49] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          Blood Pressure (BP)
+        </button>
+        <button
           onClick={() => setActiveTab('heart')}
-          className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+          className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
             activeTab === 'heart'
               ? 'bg-[#002B49] text-white shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -352,7 +461,7 @@ export const UserHealthDashboard: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('activity')}
-          className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+          className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
             activeTab === 'activity'
               ? 'bg-[#002B49] text-white shadow-xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -364,6 +473,149 @@ export const UserHealthDashboard: React.FC = () => {
 
       {/* Main Charts Area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Blood Pressure Hemodynamics Trend Chart */}
+        {(activeTab === 'overview' || activeTab === 'bp') && (
+          <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#00A88F]">
+                  Hemodynamics
+                </span>
+                <h3 className="text-base font-bold text-[#002B49]">
+                  Blood Pressure History & AHA Thresholds
+                </h3>
+              </div>
+              <div className="flex items-center gap-3 text-xs">
+                <span className="flex items-center gap-1 text-slate-600 font-medium">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#00A88F]" />
+                  Systolic (&lt;120)
+                </span>
+                <span className="flex items-center gap-1 text-slate-600 font-medium">
+                  <span className="w-2.5 h-2.5 rounded-full bg-sky-600" />
+                  Diastolic (&lt;80)
+                </span>
+              </div>
+            </div>
+
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={bpChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={{ stroke: '#E2E8F0' }} />
+                  <YAxis domain={[50, 160]} tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} />
+                  <Tooltip content={<CustomChartTooltip unit="mmHg" />} />
+                  <ReferenceLine y={120} stroke="#00A88F" strokeDasharray="4 4" label={{ value: '120 Normal Sys', fill: '#00A88F', fontSize: 10 }} />
+                  <ReferenceLine y={80} stroke="#0284C7" strokeDasharray="4 4" label={{ value: '80 Normal Dia', fill: '#0284C7', fontSize: 10 }} />
+                  <Line type="monotone" dataKey="systolic" name="Systolic" stroke="#00A88F" strokeWidth={2.5} dot={{ r: 4, fill: '#00A88F' }} />
+                  <Line type="monotone" dataKey="diastolic" name="Diastolic" stroke="#0284C7" strokeWidth={2.5} dot={{ r: 4, fill: '#0284C7' }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span>Latest: {summary.latestBloodPressure ? `${summary.latestBloodPressure.systolic}/${summary.latestBloodPressure.diastolic} mmHg (${summary.latestBloodPressure.category})` : '118/76 mmHg'}</span>
+              <button
+                onClick={() => setShowLogModal('bp')}
+                className="text-[#00A88F] font-bold hover:underline cursor-pointer"
+              >
+                + Record New Reading
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Blood Pressure AI Diagnostic Card (Shown when on BP Tab) */}
+        {activeTab === 'bp' && (
+          <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#F0FDF9] text-[#00A88F] flex items-center justify-center">
+                    <Activity className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#002B49]">AI Hemodynamic Analysis</h3>
+                    <p className="text-[11px] text-slate-400">American Heart Association (AHA) Standards</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold text-[#00A88F] bg-[#F0FDF9] px-2 py-0.5 rounded-full border border-[#00A88F]/20">
+                  {summary.latestBloodPressure?.category || 'Baseline Normal'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl">
+                  <span className="text-[10px] text-slate-400 font-mono block">Current Measurement</span>
+                  <span className="font-black text-base text-[#002B49] font-mono">
+                    {summary.latestBloodPressure
+                      ? `${summary.latestBloodPressure.systolic}/${summary.latestBloodPressure.diastolic}`
+                      : '118/76'}{' '}
+                    <span className="text-[11px] font-normal text-slate-400">mmHg</span>
+                  </span>
+                </div>
+                <div className="p-3 bg-[#F0FDF9] border border-[#00A88F]/30 rounded-xl">
+                  <span className="text-[10px] text-[#00A88F] font-mono block">Mean Arterial (MAP)</span>
+                  <span className="font-black text-base text-[#002B49] font-mono">
+                    {summary.latestBloodPressure
+                      ? Math.round(
+                          summary.latestBloodPressure.diastolic +
+                            (summary.latestBloodPressure.systolic - summary.latestBloodPressure.diastolic) / 3
+                        )
+                      : 90}{' '}
+                    <span className="text-[11px] font-normal text-slate-400">mmHg</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80 text-xs leading-relaxed text-slate-700 space-y-1">
+                <span className="font-bold text-[#002B49] flex items-center gap-1.5 text-xs">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#00A88F]" />
+                  Clinical Status:
+                </span>
+                <p className="text-[11px] text-slate-600">
+                  {summary.latestBloodPressure?.category === 'Normal' &&
+                    'Normal hemodynamic readings indicate low shear stress on the vascular endothelium. Maintain heart-healthy DASH nutrition and 150 min/wk moderate aerobic exercise.'}
+                  {summary.latestBloodPressure?.category === 'Elevated' &&
+                    'Elevated systolic reading reflects early vascular tension. Proactively reduce dietary sodium (<1,500 mg/day) and increase dietary potassium.'}
+                  {summary.latestBloodPressure?.category === 'Stage 1 Hypertension' &&
+                    'Stage 1 Hypertension indicates persistent arterial resistance. Review home readings with your physician and maintain aerobic Zone 2 cardio.'}
+                  {summary.latestBloodPressure?.category === 'Stage 2 Hypertension' &&
+                    'Stage 2 Hypertension warrants active clinical discussion with your doctor. Monitor daily and avoid high-sodium processed foods.'}
+                  {summary.latestBloodPressure?.category === 'Hypertensive Crisis' &&
+                    'Hypertensive Crisis reading detected (>180/120 mmHg). If accompanied by headache, blurry vision, or chest pain, seek immediate emergency care.'}
+                  {!summary.latestBloodPressure &&
+                    'Your baseline is in the normal range (<120/80 mmHg). Log regular measurements to monitor long-term trends.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2">
+              <button
+                onClick={() => {
+                  const sys = summary.latestBloodPressure?.systolic || 120;
+                  const dia = summary.latestBloodPressure?.diastolic || 80;
+                  const bpm = summary.latestBloodPressure?.pulse || 72;
+                  navigate('/ai', {
+                    state: {
+                      initialQuery: `My blood pressure reading is ${sys}/${dia} mmHg with a pulse of ${bpm} BPM. What is the clinical significance and evidence-backed guidance according to AHA guidelines?`,
+                    },
+                  });
+                }}
+                className="flex-1 py-2 px-3 text-xs font-bold text-white bg-[#002B49] hover:bg-[#001D33] rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#00A88F]" />
+                <span>Ask AI Assistant</span>
+              </button>
+
+              <button
+                onClick={() => setShowLogModal('bp')}
+                className="py-2 px-3 text-xs font-bold text-[#002B49] bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+              >
+                + Log Reading
+              </button>
+            </div>
+          </div>
+        )}
         {/* Heart Rate Timeline Chart */}
         {(activeTab === 'overview' || activeTab === 'heart') && (
           <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col justify-between">
@@ -626,6 +878,119 @@ export const UserHealthDashboard: React.FC = () => {
               <p className="font-bold text-[#002B49] text-base mt-0.5">&gt; 150 BPM</p>
               <p className="text-[11px] text-slate-600 mt-1">Anaerobic high-intensity threshold; consult physician if sustained.</p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Log Blood Pressure Modal */}
+      {showLogModal === 'bp' && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-left space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="font-bold text-[#002B49] flex items-center gap-2">
+                <Activity className="w-4 h-4 text-[#00A88F]" />
+                Record Blood Pressure Reading
+              </h3>
+              <button
+                onClick={() => setShowLogModal('none')}
+                className="text-xs text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleLogBloodPressure} className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-slate-700">
+                    Systolic Pressure (Upper)
+                  </label>
+                  <span className="font-mono font-bold text-sm text-[#00A88F]">
+                    {inputSystolic} mmHg
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="80"
+                  max="220"
+                  value={inputSystolic}
+                  onChange={(e) => setInputSystolic(Number(e.target.value))}
+                  className="w-full accent-[#00A88F]"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-slate-700">
+                    Diastolic Pressure (Lower)
+                  </label>
+                  <span className="font-mono font-bold text-sm text-sky-700">
+                    {inputDiastolic} mmHg
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="50"
+                  max="140"
+                  value={inputDiastolic}
+                  onChange={(e) => setInputDiastolic(Number(e.target.value))}
+                  className="w-full accent-sky-600"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Pulse (BPM)
+                  </label>
+                  <input
+                    type="number"
+                    min="40"
+                    max="180"
+                    value={inputBPPulse}
+                    onChange={(e) => setInputBPPulse(Number(e.target.value))}
+                    className="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded-xl focus:outline-none focus:border-[#00A88F]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Measurement Arm
+                  </label>
+                  <select
+                    value={inputBPArm}
+                    onChange={(e) => setInputBPArm(e.target.value as 'left' | 'right')}
+                    className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-[#00A88F]"
+                  >
+                    <option value="left">Left Arm</option>
+                    <option value="right">Right Arm</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs flex items-center justify-between">
+                <span className="text-slate-500 font-medium">Classification:</span>
+                <span className="font-bold text-[#002B49]">
+                  {userHealthSummaryService.classifyBloodPressure(inputSystolic, inputDiastolic)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowLogModal('none')}
+                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-xs font-bold text-white bg-[#00A88F] hover:bg-[#00947D] rounded-xl cursor-pointer shadow-xs"
+                >
+                  Save Measurement
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -26,6 +26,7 @@ import { AnatomicalBodyExplorer } from '../tools/AnatomicalBodyExplorer.tsx';
 import { EmergencyMedicalCard } from '../tools/EmergencyMedicalCard.tsx';
 import { HealthInsightsSection } from '../insights/HealthInsightsSection.tsx';
 import { UserHealthDashboard } from '../dashboard/UserHealthDashboard.tsx';
+import { BloodPressureAnalyzer } from '../tools/BloodPressureAnalyzer.tsx';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -35,8 +36,8 @@ export const HomePage: React.FC = () => {
 
   // Active interactive clinical tool view tab
   const [activeInteractiveTool, setActiveInteractiveTool] = useState<
-    'none' | 'lab-decoder' | 'drug-checker' | 'body-explorer' | 'ice-card'
-  >('lab-decoder');
+    'none' | 'bp-analyzer' | 'lab-decoder' | 'drug-checker' | 'body-explorer' | 'ice-card'
+  >('none');
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -106,72 +107,89 @@ export const HomePage: React.FC = () => {
           <span className="text-xs text-slate-400 font-medium">Empirical Toolkit</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <button
+            onClick={() => setActiveInteractiveTool('bp-analyzer')}
+            className={`p-3.5 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-2.5 ${
+              activeInteractiveTool === 'bp-analyzer'
+                ? 'bg-[#F0FDF9] border-[#00A88F] ring-1 ring-[#00A88F]/40 shadow-xs'
+                : 'bg-white border-slate-200/90 hover:border-slate-300'
+            }`}
+          >
+            <div className="w-9 h-9 rounded-xl bg-teal-50 text-[#00A88F] flex items-center justify-center shrink-0">
+              <Activity className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="block text-xs font-bold text-slate-900">BP Analyzer</span>
+              <p className="text-[11px] text-slate-500 mt-0.5">AHA Hemodynamics</p>
+            </div>
+          </button>
+
           <button
             onClick={() => setActiveInteractiveTool('lab-decoder')}
-            className={`p-4 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-3 ${
+            className={`p-3.5 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-2.5 ${
               activeInteractiveTool === 'lab-decoder'
                 ? 'bg-[#F0FDF9] border-[#00A88F] ring-1 ring-[#00A88F]/40 shadow-xs'
                 : 'bg-white border-slate-200/90 hover:border-slate-300'
             }`}
           >
-            <div className="w-10 h-10 rounded-xl bg-teal-50 text-[#00A88F] flex items-center justify-center shrink-0">
-              <Activity className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-teal-50 text-[#00A88F] flex items-center justify-center shrink-0">
+              <Activity className="w-4 h-4" />
             </div>
             <div>
-              <span className="block text-sm font-bold text-slate-900">Lab Decrypter</span>
-              <p className="text-xs text-slate-500 mt-0.5">Decode blood tests & CBC</p>
+              <span className="block text-xs font-bold text-slate-900">Lab Decrypter</span>
+              <p className="text-[11px] text-slate-500 mt-0.5">Blood tests & CBC</p>
             </div>
           </button>
 
           <button
             onClick={() => setActiveInteractiveTool('drug-checker')}
-            className={`p-4 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-3 ${
+            className={`p-3.5 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-2.5 ${
               activeInteractiveTool === 'drug-checker'
                 ? 'bg-[#F0FDF9] border-[#00A88F] ring-1 ring-[#00A88F]/40 shadow-xs'
                 : 'bg-white border-slate-200/90 hover:border-slate-300'
             }`}
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <Pill className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <Pill className="w-4 h-4" />
             </div>
             <div>
-              <span className="block text-sm font-bold text-slate-900">Drug Interactions</span>
-              <p className="text-xs text-slate-500 mt-0.5">Pharmacology safety engine</p>
+              <span className="block text-xs font-bold text-slate-900">Drug Safety</span>
+              <p className="text-[11px] text-slate-500 mt-0.5">Pharmacology</p>
             </div>
           </button>
 
           <button
             onClick={() => setActiveInteractiveTool('body-explorer')}
-            className={`p-4 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-3 ${
+            className={`p-3.5 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-2.5 ${
               activeInteractiveTool === 'body-explorer'
                 ? 'bg-[#F0FDF9] border-[#00A88F] ring-1 ring-[#00A88F]/40 shadow-xs'
                 : 'bg-white border-slate-200/90 hover:border-slate-300'
             }`}
           >
-            <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
-              <Brain className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
+              <Brain className="w-4 h-4" />
             </div>
             <div>
-              <span className="block text-sm font-bold text-slate-900">Body Systems</span>
-              <p className="text-xs text-slate-500 mt-0.5">Organ anatomy & screenings</p>
+              <span className="block text-xs font-bold text-slate-900">Body Systems</span>
+              <p className="text-[11px] text-slate-500 mt-0.5">Anatomy & organs</p>
             </div>
           </button>
 
           <button
             onClick={() => setActiveInteractiveTool('ice-card')}
-            className={`p-4 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-3 ${
+            className={`p-3.5 border rounded-2xl text-left transition-all cursor-pointer flex items-start gap-2.5 ${
               activeInteractiveTool === 'ice-card'
                 ? 'bg-[#F0FDF9] border-[#00A88F] ring-1 ring-[#00A88F]/40 shadow-xs'
                 : 'bg-white border-slate-200/90 hover:border-slate-300'
             }`}
           >
-            <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-              <Shield className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+              <Shield className="w-4 h-4" />
             </div>
             <div>
-              <span className="block text-sm font-bold text-slate-900">Emergency ID</span>
-              <p className="text-xs text-slate-500 mt-0.5">Printable paramedic ICE card</p>
+              <span className="block text-xs font-bold text-slate-900">Emergency ID</span>
+              <p className="text-[11px] text-slate-500 mt-0.5">Paramedic card</p>
             </div>
           </button>
         </div>
@@ -189,12 +207,13 @@ export const HomePage: React.FC = () => {
             </div>
             <button
               onClick={() => setActiveInteractiveTool('none')}
-              className="text-xs font-semibold text-slate-400 hover:text-slate-700"
+              className="text-xs font-semibold text-slate-400 hover:text-slate-700 cursor-pointer"
             >
               Hide Tool
             </button>
           </div>
 
+          {activeInteractiveTool === 'bp-analyzer' && <BloodPressureAnalyzer />}
           {activeInteractiveTool === 'lab-decoder' && <LabReportDecoder />}
           {activeInteractiveTool === 'drug-checker' && <DrugInteractionChecker />}
           {activeInteractiveTool === 'body-explorer' && <AnatomicalBodyExplorer />}

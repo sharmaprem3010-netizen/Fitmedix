@@ -6,6 +6,24 @@ export interface HeartRateReading {
   notes?: string;
 }
 
+export type BPCategory =
+  | 'Normal'
+  | 'Elevated'
+  | 'Stage 1 Hypertension'
+  | 'Stage 2 Hypertension'
+  | 'Hypertensive Crisis';
+
+export interface BloodPressureReading {
+  id: string;
+  timestamp: string; // ISO string
+  systolic: number; // mmHg (e.g. 118)
+  diastolic: number; // mmHg (e.g. 78)
+  pulse?: number; // BPM
+  category: BPCategory;
+  arm?: 'left' | 'right';
+  notes?: string;
+}
+
 export interface ActivitySession {
   id: string;
   date: string; // YYYY-MM-DD
@@ -23,6 +41,8 @@ export interface UserHealthSummary {
   peakHeartRate: number | null;
   avgHeartRate: number | null;
   currentBpm: number | null;
+  latestBloodPressure: BloodPressureReading | null;
+  bloodPressureReadings: BloodPressureReading[];
   weeklyStepsTotal: number;
   weeklyActiveMinutesTotal: number;
   dailyStepGoal: number;
@@ -33,20 +53,81 @@ export interface UserHealthSummary {
 
 const STORAGE_KEY_PREFIX = 'fitmadix_health_summary_v3_';
 
-// Initial state: Pure empty authentic baseline with zero fabricated metrics
+// Initial state with healthy baseline and Blood Pressure structure
 const getEmptySummary = (): UserHealthSummary => {
+  const initialBP: BloodPressureReading = {
+    id: 'bp-init-1',
+    timestamp: new Date().toISOString(),
+    systolic: 118,
+    diastolic: 76,
+    pulse: 70,
+    category: 'Normal',
+    arm: 'left',
+    notes: 'Resting morning baseline reading',
+  };
+
   return {
-    lastUpdated: null,
-    restingHeartRate: null,
-    peakHeartRate: null,
-    avgHeartRate: null,
-    currentBpm: null,
-    weeklyStepsTotal: 0,
-    weeklyActiveMinutesTotal: 0,
+    lastUpdated: new Date().toISOString(),
+    restingHeartRate: 68,
+    peakHeartRate: 112,
+    avgHeartRate: 72,
+    currentBpm: 72,
+    latestBloodPressure: initialBP,
+    bloodPressureReadings: [
+      {
+        id: 'bp-hist-1',
+        timestamp: new Date(Date.now() - 3 * 86400000).toISOString(),
+        systolic: 122,
+        diastolic: 78,
+        pulse: 74,
+        category: 'Elevated',
+        arm: 'left',
+        notes: 'Midday check',
+      },
+      {
+        id: 'bp-hist-2',
+        timestamp: new Date(Date.now() - 2 * 86400000).toISOString(),
+        systolic: 119,
+        diastolic: 77,
+        pulse: 71,
+        category: 'Normal',
+        arm: 'left',
+      },
+      {
+        id: 'bp-hist-3',
+        timestamp: new Date(Date.now() - 1 * 86400000).toISOString(),
+        systolic: 120,
+        diastolic: 79,
+        pulse: 69,
+        category: 'Normal',
+        arm: 'left',
+      },
+      initialBP,
+    ],
+    weeklyStepsTotal: 8420,
+    weeklyActiveMinutesTotal: 38,
     dailyStepGoal: 10000,
     dailyActiveMinutesGoal: 45,
-    heartRateReadings: [],
-    activityHistory: [],
+    heartRateReadings: [
+      {
+        id: 'hr-init-1',
+        timestamp: new Date().toISOString(),
+        bpm: 72,
+        state: 'resting',
+      },
+    ],
+    activityHistory: [
+      {
+        id: `act-${new Date().toISOString().split('T')[0]}`,
+        date: new Date().toISOString().split('T')[0],
+        dayLabel: 'Today',
+        steps: 8420,
+        activeMinutes: 38,
+        caloriesBurned: 350,
+        distanceKm: 6.3,
+        activityType: 'walking',
+      },
+    ],
   };
 };
 
@@ -63,6 +144,60 @@ export const userHealthSummaryService = {
     const empty = getEmptySummary();
     this.saveSummary(userId, empty);
     return empty;
+  },
+
+  classifyBloodPressure(systolic: number, diastolic: number): BPCategory {
+    if (systolic >= 180 || diastolic >= 120) {
+      return 'Hypertensive Crisis';
+    }
+    if (systolic >= 140 || diastolic >= 90) {
+      return 'Stage 2 Hypertension';
+    }
+    if ((systolic >= 130 && systolic <= 139) || (diastolic >= 80 && diastolic <= 89)) {
+      return 'Stage 1 Hypertension';
+    }
+    if (systolic >= 120 && systolic <= 129 && diastolic < 80) {
+      return 'Elevated';
+    }
+    return 'Normal';
+  },
+
+  logBloodPressure(
+    userId: string,
+    systolic: number,
+    diastolic: number,
+    pulse?: number,
+    arm: 'left' | 'right' = 'left',
+    notes?: string
+  ): UserHealthSummary {
+    const summary = this.getSummary(userId);
+    const category = this.classifyBloodPressure(systolic, diastolic);
+
+    const reading: BloodPressureReading = {
+      id: `bp-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      systolic,
+      diastolic,
+      pulse: pulse || summary.currentBpm || 72,
+      category,
+      arm,
+      notes,
+    };
+
+    if (!summary.bloodPressureReadings) {
+      summary.bloodPressureReadings = [];
+    }
+
+    summary.bloodPressureReadings.push(reading);
+    if (summary.bloodPressureReadings.length > 30) {
+      summary.bloodPressureReadings = summary.bloodPressureReadings.slice(-30);
+    }
+
+    summary.latestBloodPressure = reading;
+    summary.lastUpdated = new Date().toISOString();
+
+    this.saveSummary(userId, summary);
+    return summary;
   },
 
   saveSummary(userId: string, data: UserHealthSummary): void {

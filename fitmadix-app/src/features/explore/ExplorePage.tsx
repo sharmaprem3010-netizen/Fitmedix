@@ -22,6 +22,7 @@ import { DrugInteractionChecker } from '../tools/DrugInteractionChecker.tsx';
 import { AnatomicalBodyExplorer } from '../tools/AnatomicalBodyExplorer.tsx';
 import { EmergencyMedicalCard } from '../tools/EmergencyMedicalCard.tsx';
 import { HealthInsightsSection } from '../insights/HealthInsightsSection.tsx';
+import { BloodPressureAnalyzer } from '../tools/BloodPressureAnalyzer.tsx';
 
 interface ExploreModule {
   id: string;
@@ -31,7 +32,7 @@ interface ExploreModule {
   icon: React.ComponentType<{ className?: string }>;
   plannedSources: string[];
   capabilities: string[];
-  interactiveComponent?: 'lab' | 'drug' | 'anatomy' | 'ice' | 'insights';
+  interactiveComponent?: 'lab' | 'drug' | 'anatomy' | 'ice' | 'insights' | 'bp';
   directRoute?: string;
 }
 
@@ -39,11 +40,21 @@ export const ExplorePage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeModule, setActiveModule] = useState<ExploreModule | null>(null);
-  const [activeToolView, setActiveToolView] = useState<'lab' | 'drug' | 'anatomy' | 'ice' | 'insights' | null>(null);
+  const [activeToolView, setActiveToolView] = useState<'lab' | 'drug' | 'anatomy' | 'ice' | 'insights' | 'bp' | null>(null);
 
   const categories = ['All', 'Health', 'Fitness', 'Medical Records', 'AI Tools', 'Healthcare'];
 
   const modules: ExploreModule[] = [
+    {
+      id: 'bp-analyzer',
+      category: 'Health',
+      title: 'Blood Pressure (BP) Clinical Analyzer & Tracker',
+      description: 'Evaluate systolic and diastolic hemodynamic readings against AHA/ACC guidelines with instant AI clinical interpretation.',
+      icon: Activity,
+      plannedSources: ['American Heart Association (AHA)', 'American College of Cardiology (ACC)', 'Mayo Clinic'],
+      capabilities: ['AHA Diagnostic Classification', 'Mean Arterial Pressure (MAP) computation', 'Instant AI Hemodynamic breakdown & logging'],
+      interactiveComponent: 'bp',
+    },
     {
       id: 'medicines',
       category: 'Health',
@@ -190,6 +201,7 @@ export const ExplorePage: React.FC = () => {
           {activeToolView === 'anatomy' && <AnatomicalBodyExplorer />}
           {activeToolView === 'ice' && <EmergencyMedicalCard />}
           {activeToolView === 'insights' && <HealthInsightsSection />}
+          {activeToolView === 'bp' && <BloodPressureAnalyzer />}
         </div>
       </div>
     );

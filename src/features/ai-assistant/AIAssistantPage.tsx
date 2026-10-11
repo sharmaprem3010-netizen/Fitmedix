@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Sparkles,
   Mic,
@@ -37,6 +38,8 @@ interface ChatMessage {
 export const AIAssistantPage: React.FC = () => {
   const { isVoiceMode, speak, startListening, stopListening, isListening, transcript } = useVoice();
   const { language } = useLanguage();
+  const location = useLocation();
+  const initialQueryHandledRef = useRef(false);
 
   const [status, setStatus] = useState<AIServiceStatus | null>(null);
   const [query, setQuery] = useState('');
@@ -47,6 +50,14 @@ export const AIAssistantPage: React.FC = () => {
   useEffect(() => {
     aiService.getStatus().then((st) => setStatus(st));
   }, []);
+
+  useEffect(() => {
+    const initQ = (location.state as any)?.initialQuery;
+    if (initQ && typeof initQ === 'string' && !initialQueryHandledRef.current) {
+      initialQueryHandledRef.current = true;
+      executeQuery(initQ);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (transcript) {
