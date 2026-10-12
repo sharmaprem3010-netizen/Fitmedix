@@ -46,10 +46,21 @@ export const AIAssistantPage: React.FC = () => {
   const [selectedDomain, setSelectedDomain] = useState<AIQueryDomain>('health-education');
   const [loading, setLoading] = useState<boolean>(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     aiService.getStatus().then((st) => setStatus(st));
   }, []);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (messages.length > 0 || loading) {
+      scrollToBottom();
+    }
+  }, [messages, loading]);
 
   useEffect(() => {
     const initQ = (location.state as any)?.initialQuery;
@@ -212,13 +223,22 @@ export const AIAssistantPage: React.FC = () => {
       {/* Conversation Thread */}
       {messages.length > 0 && (
         <div className="space-y-4 pt-2">
+          <div className="flex items-center justify-between text-xs text-slate-500 pb-1">
+            <span className="font-bold">{messages.length} message{messages.length > 1 ? 's' : ''} in consultation</span>
+            <button
+              onClick={() => setMessages([])}
+              className="text-slate-400 hover:text-rose-600 hover:underline cursor-pointer text-[11px]"
+            >
+              Clear Thread
+            </button>
+          </div>
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`p-5 rounded-2xl border text-xs leading-relaxed space-y-3 ${
+              className={`p-4 sm:p-5 rounded-2xl border text-xs leading-relaxed space-y-3 break-words ${
                 msg.sender === 'user'
-                  ? 'bg-slate-100/90 border-slate-200 text-slate-900 ml-8 sm:ml-16'
-                  : 'bg-white border-slate-200/90 shadow-2xs text-slate-800 mr-4 sm:mr-8 bg-medical-grid'
+                  ? 'bg-slate-100/90 border-slate-200 text-slate-900 ml-4 sm:ml-16'
+                  : 'bg-white border-slate-200/90 shadow-2xs text-slate-800 mr-2 sm:mr-8 bg-medical-grid'
               }`}
             >
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
@@ -275,6 +295,7 @@ export const AIAssistantPage: React.FC = () => {
               )}
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
       )}
 
@@ -304,7 +325,7 @@ export const AIAssistantPage: React.FC = () => {
         <div className="p-5 bg-white border border-slate-200 rounded-2xl animate-pulse space-y-3">
           <div className="flex items-center gap-2 text-xs font-bold text-[#00A88F]">
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            <span>Consulting Medical Knowledge Base...</span>
+            <span>Consulting Gemini Medical Intelligence...</span>
           </div>
           <div className="w-3/4 h-3 bg-slate-200 rounded" />
           <div className="w-5/6 h-3 bg-slate-200 rounded" />
@@ -313,19 +334,25 @@ export const AIAssistantPage: React.FC = () => {
       )}
 
       {/* Query Input Box */}
-      <form onSubmit={handleSubmit} className="bg-white border border-slate-200/90 rounded-2xl shadow-xs p-4 sm:p-5 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-white border border-slate-200/90 rounded-2xl shadow-xs p-3.5 sm:p-5 space-y-3">
         <div className="relative">
           <textarea
             rows={3}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type your medical education question or lab test inquiry..."
-            className="w-full p-3.5 text-sm text-slate-900 bg-slate-50/50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00A88F] focus:bg-white resize-none"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                executeQuery(query);
+              }
+            }}
+            placeholder="Type your medical education question (e.g. 'explain 135/85 mmHg BP' or 'what does high MCV mean?'). Press Enter to submit..."
+            className="w-full p-3 sm:p-3.5 text-sm text-slate-900 bg-slate-50/50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00A88F] focus:bg-white resize-none"
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+          <div className="flex items-center justify-between sm:justify-start gap-2">
             {/* Microphone button for speech input */}
             <button
               type="button"
@@ -348,11 +375,11 @@ export const AIAssistantPage: React.FC = () => {
                 </>
               )}
             </button>
-            <span className="text-[11px] text-slate-400">Web Speech API</span>
+            <span className="text-[10px] sm:text-[11px] text-slate-400">Press Enter ↵ to Send</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button type="submit" disabled={!query.trim() || loading} size="sm">
+          <div className="w-full sm:w-auto">
+            <Button type="submit" disabled={!query.trim() || loading} size="sm" className="w-full sm:w-auto justify-center">
               <span>{loading ? 'Synthesizing...' : 'Send Question'}</span>
               <Send className="w-3.5 h-3.5 ml-1" />
             </Button>

@@ -171,9 +171,9 @@ export const BloodPressureAnalyzer: React.FC = () => {
       </div>
 
       {/* Main Interactive Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-w-0">
         {/* Left Column: Interactive Input Controls */}
-        <div className="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-5">
+        <div className="lg:col-span-5 min-w-0 bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-2xs space-y-5">
           <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between">
             <span>Input BP Measurement</span>
             <span className="text-[11px] font-mono text-slate-400">Unit: mmHg</span>
@@ -363,9 +363,9 @@ export const BloodPressureAnalyzer: React.FC = () => {
         </div>
 
         {/* Right Column: Clinical Classification & Actionable Insights */}
-        <div className="lg:col-span-7 space-y-5">
+        <div className="lg:col-span-7 min-w-0 space-y-5">
           {/* Classification Banner */}
-          <div className={`p-6 rounded-2xl border-2 ${categoryDetail.borderCol} bg-white shadow-sm space-y-4`}>
+          <div className={`p-4 sm:p-6 rounded-2xl border-2 ${categoryDetail.borderCol} bg-white shadow-sm space-y-4 min-w-0`}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">

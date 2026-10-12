@@ -133,8 +133,8 @@ export const HomePage: React.FC = () => {
                 : 'bg-white border-slate-200/90 hover:border-slate-300'
             }`}
           >
-            <div className="w-9 h-9 rounded-xl bg-teal-50 text-[#00A88F] flex items-center justify-center shrink-0">
-              <Activity className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <FileText className="w-4 h-4" />
             </div>
             <div>
               <span className="block text-xs font-bold text-slate-900">Lab Decrypter</span>
@@ -197,7 +197,7 @@ export const HomePage: React.FC = () => {
 
       {/* Featured Interactive Tool Display Area */}
       {activeInteractiveTool !== 'none' && (
-        <section className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm">
+        <section className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-sm min-w-0">
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#00A88F]" />

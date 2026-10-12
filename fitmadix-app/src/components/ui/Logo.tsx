@@ -14,10 +14,11 @@ export const FitmadixLogo: React.FC<LogoProps> = ({
   showTagline = true,
 }) => {
   const sizeMap = {
-    sm: { symbol: 28, text: 'text-base', tagline: 'text-[8px]', height: 'h-8' },
-    md: { symbol: 38, text: 'text-xl', tagline: 'text-[9px]', height: 'h-10' },
-    lg: { symbol: 52, text: 'text-2xl', tagline: 'text-[10px]', height: 'h-14' },
-    xl: { symbol: 72, text: 'text-4xl', tagline: 'text-xs', height: 'h-20' },
+    xs: { symbol: 20, text: 'text-xs', tagline: 'text-[7px]', height: 'h-6' },
+    sm: { symbol: 24, text: 'text-sm sm:text-base', tagline: 'text-[8px]', height: 'h-7' },
+    md: { symbol: 32, text: 'text-base sm:text-xl', tagline: 'text-[9px]', height: 'h-9' },
+    lg: { symbol: 48, text: 'text-xl sm:text-2xl', tagline: 'text-[10px]', height: 'h-12' },
+    xl: { symbol: 64, text: 'text-3xl sm:text-4xl', tagline: 'text-xs', height: 'h-16' },
   };
 
   const currentSize = sizeMap[size];

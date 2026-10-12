@@ -65,15 +65,15 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       </a>
 
       {/* Top Bar with Official Fitmadix Logo and 3-Zone Contract */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-8">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-18 flex items-center justify-between gap-2 sm:gap-4 md:gap-8">
           {/* Zone 1: Official Brand Logo & Wordmark */}
           <Link
             to="/home"
-            className="whitespace-nowrap shrink-0 group flex items-center"
+            className="shrink-0 group flex items-center"
             aria-label="Fitmadix Home"
           >
-            <FitmadixLogo variant="full" size="md" showTagline={false} />
+            <FitmadixLogo variant="full" size="sm" showTagline={false} />
           </Link>
 
           {/* Zone 2: 5 single-line clean nav links */}
@@ -265,7 +265,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
       {/* Mobile Navigation Bar with Safe Area Bottom */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 flex items-center justify-around py-1.5 px-2 pb-safe shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 flex items-center justify-between py-1.5 px-1.5 pb-safe shadow-lg"
         aria-label="Mobile Navigation"
       >
         {navLinks.map((item) => {
@@ -275,14 +275,14 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
             <Link
               key={item.to}
               to={item.to}
-              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap min-w-[56px] min-h-[44px] ${
+              className={`flex-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl text-[10px] font-bold transition-all text-center min-h-[44px] ${
                 isActive
                   ? 'text-[#00A88F] bg-[#F0FDF9]'
                   : 'text-slate-500 hover:text-slate-900 active:bg-slate-50'
               }`}
             >
-              <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'text-[#00A88F]' : 'text-slate-400'}`} />
-              <span className="leading-tight">{item.label}</span>
+              <Icon className={`w-5 h-5 mb-0.5 shrink-0 ${isActive ? 'text-[#00A88F]' : 'text-slate-400'}`} />
+              <span className="leading-tight truncate max-w-[64px]">{item.label}</span>
             </Link>
           );
         })}

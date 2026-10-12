@@ -167,7 +167,7 @@ Strict Requirements:
         });
 
         const timeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('AI generation timeout')), 6000)
+          setTimeout(() => reject(new Error('AI generation timeout')), 16000)
         );
 
         const response: any = await Promise.race([aiCall, timeout]);
@@ -177,8 +177,8 @@ Strict Requirements:
           successfulModel = modelName;
           break;
         }
-      } catch {
-        // Continue to next candidate model
+      } catch (candidateErr: any) {
+        console.warn(`Health-insights model ${modelName} error:`, candidateErr?.message || candidateErr);
       }
     }
 
@@ -299,7 +299,7 @@ Strict Clinical Directives:
         });
 
         const timeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('AI response timeout')), 7000)
+          setTimeout(() => reject(new Error('AI response timeout')), 16000)
         );
 
         const response: any = await Promise.race([chatCall, timeout]);
@@ -309,8 +309,8 @@ Strict Clinical Directives:
           usedModel = modelName;
           break;
         }
-      } catch {
-        // Try next candidate model
+      } catch (candidateErr: any) {
+        console.warn(`AI chat candidate ${modelName} error:`, candidateErr?.message || candidateErr);
       }
     }
 

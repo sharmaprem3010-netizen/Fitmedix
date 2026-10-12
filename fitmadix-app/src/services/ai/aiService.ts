@@ -45,8 +45,11 @@ export function generateClinicalEducationResponse(prompt: string, domain?: strin
     };
   }
 
-  // 2. Short, Greeting, or Single-Character Prompts (e.g. "a", "hi", "help")
-  if (q.length <= 2 || ['hi', 'hello', 'hey', 'start', 'help', 'test', 'menu', 'who are you'].includes(q)) {
+  // 2. Short, Greeting, or Single-Character Prompts (e.g. "a", "hi", "help") (excluding medical acronyms like "bp")
+  if (
+    (q.length <= 2 && q !== 'bp') ||
+    ['hi', 'hello', 'hey', 'start', 'help', 'test', 'menu', 'who are you', 'howdy'].includes(q)
+  ) {
     return {
       answer: `Hello! I am your Fitmadix Clinical Health Assistant.
 
@@ -683,11 +686,11 @@ export class FitMadixAIService implements AIServiceInterface {
 
       if (res.ok) {
         const data = await res.json();
-        if (data.success && data.answer && data.answer.length > 50) {
+        if (data.success && data.answer && data.answer.trim().length > 0) {
           return {
             answer: data.answer,
             sources: data.sources || ['WHO Clinical Guidelines', 'NIH / PubMed Literature'],
-            confidence: data.confidence || 'verified-gemini-3.8-flash',
+            confidence: data.confidence || 'verified-gemini-2.5-flash',
             disclaimer:
               'This information is educational and not medical diagnosis or prescription. Consult a licensed physician for individualized medical advice.',
             suggestedFollowUps: data.suggestedFollowUps || [],

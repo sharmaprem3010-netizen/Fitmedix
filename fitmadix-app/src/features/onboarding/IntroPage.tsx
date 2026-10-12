@@ -89,31 +89,31 @@ export const IntroPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between selection:bg-[#00A88F]/20 selection:text-[#002B49] bg-medical-grid">
       {/* Top Header with Official Logo */}
-      <header className="border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-          <Link to="/intro" className="group flex items-center">
-            <FitmadixLogo size="md" showTagline={false} />
+      <header className="border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-2xs w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-18 flex items-center justify-between gap-2">
+          <Link to="/intro" className="group flex items-center shrink-0" aria-label="FitMadix Home">
+            <FitmadixLogo size="sm" showTagline={false} />
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {isVoiceMode && (
               <button
                 onClick={handleReadIntro}
-                className="hidden sm:inline-flex text-xs text-[#00A88F] bg-[#F0FDF9] hover:bg-[#E0FBF4] px-3.5 py-1.5 rounded-full font-bold border border-[#00A88F]/30 transition-colors cursor-pointer"
+                className="hidden md:inline-flex text-xs text-[#00A88F] bg-[#F0FDF9] hover:bg-[#E0FBF4] px-3 py-1.5 rounded-full font-bold border border-[#00A88F]/30 transition-colors cursor-pointer"
               >
-                <Volume2 className="w-3.5 h-3.5 mr-1.5" />
+                <Volume2 className="w-3.5 h-3.5 mr-1" />
                 <span>Read aloud</span>
               </button>
             )}
             <Link
               to="/login"
-              className="px-4 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs font-bold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg sm:rounded-xl hover:bg-slate-50 transition-colors whitespace-nowrap"
             >
               {t.logIn}
             </Link>
             <Link
               to="/signup"
-              className="px-4 py-2 text-xs font-bold text-white bg-[#002B49] hover:bg-[#001D33] rounded-xl transition-colors shadow-xs"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-bold text-white bg-[#002B49] hover:bg-[#001D33] rounded-lg sm:rounded-xl transition-colors shadow-xs whitespace-nowrap"
             >
               {t.signUp}
             </Link>
@@ -122,60 +122,60 @@ export const IntroPage: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 flex-1 space-y-16">
-        <div className="max-w-3xl space-y-6 text-left">
+      <main className="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 md:py-20 flex-1 space-y-10 sm:space-y-16 overflow-x-hidden">
+        <div className="max-w-3xl w-full space-y-4 sm:space-y-6 text-left">
           {/* Unboxed Metadata Kicker */}
-          <div className="flex items-center gap-2 text-xs font-bold text-[#00A88F] tracking-wide uppercase">
-            <span className="w-2 h-2 rounded-full bg-[#00A88F] animate-pulse" />
+          <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs font-bold text-[#00A88F] tracking-wide uppercase">
+            <span className="w-2 h-2 rounded-full bg-[#00A88F] animate-pulse shrink-0" />
             <span>Clinical Intelligence Platform</span>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="text-slate-300">·</span>
             <span>Multilingual</span>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="text-slate-300">·</span>
             <span>WCAG AA Accessible</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#002B49] leading-[1.1]">
+          <h1 className="text-2xl sm:text-4xl lg:text-6xl font-black tracking-tight text-[#002B49] leading-[1.15] sm:leading-[1.1] break-words">
             Your Health, <span className="text-[#00A88F]">Our Priority.</span>
           </h1>
 
-          <p className="text-base sm:text-xl text-slate-600 leading-relaxed font-normal">
+          <p className="text-xs sm:text-base lg:text-xl text-slate-600 leading-relaxed font-normal">
             Understand your health. Make better-informed decisions. An accessible, privacy-first digital health platform built on verified medical literature, interactive clinical decrypters, and zero fabricated data.
           </p>
 
           {/* Action Row */}
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 pt-1 sm:pt-2 w-full">
             <button
               onClick={() => handleExplore('/home')}
-              className="px-6 py-3.5 text-sm font-bold text-white bg-[#00A88F] hover:bg-[#00947D] active:bg-[#007D69] rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer flex items-center gap-2"
+              className="w-full sm:w-auto px-5 py-3 text-xs sm:text-sm font-bold text-white bg-[#00A88F] hover:bg-[#00947D] active:bg-[#007D69] rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer flex items-center justify-center gap-2"
             >
               <span>{isAuthenticated ? 'Open Health Dashboard' : t.exploreFitmadix}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 shrink-0" />
             </button>
             {!isAuthenticated ? (
               <Link
                 to="/signup"
-                className="px-6 py-3.5 text-sm font-bold text-[#002B49] bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-colors cursor-pointer shadow-2xs"
+                className="w-full sm:w-auto px-5 py-3 text-xs sm:text-sm font-bold text-[#002B49] bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-colors cursor-pointer shadow-2xs text-center"
               >
                 {t.signUp}
               </Link>
             ) : (
               <Link
                 to="/explore"
-                className="px-6 py-3.5 text-sm font-bold text-[#002B49] bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-colors cursor-pointer shadow-2xs"
+                className="w-full sm:w-auto px-5 py-3 text-xs sm:text-sm font-bold text-[#002B49] bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-colors cursor-pointer shadow-2xs text-center"
               >
                 Explore Clinical Tools
               </Link>
             )}
             <Link
               to="/language"
-              className="px-4 py-3.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+              className="w-full sm:w-auto px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors text-center"
             >
               Language Switcher
             </Link>
           </div>
 
           {/* Medical Responsibility Note */}
-          <div className="pt-3 flex items-start gap-2.5 text-xs text-slate-500">
+          <div className="pt-2 flex items-start gap-2 text-[11px] sm:text-xs text-slate-500">
             <ShieldCheck className="w-4 h-4 text-[#00A88F] shrink-0 mt-0.5" />
             <p>
               Strictly evidence-backed health guidance. Never substitutes for licensed professional medical advice, clinical diagnosis, or emergency dispatch.
@@ -184,19 +184,19 @@ export const IntroPage: React.FC = () => {
         </div>
 
         {/* Evidence Credibility Ticker */}
-        <div className="p-4 bg-white/90 border border-slate-200/90 rounded-2xl shadow-2xs flex flex-wrap items-center justify-between gap-4 text-xs">
-          <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+        <div className="p-3.5 sm:p-4 bg-white/90 border border-slate-200/90 rounded-2xl shadow-2xs space-y-2 text-xs">
+          <span className="font-bold text-slate-700 uppercase tracking-wider text-[10px] sm:text-[11px] block">
             Empirical Medical References:
           </span>
-          <div className="flex flex-wrap items-center gap-4 font-semibold text-slate-600 text-xs">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 font-semibold text-slate-600 text-[11px] sm:text-xs">
             <span>🏛 American Heart Association (AHA)</span>
-            <span>·</span>
+            <span aria-hidden="true" className="hidden sm:inline text-slate-300">·</span>
             <span>🏛 World Health Organization (WHO)</span>
-            <span>·</span>
+            <span aria-hidden="true" className="hidden sm:inline text-slate-300">·</span>
             <span>🏛 National Institutes of Health (NIH)</span>
-            <span>·</span>
+            <span aria-hidden="true" className="hidden sm:inline text-slate-300">·</span>
             <span>🏛 Mayo Clinic Clinical Standards</span>
-            <span>·</span>
+            <span aria-hidden="true" className="hidden sm:inline text-slate-300">·</span>
             <span>🏛 FDA National Drug Code</span>
           </div>
         </div>
