@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --color-fitmadix-teal: #00A88F;
+    --color-fitmadix-navy: #002B49;
+    --color-fitmadix-emerald: #2EAA4D;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-color: #f8fafc;
+    color: #0f172a;
+  }
+
+  /* Accessible focus rings */
+  *:focus-visible {
+    outline: 2px solid #00A88F;
+    outline-offset: 2px;
+  }
+
+  /* High contrast mode overrides */
+  .high-contrast {
+    --tw-border-opacity: 1;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+  }
+
+  .high-contrast .bg-slate-50,
+  .high-contrast .bg-white,
+  .high-contrast .bg-slate-100 {
+    background-color: #ffffff !important;
+    border-color: #000000 !important;
+  }
+
+  .high-contrast button,
+  .high-contrast a,
+  .high-contrast input,
+  .high-contrast select,
+  .high-contrast textarea {
+    border-color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  .high-contrast .text-slate-500,
+  .high-contrast .text-slate-600,
+  .high-contrast .text-slate-700 {
+    color: #111827 !important;
+  }
+
+  /* Text size adjustments */
+  .text-size-standard {
+    font-size: 100%;
+  }
+
+  .text-size-large {
+    font-size: 112.5%;
+  }
+
+  .text-size-xlarge {
+    font-size: 125%;
+  }
+}
+
+/* Subtle medical grid background pattern */
+.bg-medical-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 168, 143, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 168, 143, 0.04) 1px, transparent 1px);
+}
+
+/* Safe area padding utilities for mobile devices */
+.pb-safe {
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+}
+.pt-safe {
+  padding-top: max(16px, env(safe-area-inset-top, 16px));
+}
+
+/* Hide scrollbars while allowing touch scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ambient glow accents */
+.bg-radial-teal {
+  background: radial-gradient(circle at 50% 0%, rgba(0, 168, 143, 0.08) 0%, transparent 60%);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
