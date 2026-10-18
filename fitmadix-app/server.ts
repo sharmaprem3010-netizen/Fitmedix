@@ -94,22 +94,43 @@ const FALLBACK_INSIGHTS = [
   },
 ];
 
+// In-memory cache for generated health insights to prevent duplicate concurrent LLM calls
+const insightsMemoryCache = new Map<string, { timestamp: number; source: string; insights: any[] }>();
+const INSIGHTS_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
 // Health Insights API Endpoint
 app.post('/api/health-insights', async (req, res) => {
-  const { category, focusTopic } = req.body || {};
+  const { category, focusTopic, forceRefresh } = req.body || {};
   const apiKey = process.env.GEMINI_API_KEY;
 
   // Filter fallback insights by category if specified
   const getFilteredFallbacks = (cat?: string) => {
     if (!cat || cat === 'All') return FALLBACK_INSIGHTS;
-    return FALLBACK_INSIGHTS.filter(
+    const filtered = FALLBACK_INSIGHTS.filter(
       (item) => item.category.toLowerCase() === cat.toLowerCase()
     );
+    return filtered.length > 0 ? filtered : FALLBACK_INSIGHTS;
   };
 
-  // If no valid key configured or in quota cooldown, return verified clinical cache immediately
+  const cacheKey = `${category || 'All'}::${(focusTopic || '').trim().toLowerCase()}`;
+  const cached = insightsMemoryCache.get(cacheKey);
+  if (cached && !forceRefresh && Date.now() - cached.timestamp < INSIGHTS_CACHE_TTL_MS) {
+    return res.json({
+      success: true,
+      source: cached.source,
+      insights: cached.insights,
+    });
+  }
+
+  // If no valid key configured, in quota cooldown, or standard initial load without custom topic/refresh, serve verified clinical cache immediately
   const isInQuotaCooldown = Date.now() < geminiQuotaExhaustedUntil;
-  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY' || apiKey.length < 10 || isInQuotaCooldown) {
+  if (
+    (!focusTopic && !forceRefresh) ||
+    !apiKey ||
+    apiKey === 'MY_GEMINI_API_KEY' ||
+    apiKey.length < 10 ||
+    isInQuotaCooldown
+  ) {
     return res.json({
       success: true,
       source: 'verified-clinical-cache',
@@ -118,7 +139,7 @@ app.post('/api/health-insights', async (req, res) => {
   }
 
   try {
-    const promptText = `Generate 6 verified, evidence-backed medical insights and snippets for clinical health education.
+    const promptText = `Generate 4 verified, evidence-backed medical insights and snippets for clinical health education.
 Category focus: ${category && category !== 'All' ? category : 'General Preventive Medicine, Cardiology, Neurology, Endocrinology, and Nutrition'}.
 ${focusTopic ? `Specific focus topic: ${focusTopic}` : ''}
 
@@ -129,11 +150,12 @@ Strict Requirements:
 4. Output must be a JSON array of objects.`;
 
     // Multi-model fallback cascade starting with fast and reliable gemini-2.5-flash
-    const candidateModels = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+    const candidateModels = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite-preview'];
     let parsed: any = null;
     let successfulModel = '';
 
     for (const modelName of candidateModels) {
+      let timerId: ReturnType<typeof setTimeout> | null = null;
       try {
         const aiCall = ai.models.generateContent({
           model: modelName,
@@ -166,26 +188,34 @@ Strict Requirements:
           },
         });
 
-        const timeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('AI generation timeout')), 16000)
-        );
+        const timeout = new Promise((_, reject) => {
+          timerId = setTimeout(() => reject(new Error('timeout')), 12000);
+        });
 
         const response: any = await Promise.race([aiCall, timeout]);
+        if (timerId) clearTimeout(timerId);
+
         const text = response.text?.trim() || '[]';
         parsed = JSON.parse(text);
         if (Array.isArray(parsed) && parsed.length > 0) {
           successfulModel = modelName;
           break;
         }
-      } catch (candidateErr: any) {
-        console.warn(`Health-insights model ${modelName} error:`, candidateErr?.message || candidateErr);
+      } catch {
+        if (timerId) clearTimeout(timerId);
       }
     }
 
     if (Array.isArray(parsed) && parsed.length > 0) {
+      const sourceLabel = successfulModel || 'gemini-2.5-flash-grounded';
+      insightsMemoryCache.set(cacheKey, {
+        timestamp: Date.now(),
+        source: sourceLabel,
+        insights: parsed,
+      });
       return res.json({
         success: true,
-        source: successfulModel || 'gemini-2.5-flash-grounded',
+        source: sourceLabel,
         insights: parsed,
       });
     }
@@ -209,7 +239,7 @@ Strict Requirements:
 });
 
 // GET endpoint as convenience
-app.get('/api/health-insights', async (req, res) => {
+app.get('/api/health-insights', async (_req, res) => {
   return res.json({
     success: true,
     source: 'verified-clinical-cache',
@@ -219,7 +249,8 @@ app.get('/api/health-insights', async (req, res) => {
 
 // AI Assistant Chat & Medical Inquiry Endpoint
 app.post('/api/ai-chat', async (req, res) => {
-  const { prompt, domain, userContext } = req.body || {};
+  const { prompt: rawPrompt, query: rawQuery, domain, userContext } = req.body || {};
+  const prompt = rawPrompt || rawQuery;
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!prompt || typeof prompt !== 'string') {
@@ -284,11 +315,12 @@ Strict Clinical Directives:
 9. If the query is in Spanish, Hindi, or Bengali, provide the answer fluently in that language while preserving clinical accuracy.`;
 
     // Multi-model candidate cascade
-    const candidateModels = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+    const candidateModels = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite-preview'];
     let answerText = '';
     let usedModel = 'gemini-2.5-flash';
 
     for (const modelName of candidateModels) {
+      let timerId: ReturnType<typeof setTimeout> | null = null;
       try {
         const chatCall = ai.models.generateContent({
           model: modelName,
@@ -298,19 +330,21 @@ Strict Clinical Directives:
           },
         });
 
-        const timeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('AI response timeout')), 16000)
-        );
+        const timeout = new Promise((_, reject) => {
+          timerId = setTimeout(() => reject(new Error('timeout')), 14000);
+        });
 
         const response: any = await Promise.race([chatCall, timeout]);
+        if (timerId) clearTimeout(timerId);
+
         const text = response.text?.trim() || '';
         if (text && text.length > 20) {
           answerText = text;
           usedModel = modelName;
           break;
         }
-      } catch (candidateErr: any) {
-        console.warn(`AI chat candidate ${modelName} error:`, candidateErr?.message || candidateErr);
+      } catch {
+        if (timerId) clearTimeout(timerId);
       }
     }
 

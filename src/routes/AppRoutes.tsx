@@ -19,6 +19,7 @@ import { ExplorePage } from '../features/explore/ExplorePage.tsx';
 import { AIAssistantPage } from '../features/ai-assistant/AIAssistantPage.tsx';
 import { MedicalRecordsPage } from '../features/medical-reports/MedicalRecordsPage.tsx';
 import { ProfilePage } from '../features/profile/ProfilePage.tsx';
+import { HealthDashboard } from '../features/dashboard/HealthDashboard.tsx';
 
 /**
  * Route protection wrapper: guarantees authenticated session
@@ -114,6 +115,16 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <AppLayout>
               <HomePage />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <HealthDashboard />
             </AppLayout>
           </ProtectedRoute>
         }

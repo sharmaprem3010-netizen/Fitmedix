@@ -66,7 +66,7 @@ export const HealthInsightsSection: React.FC<HealthInsightsSectionProps> = ({
     'Digestive & Immunity',
   ];
 
-  const fetchInsights = async (cat?: string, topic?: string) => {
+  const fetchInsights = async (cat?: string, topic?: string, forceRefresh = false) => {
     setLoading(true);
     try {
       const response = await fetch('/api/health-insights', {
@@ -75,6 +75,7 @@ export const HealthInsightsSection: React.FC<HealthInsightsSectionProps> = ({
         body: JSON.stringify({
           category: cat || selectedCategory,
           focusTopic: topic || searchQuery,
+          forceRefresh,
         }),
       });
       const data = await response.json();
@@ -82,20 +83,20 @@ export const HealthInsightsSection: React.FC<HealthInsightsSectionProps> = ({
         setInsights(data.insights);
         setSourceType(data.source || 'verified-clinical-cache');
       }
-    } catch (err) {
-      console.warn('Could not fetch live insights, using fallback:', err);
+    } catch {
+      // Fallback handled silently
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchInsights(selectedCategory);
+    fetchInsights(selectedCategory, searchQuery, false);
   }, [selectedCategory]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchInsights(selectedCategory, searchQuery);
+    fetchInsights(selectedCategory, searchQuery, true);
   };
 
   const toggleSave = (e: React.MouseEvent, id: string) => {
@@ -192,7 +193,7 @@ export const HealthInsightsSection: React.FC<HealthInsightsSectionProps> = ({
 
           <div className="flex items-center gap-2.5">
             <button
-              onClick={() => fetchInsights()}
+              onClick={() => fetchInsights(selectedCategory, searchQuery, true)}
               disabled={loading}
               className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-[#002B49] bg-white hover:bg-[#F0FDF9] border border-slate-200 hover:border-[#00A88F]/40 rounded-xl transition-all cursor-pointer shadow-2xs disabled:opacity-50"
               title="Generate fresh medical snippets"

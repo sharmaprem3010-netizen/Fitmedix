@@ -26,6 +26,7 @@ import { AnatomicalBodyExplorer } from '../tools/AnatomicalBodyExplorer.tsx';
 import { EmergencyMedicalCard } from '../tools/EmergencyMedicalCard.tsx';
 import { HealthInsightsSection } from '../insights/HealthInsightsSection.tsx';
 import { UserHealthDashboard } from '../dashboard/UserHealthDashboard.tsx';
+import { HealthDashboard } from '../dashboard/HealthDashboard.tsx';
 import { BloodPressureAnalyzer } from '../tools/BloodPressureAnalyzer.tsx';
 
 export const HomePage: React.FC = () => {
@@ -221,7 +222,10 @@ export const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* User Health Summary Dashboard with Recharts */}
+      {/* Unified HealthDashboard with AuthContext Fitness Stats & Recent Medical Insights */}
+      <HealthDashboard />
+
+      {/* Detailed Hemodynamic & Vitals Telemetry */}
       <UserHealthDashboard />
 
       {/* Main Two-Column Layout: Profile Context & Records Vault */}
